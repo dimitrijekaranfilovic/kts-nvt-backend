@@ -35,4 +35,15 @@ public class Table extends BaseEntity{
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "table")
     private Set<Order> orders = new HashSet<>();
+
+    public void addOrder(Order order){
+        orders.add(order);
+        order.setTable(this);
+    }
+
+    public void removeOrder(Order order){
+        orders.remove(order);
+        order.setTable(null);
+    }
+
 }

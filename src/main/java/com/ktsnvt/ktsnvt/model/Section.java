@@ -25,4 +25,15 @@ public class Section extends BaseEntity{
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "section")
     private Set<Table> tables = new HashSet<>();
+
+    public void addTable(Table table){
+        tables.add(table);
+        table.setSection(this);
+    }
+
+    public void removeTable(Table table){
+        tables.remove(table);
+        table.setSection(null);
+    }
+
 }

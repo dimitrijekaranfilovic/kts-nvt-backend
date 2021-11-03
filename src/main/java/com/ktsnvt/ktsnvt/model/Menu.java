@@ -22,9 +22,10 @@ public class Menu extends BaseEntity {
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
 
-    @Column(name = "end_date", nullable = false)
+    @Column(name = "end_date", nullable = true)
     private LocalDate endDate;
 
     @OneToMany(fetch = FetchType.LAZY)
     private Set<MenuItem> menuItems = new HashSet<>();
+    
 }

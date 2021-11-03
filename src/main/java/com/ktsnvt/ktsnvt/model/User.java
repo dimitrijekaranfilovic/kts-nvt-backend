@@ -31,4 +31,15 @@ public abstract class User extends BaseEntity{
 
     @OneToMany(fetch = FetchType.LAZY)
     private Set<Salary> salaries = new HashSet<>();
+
+    public void addSalary(Salary salary){
+        salaries.add(salary);
+        salary.setUser(this);
+    }
+
+    public void removeSalary(Salary salary){
+        salaries.remove(salary);
+        salary.setUser(null);
+    }
+
 }

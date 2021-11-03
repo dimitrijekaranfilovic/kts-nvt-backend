@@ -9,6 +9,7 @@ import lombok.Setter;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.util.HashSet;
 
 @Getter
 @Setter
@@ -23,4 +24,11 @@ public class Employee extends User {
 
     @Column(name = "type", nullable = false)
     private EmployeeType type;
+
+    public Employee(String name, String surname, Authority authority, Integer pinCode, EmployeeType employeeType){
+        super(name, surname, authority, new HashSet<>());
+        pin = pinCode;
+        type = employeeType;
+    }
+
 }
