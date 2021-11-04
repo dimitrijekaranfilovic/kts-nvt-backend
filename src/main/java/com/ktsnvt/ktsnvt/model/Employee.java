@@ -1,22 +1,19 @@
 package com.ktsnvt.ktsnvt.model;
 
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import java.util.HashSet;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 @Table(name = "employees")
+@Where(clause = "is_active = true")
 public class Employee extends User {
 
     @Column(name = "pin", nullable = false)
@@ -25,8 +22,12 @@ public class Employee extends User {
     @Column(name = "type", nullable = false)
     private EmployeeType type;
 
-    public Employee(String name, String surname, Authority authority, Integer pinCode, EmployeeType employeeType){
-        super(name, surname, authority, new HashSet<>());
+    public Employee() {
+        super();
+    }
+
+    public Employee(String name, String surname, Authority authority, Integer pinCode, EmployeeType employeeType) {
+        super(name, surname, authority);
         pin = pinCode;
         type = employeeType;
     }

@@ -1,9 +1,8 @@
 package com.ktsnvt.ktsnvt.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -12,24 +11,23 @@ import java.util.Set;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
-@javax.persistence.Table(name = "orders")
-public class Order extends BaseEntity{
+@Table(name = "orders")
+@Where(clause = "is_active = true")
+public class Order extends BaseEntity {
 
     @Column(name = "finished", nullable = false)
-    private Boolean finished = false;
+    private Boolean finished;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "served_at", nullable = false)
+    @Column(name = "served_at", nullable = true)
     private LocalDateTime servedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "table_id")
-    private Table table;
+    private RestaurantTable restaurantTable;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Employee waiter;
@@ -37,12 +35,25 @@ public class Order extends BaseEntity{
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "order")
     private Set<OrderItemGroup> itemGroups = new HashSet<>();
 
-    public void addOrderItemGroup(OrderItemGroup group){
+    public Order() {
+        super();
+    }
+
+    public Order(Boolean finished, LocalDateTime createdAt, LocalDateTime servedAt, RestaurantTable restaurantTable, Employee waiter) {
+        this();
+        this.finished = finished;
+        this.createdAt = createdAt;
+        this.servedAt = servedAt;
+        this.restaurantTable = restaurantTable;
+        this.waiter = waiter;
+    }
+
+    public void addOrderItemGroup(OrderItemGroup group) {
         itemGroups.add(group);
         group.setOrder(this);
     }
 
-    public void removeOrderItemGroup(OrderItemGroup group){
+    public void removeOrderItemGroup(OrderItemGroup group) {
         itemGroups.remove(group);
         group.setOrder(null);
     }

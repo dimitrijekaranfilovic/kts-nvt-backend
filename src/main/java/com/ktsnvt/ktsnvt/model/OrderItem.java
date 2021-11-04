@@ -1,19 +1,17 @@
 package com.ktsnvt.ktsnvt.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
-import javax.persistence.*;
 import javax.persistence.Table;
+import javax.persistence.*;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 @Table(name = "order_items")
+@Where(clause = "is_active = true")
 public class OrderItem extends BaseEntity {
 
     @Column(name = "amount", nullable = false)
@@ -28,4 +26,16 @@ public class OrderItem extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private MenuItem item;
+
+    public OrderItem() {
+        super();
+    }
+
+    public OrderItem(Integer amount, OrderItemGroup group, Employee preparedBy, MenuItem item) {
+        this();
+        this.amount = amount;
+        this.orderItemGroup = group;
+        this.preparedBy = preparedBy;
+        this.item = item;
+    }
 }

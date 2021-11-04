@@ -1,39 +1,43 @@
 package com.ktsnvt.ktsnvt.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
-@javax.persistence.Table(name = "sections")
-public class Section extends BaseEntity{
+@Table(name = "sections")
+@Where(clause = "is_active = true")
+public class Section extends BaseEntity {
 
     @Column(name = "name", nullable = false)
     private String name;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "section")
-    private Set<Table> tables = new HashSet<>();
+    private Set<RestaurantTable> restaurantTables = new HashSet<>();
 
-    public void addTable(Table table){
-        tables.add(table);
-        table.setSection(this);
+    public Section() {
+        super();
     }
 
-    public void removeTable(Table table){
-        tables.remove(table);
-        table.setSection(null);
+    public Section(String name) {
+        this();
+        this.name = name;
+    }
+
+    public void addTable(RestaurantTable restaurantTable) {
+        restaurantTables.add(restaurantTable);
+        restaurantTable.setSection(this);
+    }
+
+    public void removeTable(RestaurantTable restaurantTable) {
+        restaurantTables.remove(restaurantTable);
+        restaurantTable.setSection(null);
     }
 
 }

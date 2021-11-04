@@ -1,19 +1,17 @@
 package com.ktsnvt.ktsnvt.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
-import javax.persistence.*;
 import javax.persistence.Table;
+import javax.persistence.*;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 @Table(name = "menu_items")
+@Where(clause = "is_active = true")
 public class MenuItem extends BaseEntity {
 
     @Column(name = "price", nullable = false)
@@ -21,4 +19,14 @@ public class MenuItem extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     private InventoryItem item;
+
+    public MenuItem() {
+        super();
+    }
+
+    public MenuItem(Double price, InventoryItem item) {
+        this();
+        this.price = price;
+        this.item = item;
+    }
 }
