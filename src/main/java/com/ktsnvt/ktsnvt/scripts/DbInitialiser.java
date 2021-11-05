@@ -5,11 +5,9 @@ import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
 import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
 import com.ktsnvt.ktsnvt.model.enums.SuperUserType;
 import com.ktsnvt.ktsnvt.repository.*;
-import org.springframework.aop.scope.ScopedProxyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +15,8 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+
+import static com.ktsnvt.ktsnvt.model.enums.OrderStatus.*;
 
 @Component
 public class DbInitialiser implements ApplicationRunner {
@@ -142,9 +142,9 @@ public class DbInitialiser implements ApplicationRunner {
         tableRepo.save(restaurantTable8);
         tableRepo.save(restaurantTable9);
 
-        Order order1 = new Order(true, LocalDateTime.parse("2021-01-01 12:12", formatter), LocalDateTime.parse("2021-01-01 12:15", formatter), restaurantTable1, employee3);
-        Order order2 = new Order(false, LocalDateTime.now(), null, restaurantTable1, employee3);
-        Order order3 = new Order(false, LocalDateTime.now(), null, restaurantTable1, employee3);
+        Order order1 = new Order(CHARGED, LocalDateTime.parse("2021-01-01 12:12", formatter), LocalDateTime.parse("2021-01-01 12:15", formatter), restaurantTable1, employee3);
+        Order order2 = new Order(CREATED, LocalDateTime.now(), null, restaurantTable1, employee3);
+        Order order3 = new Order(IN_PROGRESS, LocalDateTime.now(), null, restaurantTable1, employee3);
         orderRepo.save(order1);
         orderRepo.save(order2);
         orderRepo.save(order3);

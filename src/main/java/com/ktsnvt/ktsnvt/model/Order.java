@@ -1,5 +1,6 @@
 package com.ktsnvt.ktsnvt.model;
 
+import com.ktsnvt.ktsnvt.model.enums.OrderStatus;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Where;
@@ -16,8 +17,8 @@ import java.util.Set;
 @Where(clause = "is_active = true")
 public class Order extends BaseEntity {
 
-    @Column(name = "finished", nullable = false)
-    private Boolean finished;
+    @Column(name = "status", nullable = false)
+    private OrderStatus status;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -39,9 +40,9 @@ public class Order extends BaseEntity {
         super();
     }
 
-    public Order(Boolean finished, LocalDateTime createdAt, LocalDateTime servedAt, RestaurantTable restaurantTable, Employee waiter) {
+    public Order(OrderStatus status, LocalDateTime createdAt, LocalDateTime servedAt, RestaurantTable restaurantTable, Employee waiter) {
         this();
-        this.finished = finished;
+        this.status = status;
         this.createdAt = createdAt;
         this.servedAt = servedAt;
         this.restaurantTable = restaurantTable;

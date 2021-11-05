@@ -6,6 +6,7 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.Table;
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -16,6 +17,15 @@ public class OrderItem extends BaseEntity {
 
     @Column(name = "amount", nullable = false)
     private Integer amount;
+
+    @Column(name = "sent_at", nullable = true)
+    private LocalDateTime sentAt;
+
+    @Column(name = "taken_at", nullable = true)
+    private LocalDateTime takenAt;
+
+    @Column(name = "prepared_at", nullable = true)
+    private LocalDateTime preparedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "orderItemGroup_id")

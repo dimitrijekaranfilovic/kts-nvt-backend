@@ -27,6 +27,12 @@ public class RestaurantTable extends BaseEntity {
     @Column(name = "r", nullable = false)
     private Integer r;
 
+    @Column(name = "ready_groups", nullable = false)
+    private Integer readyGroups;
+
+    @Column(name = "avaliable", nullable = false)
+    private Boolean avaliable;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "section_id")
     private Section section;
@@ -45,6 +51,8 @@ public class RestaurantTable extends BaseEntity {
         this.y = y;
         this.r = r;
         this.section = section;
+        this.readyGroups = 0;
+        this.avaliable = true;
     }
 
     public void addOrder(Order order) {
