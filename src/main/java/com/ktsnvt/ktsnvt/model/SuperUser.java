@@ -16,7 +16,7 @@ import javax.persistence.Table;
 @Where(clause = "is_active = true")
 public class SuperUser extends User {
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Column(name = "password", nullable = false)

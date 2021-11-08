@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping(value = "api/employees")
 public class EmployeeController {
@@ -29,7 +31,7 @@ public class EmployeeController {
     // PRE AUTHORIZER (ADMIN, MANAGER)
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CreateEmployeeResponse createEmployee(@RequestBody CreateEmployeeRequest request) {
+    public CreateEmployeeResponse createEmployee(@RequestBody @Valid CreateEmployeeRequest request) {
         var employee = createEmployeeToEmployee.convert(request);
         var result = employeeService.create(employee);
         return employeeToCreateEmployee.convert(result);

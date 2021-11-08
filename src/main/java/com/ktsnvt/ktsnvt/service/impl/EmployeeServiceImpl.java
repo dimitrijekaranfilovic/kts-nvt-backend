@@ -7,6 +7,8 @@ import com.ktsnvt.ktsnvt.service.AuthorityService;
 import com.ktsnvt.ktsnvt.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -20,6 +22,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Employee create(Employee employee) {
         var samePinEmployee = employeeRepository.findByPin(employee.getPin());
         if (samePinEmployee.isPresent()) {
