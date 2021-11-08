@@ -1,9 +1,7 @@
 package com.ktsnvt.ktsnvt;
 
 import com.ktsnvt.ktsnvt.model.*;
-import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
-import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
-import com.ktsnvt.ktsnvt.model.enums.SuperUserType;
+import com.ktsnvt.ktsnvt.model.enums.*;
 import com.ktsnvt.ktsnvt.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -78,11 +76,11 @@ public class DbInitializer implements ApplicationRunner {
         salaryRepo.save(salary4);
         salaryRepo.save(salary5);
 
-        var employee1 = new Employee("Jovan", "Jovovic", chef, 1234, EmployeeType.CHEF);
+        var employee1 = new Employee("Jovan", "Jovovic", chef, "1234", EmployeeType.CHEF);
         employee1.addSalary(salary1);
-        var employee2 = new Employee("Svetlana", "Markovic", bartender, 5678, EmployeeType.BARTENDER);
+        var employee2 = new Employee("Svetlana", "Markovic", bartender, "5678", EmployeeType.BARTENDER);
         employee2.addSalary(salary2);
-        var employee3 = new Employee("Marko", "Kovacevic", waiter, 4321, EmployeeType.WAITER);
+        var employee3 = new Employee("Marko", "Kovacevic", waiter, "4321", EmployeeType.WAITER);
         employee3.addSalary(salary3);
         employeeRepo.save(employee1);
         employeeRepo.save(employee2);
@@ -148,8 +146,27 @@ public class DbInitializer implements ApplicationRunner {
         orderRepo.save(order2);
         orderRepo.save(order3);
 
-        var page = orderRepo.examplePage(PageRequest.of(0, 2));
-        System.out.println(page.getTotalPages());
+        var orderGroup1 = new OrderItemGroup("Group 1", OrderItemGroupStatus.SENT, null);
+        order1.addOrderItemGroup(orderGroup1);
+        orderItemGroupRepo.save(orderGroup1);
+
+        var orderItem1 = new OrderItem(2, orderGroup1, null, menuItem1, OrderItemStatus.SENT);
+        var orderItem2 = new OrderItem(1, orderGroup1, null, menuItem2, OrderItemStatus.SENT);
+        var orderItem3 = new OrderItem(1, orderGroup1, null, menuItem3, OrderItemStatus.SENT);
+        var orderItem4 = new OrderItem(1, orderGroup1, null, menuItem3, OrderItemStatus.NEW);
+        orderGroup1.addItem(orderItem1);
+        orderItem1.setSentAt(LocalDateTime.now());
+        orderGroup1.addItem(orderItem2);
+        orderItem2.setSentAt(LocalDateTime.now());
+        orderGroup1.addItem(orderItem3);
+        orderItem3.setSentAt(LocalDateTime.now());
+        orderGroup1.addItem(orderItem4);
+        orderItem4.setSentAt(LocalDateTime.now());
+        orderItemRepo.save(orderItem1);
+        orderItemRepo.save(orderItem2);
+        orderItemRepo.save(orderItem3);
+        orderItemRepo.save(orderItem4);
+
 
     }
 }
