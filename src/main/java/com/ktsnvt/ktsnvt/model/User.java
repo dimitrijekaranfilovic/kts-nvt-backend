@@ -27,7 +27,7 @@ public abstract class User extends BaseEntity {
     @JoinColumn(name = "authority_id")
     private Authority authority;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Salary> salaries = new HashSet<>();
 
     protected User() {

@@ -78,11 +78,11 @@ public class DbInitializer implements ApplicationRunner {
         salaryRepo.save(salary4);
         salaryRepo.save(salary5);
 
-        var employee1 = new Employee("Jovan", "Jovovic", chef, 1234, EmployeeType.CHEF);
+        var employee1 = new Employee("Jovan", "Jovovic", chef, "1234", EmployeeType.CHEF);
         employee1.addSalary(salary1);
-        var employee2 = new Employee("Svetlana", "Markovic", bartender, 5678, EmployeeType.BARTENDER);
+        var employee2 = new Employee("Svetlana", "Markovic", bartender, "5678", EmployeeType.BARTENDER);
         employee2.addSalary(salary2);
-        var employee3 = new Employee("Marko", "Kovacevic", waiter, 4321, EmployeeType.WAITER);
+        var employee3 = new Employee("Marko", "Kovacevic", waiter, "4321", EmployeeType.WAITER);
         employee3.addSalary(salary3);
         employeeRepo.save(employee1);
         employeeRepo.save(employee2);

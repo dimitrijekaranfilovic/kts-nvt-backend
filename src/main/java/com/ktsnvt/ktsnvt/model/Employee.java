@@ -16,8 +16,8 @@ import javax.persistence.Table;
 @Where(clause = "is_active = true")
 public class Employee extends User {
 
-    @Column(name = "pin", nullable = false)
-    private Integer pin;
+    @Column(name = "pin", nullable = false, unique = true)
+    private String pin;
 
     @Column(name = "type", nullable = false)
     private EmployeeType type;
@@ -26,7 +26,7 @@ public class Employee extends User {
         super();
     }
 
-    public Employee(String name, String surname, Authority authority, Integer pinCode, EmployeeType employeeType) {
+    public Employee(String name, String surname, Authority authority, String pinCode, EmployeeType employeeType) {
         super(name, surname, authority);
         pin = pinCode;
         type = employeeType;
