@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -67,11 +68,11 @@ public class DbInitializer implements ApplicationRunner {
         authorityRepo.save(manager);
         authorityRepo.save(admin);
 
-        var salary1 = new Salary(LocalDate.parse("2021-01-01"), null, 500.00, null);
-        var salary2 = new Salary(LocalDate.parse("2021-01-01"), null, 500.00, null);
-        var salary3 = new Salary(LocalDate.parse("2021-01-01"), null, 500.00, null);
-        var salary4 = new Salary(LocalDate.parse("2021-01-01"), null, 500.00, null);
-        var salary5 = new Salary(LocalDate.parse("2021-01-01"), null, 500.00, null);
+        var salary1 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
+        var salary2 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
+        var salary3 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
+        var salary4 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
+        var salary5 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
         salaryRepo.save(salary1);
         salaryRepo.save(salary2);
         salaryRepo.save(salary3);
