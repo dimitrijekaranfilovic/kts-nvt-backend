@@ -1,4 +1,4 @@
-package com.ktsnvt.ktsnvt.valueobjects;
+package com.ktsnvt.ktsnvt.exception;
 
 import org.springframework.http.HttpStatus;
 
