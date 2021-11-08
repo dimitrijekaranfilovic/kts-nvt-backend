@@ -1,5 +1,6 @@
 package com.ktsnvt.ktsnvt.service.impl;
 
+import com.ktsnvt.ktsnvt.exception.PinAlreadyExistsException;
 import com.ktsnvt.ktsnvt.model.Employee;
 import com.ktsnvt.ktsnvt.repository.EmployeeRepository;
 import com.ktsnvt.ktsnvt.service.AuthorityService;
@@ -20,6 +21,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee create(Employee employee) {
+        var samePinEmployee = employeeRepository.findByPin(employee.getPin());
+        if (samePinEmployee.isPresent()) {
+            throw new PinAlreadyExistsException(employee.getPin());
+        }
         var authority = authorityService.findByName(employee.getType().toString());
         employee.setAuthority(authority);
         return employeeRepository.save(employee);
