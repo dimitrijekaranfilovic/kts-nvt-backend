@@ -1,5 +1,6 @@
 package com.ktsnvt.ktsnvt.model;
 
+import com.ktsnvt.ktsnvt.model.enums.OrderItemStatus;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Where;
@@ -37,15 +38,19 @@ public class OrderItem extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private MenuItem item;
 
+    @Column(name = "status", nullable = false)
+    private OrderItemStatus status;
+
     public OrderItem() {
         super();
     }
 
-    public OrderItem(Integer amount, OrderItemGroup group, Employee preparedBy, MenuItem item) {
+    public OrderItem(Integer amount, OrderItemGroup group, Employee preparedBy, MenuItem item, OrderItemStatus status) {
         this();
         this.amount = amount;
         this.orderItemGroup = group;
         this.preparedBy = preparedBy;
         this.item = item;
+        this.status = status;
     }
 }
