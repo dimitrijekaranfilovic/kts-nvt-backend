@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -95,9 +96,9 @@ public class DbInitializer implements ApplicationRunner {
         superUserRepo.save(manager1);
         superUserRepo.save(admin1);
 
-        var item1 = new InventoryItem("Ice cream", 70.00, "Description", "image", "Allergies", ItemCategory.FOOD);
-        var item2 = new InventoryItem("T-bone steak", 440.00, "Description", "image", "Allergies", ItemCategory.FOOD);
-        var item3 = new InventoryItem("Orange juice", 50.00, "Description", "image", "Allergies", ItemCategory.DRINK);
+        var item1 = new InventoryItem("Ice cream", BigDecimal.valueOf(70.00), "Description", "image", "Allergies", ItemCategory.FOOD);
+        var item2 = new InventoryItem("T-bone steak", BigDecimal.valueOf(440.00), "Description", "image", "Allergies", ItemCategory.FOOD);
+        var item3 = new InventoryItem("Orange juice", BigDecimal.valueOf(50.00), "Description", "image", "Allergies", ItemCategory.DRINK);
         inventoryItemRepo.save(item1);
         inventoryItemRepo.save(item2);
         inventoryItemRepo.save(item3);
