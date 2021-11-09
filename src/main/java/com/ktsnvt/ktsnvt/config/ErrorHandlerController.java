@@ -30,7 +30,7 @@ public class ErrorHandlerController {
         return new ErrorInfo(request.getRequestURI(), ex.getMessage(), LocalDateTime.now(), HttpStatus.BAD_REQUEST);
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFoundException.class)
     @ResponseBody
     public ErrorInfo handleNotFoundException(HttpServletRequest request, NotFoundException ex) {

@@ -15,7 +15,7 @@ import javax.persistence.Table;
 @Where(clause = "is_active = true")
 public class Authority extends BaseEntity {
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
     public Authority() {

@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -67,22 +68,22 @@ public class DbInitializer implements ApplicationRunner {
         authorityRepo.save(manager);
         authorityRepo.save(admin);
 
-        var salary1 = new Salary(LocalDate.parse("2021-01-01"), null, 500.00, null);
-        var salary2 = new Salary(LocalDate.parse("2021-01-01"), null, 500.00, null);
-        var salary3 = new Salary(LocalDate.parse("2021-01-01"), null, 500.00, null);
-        var salary4 = new Salary(LocalDate.parse("2021-01-01"), null, 500.00, null);
-        var salary5 = new Salary(LocalDate.parse("2021-01-01"), null, 500.00, null);
+        var salary1 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
+        var salary2 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
+        var salary3 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
+        var salary4 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
+        var salary5 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
         salaryRepo.save(salary1);
         salaryRepo.save(salary2);
         salaryRepo.save(salary3);
         salaryRepo.save(salary4);
         salaryRepo.save(salary5);
 
-        var employee1 = new Employee("Jovan", "Jovovic", chef, 1234, EmployeeType.CHEF);
+        var employee1 = new Employee("Jovan", "Jovovic", chef, "1234", EmployeeType.CHEF);
         employee1.addSalary(salary1);
-        var employee2 = new Employee("Svetlana", "Markovic", bartender, 5678, EmployeeType.BARTENDER);
+        var employee2 = new Employee("Svetlana", "Markovic", bartender, "5678", EmployeeType.BARTENDER);
         employee2.addSalary(salary2);
-        var employee3 = new Employee("Marko", "Kovacevic", waiter, 4321, EmployeeType.WAITER);
+        var employee3 = new Employee("Marko", "Kovacevic", waiter, "4321", EmployeeType.WAITER);
         employee3.addSalary(salary3);
         employeeRepo.save(employee1);
         employeeRepo.save(employee2);
