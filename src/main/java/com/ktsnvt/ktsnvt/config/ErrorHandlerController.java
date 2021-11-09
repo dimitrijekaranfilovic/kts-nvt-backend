@@ -89,12 +89,5 @@ public class ErrorHandlerController {
     }
 
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(OrderItemGroupInvalidStatusException.class)
-    @ResponseBody
-    public ErrorInfo handleOrderItemGroupInvalidStatusException(HttpServletRequest request, OrderItemGroupInvalidStatusException ex){
-        return new ErrorInfo(request.getRequestURI(), ex.getMessage(), LocalDateTime.now(), HttpStatus.BAD_REQUEST);
-    }
-
 
 }
