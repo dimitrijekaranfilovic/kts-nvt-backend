@@ -9,12 +9,12 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 
 @Service
-public class SectionServiceImp implements SectionService {
+public class SectionServiceImpl implements SectionService {
 
     private final SectionRepository sectionRepository;
 
     @Autowired
-    public SectionServiceImp(SectionRepository sectionRepository) {
+    public SectionServiceImpl(SectionRepository sectionRepository) {
         this.sectionRepository = sectionRepository;
     }
 
