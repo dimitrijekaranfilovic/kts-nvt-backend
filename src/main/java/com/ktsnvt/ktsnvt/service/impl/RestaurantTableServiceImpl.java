@@ -5,6 +5,7 @@ import com.ktsnvt.ktsnvt.model.RestaurantTable;
 import com.ktsnvt.ktsnvt.repository.RestaurantTableRepository;
 import com.ktsnvt.ktsnvt.repository.SectionRepository;
 import com.ktsnvt.ktsnvt.service.RestaurantTableService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -15,6 +16,7 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
     private final RestaurantTableRepository restaurantTableRepository;
     private final SectionRepository sectionRepository;
 
+    @Autowired
     public RestaurantTableServiceImpl(RestaurantTableRepository restaurantTableRepository,
                                       SectionRepository sectionRepository) {
         this.restaurantTableRepository = restaurantTableRepository;
