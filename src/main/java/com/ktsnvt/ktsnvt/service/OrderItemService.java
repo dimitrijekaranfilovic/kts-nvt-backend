@@ -1,5 +1,6 @@
 package com.ktsnvt.ktsnvt.service;
 
+import com.ktsnvt.ktsnvt.model.Employee;
 import com.ktsnvt.ktsnvt.model.OrderItem;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,4 +19,6 @@ public interface OrderItemService {
     void takeItemRequest(Integer itemId, String employeePin);
 
     void finishItemRequest(Integer itemId, String employeePin);
+
+    boolean hasActiveOrderItems(Employee employee);
 }

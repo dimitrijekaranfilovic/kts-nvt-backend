@@ -52,4 +52,11 @@ public class SuperUserController {
         var page = superUserService.read(request.getQuery(), request.getSalaryLowerBound(), request.getSalaryUpperBound(), request.getType(), pageable);
         return page.map(superUserToReadSuperUserResponse::convert);
     }
+
+    // PRE AUTHORIZE (ADMIN)
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteManager(@PathVariable Integer id) {
+        superUserService.deleteManager(id);
+    }
 }

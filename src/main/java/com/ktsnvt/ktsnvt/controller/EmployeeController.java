@@ -52,4 +52,11 @@ public class EmployeeController {
         var page = employeeService.read(request.getQuery(), request.getSalaryLowerBound(), request.getSalaryUpperBound(), request.getType(), pageable);
         return page.map(employeeToReadEmployee::convert);
     }
+
+    // PRE AUTHORIZE (ADMIN, MANAGER)
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteEmployee(@PathVariable Integer id) {
+        employeeService.delete(id);
+    }
 }

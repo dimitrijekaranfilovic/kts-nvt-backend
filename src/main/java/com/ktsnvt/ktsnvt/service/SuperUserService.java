@@ -11,4 +11,6 @@ public interface SuperUserService {
     SuperUser create(SuperUser superUser);
 
     Page<SuperUser> read(String query, BigDecimal salaryFrom, BigDecimal salaryTo, SuperUserType type, Pageable pageable);
+
+    void deleteManager(Integer id);
 }
