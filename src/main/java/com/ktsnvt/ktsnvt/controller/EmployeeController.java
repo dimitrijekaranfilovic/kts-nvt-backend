@@ -4,6 +4,7 @@ import com.ktsnvt.ktsnvt.dto.createemployee.CreateEmployeeRequest;
 import com.ktsnvt.ktsnvt.dto.createemployee.CreateEmployeeResponse;
 import com.ktsnvt.ktsnvt.dto.reademployees.ReadEmployeesRequest;
 import com.ktsnvt.ktsnvt.dto.reademployees.ReadEmployeesResponse;
+import com.ktsnvt.ktsnvt.dto.updateemployee.UpdateEmployeeRequest;
 import com.ktsnvt.ktsnvt.model.Employee;
 import com.ktsnvt.ktsnvt.service.EmployeeService;
 import com.ktsnvt.ktsnvt.support.EntityConverter;
@@ -51,6 +52,13 @@ public class EmployeeController {
     public Page<ReadEmployeesResponse> readEmployees(ReadEmployeesRequest request, @PageableDefault Pageable pageable) {
         var page = employeeService.read(request.getQuery(), request.getSalaryLowerBound(), request.getSalaryUpperBound(), request.getType(), pageable);
         return page.map(employeeToReadEmployee::convert);
+    }
+
+    // PRE AUTHORIZE (ADMIN, MANAGER)
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void update(@PathVariable Integer id, @RequestBody @Valid UpdateEmployeeRequest request) {
+        employeeService.update(id, request.getName(), request.getSurname(), request.getPin(), request.getType());
     }
 
     // PRE AUTHORIZE (ADMIN, MANAGER)

@@ -10,7 +10,11 @@ import java.math.BigDecimal;
 public interface EmployeeService {
     Employee create(Employee employee);
 
+    Employee readForUpdate(Integer id);
+
     Page<Employee> read(String query, BigDecimal salaryFrom, BigDecimal salaryTo, EmployeeType type, Pageable pageable);
 
     void delete(Integer id);
+
+    void update(Integer id, String name, String surname, String pin, EmployeeType type);
 }

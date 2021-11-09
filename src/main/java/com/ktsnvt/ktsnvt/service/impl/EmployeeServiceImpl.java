@@ -1,8 +1,6 @@
 package com.ktsnvt.ktsnvt.service.impl;
 
-import com.ktsnvt.ktsnvt.exception.BusyEmployeeDeletionException;
-import com.ktsnvt.ktsnvt.exception.EmployeeNotFoundException;
-import com.ktsnvt.ktsnvt.exception.PinAlreadyExistsException;
+import com.ktsnvt.ktsnvt.exception.*;
 import com.ktsnvt.ktsnvt.model.Employee;
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
 import com.ktsnvt.ktsnvt.repository.EmployeeRepository;
@@ -46,6 +44,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public Employee readForUpdate(Integer id) {
+        return employeeRepository
+                .findOneForUpdate(id)
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee with id: " + id + " not found"));
+    }
+
+    @Override
     public Page<Employee> read(String query, BigDecimal salaryFrom, BigDecimal salaryTo, EmployeeType type, Pageable pageable) {
         return employeeRepository.findAll(query.trim().toLowerCase(), salaryFrom, salaryTo, type, pageable);
     }
@@ -53,9 +59,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void delete(Integer id) {
-        var employee = employeeRepository
-                .findOneForUpdate(id)
-                .orElseThrow(() -> new EmployeeNotFoundException("Employee with id: " + id + " not found"));
+        var employee = readForUpdate(id);
         // Check if the employee has some orders assigned
         if (orderService.hasAssignedActiveOrders(employee)) {
             throw new BusyEmployeeDeletionException("Employee with id: " + id + " has active orders which he has to process.");
@@ -66,5 +70,32 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         salaryService.endActiveSalaryForUser(employee);
         employee.setIsActive(false);
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void update(Integer id, String name, String surname, String pin, EmployeeType type) {
+        var employee = readForUpdate(id);
+        var samePinEmployee = employeeRepository.findByPin(pin);
+        samePinEmployee.ifPresent(same -> {
+            if (!same.getId().equals(employee.getId())) {
+                throw new PinAlreadyExistsException(pin);
+            }
+        });
+        // Basically if we want to change role of an employee, then we have to make sure that he has completed
+        // all of his tasks in a previous role
+        if (!employee.getType().equals(type)) {
+            if (employee.getType().equals(EmployeeType.WAITER) && orderService.hasAssignedActiveOrders(employee)) {
+                throw new IllegalEmployeeTypeChangeException("Employee has order which it has to process.");
+            } else if (orderItemService.hasActiveOrderItems(employee)) {
+                throw new IllegalEmployeeTypeChangeException("Employee has order items which it has to prepare.");
+            }
+        }
+        employee.setName(name);
+        employee.setSurname(surname);
+        employee.setPin(pin);
+        employee.setType(type);
+        var authority = authorityService.findByName(employee.getType().toString());
+        employee.setAuthority(authority);
     }
 }
