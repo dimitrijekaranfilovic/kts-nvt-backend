@@ -28,7 +28,4 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
 
     @Query("select oi from OrderItem oi join fetch oi.item where oi.id = :id and oi.status = 0")
     Optional<OrderItem> findOneByIdWithItemReference(Integer id);
-
-    @Query("select oi from OrderItem oi join fetch oi.item where oi.id = :id and oi.status = 1")
-    Optional<OrderItem> findOneInProgressByIdWithItemReference(Integer id);
 }

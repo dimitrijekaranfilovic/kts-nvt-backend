@@ -101,7 +101,7 @@ public class OrderItemServiceImpl implements OrderItemService {
     @Override
     public void finishItemRequest(Integer itemId, String employeePin) {
         var employee = employeeRepository.findEmployeeByPin(employeePin);
-        var orderItem = orderItemRepository.findOneInProgressByIdWithItemReference(itemId);
+        var orderItem = orderItemRepository.findOneByIdWithItemReference(itemId);
 
         if (employee.isEmpty()) {
             throw new InvalidEmployeeTypeException(employeePin);
