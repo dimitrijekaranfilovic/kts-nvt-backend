@@ -1,4 +1,4 @@
-package com.ktsnvt.ktsnvt.dto.readFoodAndDrinkRequests;
+package com.ktsnvt.ktsnvt.dto.readfoodanddrinkrequests;
 
 import lombok.Data;
 
@@ -14,6 +14,10 @@ public class ReadFoodAndDrinkRequestResponse {
 
     private LocalDateTime sentAt;
 
+    private LocalDateTime takenAt;
+
     private String item;
+
+    private String preparedBy;
 
 }

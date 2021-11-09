@@ -1,6 +1,6 @@
 package com.ktsnvt.ktsnvt.controller;
 
-import com.ktsnvt.ktsnvt.dto.readFoodAndDrinkRequests.ReadFoodAndDrinkRequestResponse;
+import com.ktsnvt.ktsnvt.dto.readfoodanddrinkrequests.ReadFoodAndDrinkRequestResponse;
 import com.ktsnvt.ktsnvt.model.OrderItem;
 import com.ktsnvt.ktsnvt.service.OrderItemService;
 import com.ktsnvt.ktsnvt.support.EntityConverter;
@@ -23,7 +23,7 @@ public class OrderItemController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @RequestMapping("foodRequests/{pin}")
+    @RequestMapping("food_requests/{pin}")
     public Page<ReadFoodAndDrinkRequestResponse> getFoodRequests(Pageable pageable, @PathVariable String pin) {
         var foodRequests = orderItemService.getAllFoodRequests(pageable, pin);
         return foodRequests.map(orderItemToReadFoodAndDrinkRequest::convert);
@@ -31,9 +31,25 @@ public class OrderItemController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @RequestMapping("drinkRequests/{pin}")
+    @RequestMapping("drink_requests/{pin}")
     public Page<ReadFoodAndDrinkRequestResponse> getDrinkRequests(Pageable pageable, @PathVariable String pin) {
         var drinkRequests = orderItemService.getAllDrinkRequests(pageable, pin);
+        return drinkRequests.map(orderItemToReadFoodAndDrinkRequest::convert);
+    }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    @RequestMapping("food_preparation_requests/{pin}")
+    public Page<ReadFoodAndDrinkRequestResponse> getFoodInPreparation(Pageable pageable, @PathVariable String pin) {
+        var foodRequests = orderItemService.getAllFoodInPreparation(pageable, pin);
+        return foodRequests.map(orderItemToReadFoodAndDrinkRequest::convert);
+    }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    @RequestMapping("drink_preparation_requests/{pin}")
+    public Page<ReadFoodAndDrinkRequestResponse> getDrinksInPreparation(Pageable pageable, @PathVariable String pin) {
+        var drinkRequests = orderItemService.getAllDrinksInPreparation(pageable, pin);
         return drinkRequests.map(orderItemToReadFoodAndDrinkRequest::convert);
     }
 

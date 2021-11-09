@@ -32,7 +32,7 @@ public class OrderItem extends BaseEntity {
     @JoinColumn(name = "orderItemGroup_id")
     private OrderItemGroup orderItemGroup;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Employee preparedBy;
 
     @ManyToOne(fetch = FetchType.LAZY)

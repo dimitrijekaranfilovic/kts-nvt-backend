@@ -51,6 +51,28 @@ public class OrderItemServiceImpl implements OrderItemService {
     }
 
     @Override
+    public Page<OrderItem> getAllFoodInPreparation(Pageable pageable, String employeePin) {
+        var employee = employeeRepository.findEmployeeByPin(employeePin);
+
+        if (employee.isEmpty() || employee.get().getType() == EmployeeType.BARTENDER) {
+            throw new InvalidEmployeeTypeException(employeePin);
+        }
+
+        return orderItemRepository.findAllFoodInPreparation(pageable);
+    }
+
+    @Override
+    public Page<OrderItem> getAllDrinksInPreparation(Pageable pageable, String employeePin) {
+        var employee = employeeRepository.findEmployeeByPin(employeePin);
+
+        if (employee.isEmpty() || employee.get().getType() == EmployeeType.CHEF) {
+            throw new InvalidEmployeeTypeException(employeePin);
+        }
+
+        return orderItemRepository.findAllDrinksInPreparation(pageable);
+    }
+
+    @Override
     public void takeItemRequest(Integer itemId, String employeePin) {
         var employee = employeeRepository.findEmployeeByPin(employeePin);
         var orderItem = orderItemRepository.findOneByIdWithItemReference(itemId);

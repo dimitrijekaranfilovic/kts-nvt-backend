@@ -11,6 +11,10 @@ public interface OrderItemService {
 
     Page<OrderItem> getAllDrinkRequests(Pageable pageable, String employeePin);
 
+    Page<OrderItem> getAllFoodInPreparation(Pageable pageable, String employeePin);
+
+    Page<OrderItem> getAllDrinksInPreparation(Pageable pageable, String employeePin);
+
     void takeItemRequest(Integer itemId, String employeePin);
 
     void finishItemRequest(Integer itemId, String employeePin);
