@@ -13,7 +13,8 @@ public interface OrderService {
     Optional<OrderItemGroup> getOrderItemGroup(Integer orderId, String groupName);
 
     OrderItemGroup createGroupForOrder(Integer orderId, String groupName);
+
     boolean hasAssignedActiveOrders(Employee employee);
 
-
+    void chargeOrder(Integer id, String pin);
 }

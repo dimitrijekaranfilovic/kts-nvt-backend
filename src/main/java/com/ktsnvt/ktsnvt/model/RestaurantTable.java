@@ -65,4 +65,8 @@ public class RestaurantTable extends BaseEntity {
         order.setRestaurantTable(null);
     }
 
+    public void freeTable() {
+        this.available = true;
+        this.readyGroups = 0;
+    }
 }

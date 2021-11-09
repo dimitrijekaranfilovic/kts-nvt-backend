@@ -1,9 +1,11 @@
 package com.ktsnvt.ktsnvt.controller;
 
 
+import com.ktsnvt.ktsnvt.dto.chargeorder.ChargeOrderRequest;
 import com.ktsnvt.ktsnvt.dto.createorderitemgroup.CreateOrderItemGroupRequest;
 import com.ktsnvt.ktsnvt.dto.createorderitemgroup.CreateOrderItemGroupResponse;
 import com.ktsnvt.ktsnvt.model.OrderItemGroup;
+import com.ktsnvt.ktsnvt.service.EmployeeService;
 import com.ktsnvt.ktsnvt.service.OrderService;
 import com.ktsnvt.ktsnvt.support.EntityConverter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,16 +17,22 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping(value = "/api/orders")
 public class OrderController {
-
     private final OrderService orderService;
+
     private final EntityConverter<OrderItemGroup, CreateOrderItemGroupResponse> orderItemGroupToCreateOrderItemGroupResponse;
 
     @Autowired
-    public OrderController(OrderService orderService, EntityConverter<OrderItemGroup, CreateOrderItemGroupResponse> orderItemGroupToCreateOrderItemGroupResponse) {
+    public OrderController(OrderService orderService,
+                           EntityConverter<OrderItemGroup, CreateOrderItemGroupResponse> orderItemGroupToCreateOrderItemGroupResponse) {
         this.orderService = orderService;
         this.orderItemGroupToCreateOrderItemGroupResponse = orderItemGroupToCreateOrderItemGroupResponse;
     }
 
+    @PutMapping("/{id}/charge")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void chargeOrder(@PathVariable Integer id, @RequestBody @Valid ChargeOrderRequest request) {
+        orderService.chargeOrder(id, request.getPin());
+    }
 
     @PostMapping(value = "/{id}/groups")
     @ResponseStatus(HttpStatus.CREATED)
