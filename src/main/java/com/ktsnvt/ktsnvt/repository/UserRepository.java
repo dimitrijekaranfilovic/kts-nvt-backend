@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.LockModeType;
 import java.util.Optional;
 
-@Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select u from User u where u.id = :id")

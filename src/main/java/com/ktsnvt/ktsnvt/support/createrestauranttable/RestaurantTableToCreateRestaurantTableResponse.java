@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class RestaurantTableToCreateRestaurantTableResponse extends AbstractConverter<RestaurantTable, CreateRestaurantTableResponse> {
+
     @Override
     public CreateRestaurantTableResponse convert(@NonNull RestaurantTable response) {
         return getModelMapper().map(response, CreateRestaurantTableResponse.class);

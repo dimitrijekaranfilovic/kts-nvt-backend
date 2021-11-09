@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
 public interface InventoryItemRepository extends JpaRepository<InventoryItem, Integer> {
 
     Optional<InventoryItem> findByName(String name);

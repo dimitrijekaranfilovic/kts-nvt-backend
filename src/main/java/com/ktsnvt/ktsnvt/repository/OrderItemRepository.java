@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-@Repository
 public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
 
     @Query(value = "select oi from OrderItem oi where oi.status = :status and oi.item.item.category = :category")

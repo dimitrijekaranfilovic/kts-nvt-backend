@@ -25,22 +25,22 @@ public class SectionController {
     private final RestaurantTableService restaurantTableService;
     private final SectionToReadSectionResponse sectionToReadSectionResponse;
     private final RestaurantTableToReadSectionTablesResponse restaurantTableToReadSectionTablesResponse;
-    private final RestaurantTableToCreateRestaurantTableResponse restaurantTableToCreateRestaurantTableResponse;
     private final CreateRestaurantTableRequestToRestaurantTable createRestaurantTableRequestToRestaurantTable;
+    private final RestaurantTableToCreateRestaurantTableResponse restaurantTableToCreateRestaurantTableResponse;
 
     @Autowired
     public SectionController(SectionService sectionService,
                              RestaurantTableService restaurantTableService,
                              SectionToReadSectionResponse sectionToReadSectionResponse,
                              RestaurantTableToReadSectionTablesResponse restaurantTableToReadSectionTablesResponse,
-                             RestaurantTableToCreateRestaurantTableResponse restaurantTableToCreateRestaurantTableResponse,
-                             CreateRestaurantTableRequestToRestaurantTable createRestaurantTableRequestToRestaurantTable) {
+                             CreateRestaurantTableRequestToRestaurantTable createRestaurantTableRequestToRestaurantTable,
+                             RestaurantTableToCreateRestaurantTableResponse restaurantTableToCreateRestaurantTableResponse) {
         this.sectionService = sectionService;
         this.restaurantTableService = restaurantTableService;
         this.sectionToReadSectionResponse = sectionToReadSectionResponse;
         this.restaurantTableToReadSectionTablesResponse = restaurantTableToReadSectionTablesResponse;
-        this.restaurantTableToCreateRestaurantTableResponse = restaurantTableToCreateRestaurantTableResponse;
         this.createRestaurantTableRequestToRestaurantTable = createRestaurantTableRequestToRestaurantTable;
+        this.restaurantTableToCreateRestaurantTableResponse = restaurantTableToCreateRestaurantTableResponse;
     }
 
     @GetMapping
@@ -57,11 +57,11 @@ public class SectionController {
 
     @PostMapping(value = "{sectionId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public CreateRestaurantTableResponse createTable(@RequestBody CreateRestaurantTableRequest request, Integer sectionId){
+    public CreateRestaurantTableResponse createTable(@RequestBody CreateRestaurantTableRequest request, @PathVariable Integer sectionId){
         RestaurantTable newTable = createRestaurantTableRequestToRestaurantTable.convert(request);
 
-        restaurantTableService.createRestaurantTable(newTable, sectionId);
+        RestaurantTable createdTable = restaurantTableService.createRestaurantTable(newTable, sectionId);
 
-        return restaurantTableToCreateRestaurantTableResponse.convert(newTable);
+        return restaurantTableToCreateRestaurantTableResponse.convert(createdTable);
     }
 }

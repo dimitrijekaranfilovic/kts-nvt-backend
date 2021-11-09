@@ -13,7 +13,6 @@ import javax.persistence.LockModeType;
 import java.math.BigDecimal;
 import java.util.Optional;
 
-@Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
 
     Optional<Employee> findEmployeeByPin(String pin);

@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-@Repository
 public interface OrderRepository extends JpaRepository<Order, Integer> {
 
     // Order status: CREATED or IN_PROGRESS 

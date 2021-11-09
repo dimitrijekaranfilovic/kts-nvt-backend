@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
 public interface AuthorityRepository extends JpaRepository<Authority, Integer> {
 
     Optional<Authority> findByName(String name);

@@ -6,6 +6,8 @@ import lombok.Data;
 public class CreateRestaurantTableResponse {
     private Integer id;
 
+    private Integer number;
+
     private Integer x;
 
     private Integer y;
