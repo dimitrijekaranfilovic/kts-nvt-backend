@@ -12,6 +12,8 @@ public interface EmployeeService {
 
     Employee readForUpdate(Integer id);
 
+    Employee read(Integer id);
+
     Page<Employee> read(String query, BigDecimal salaryFrom, BigDecimal salaryTo, EmployeeType type, Pageable pageable);
 
     void delete(Integer id);

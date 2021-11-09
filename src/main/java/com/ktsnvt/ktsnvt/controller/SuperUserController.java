@@ -5,8 +5,11 @@ import com.ktsnvt.ktsnvt.dto.createesuperuser.CreateSuperUserResponse;
 import com.ktsnvt.ktsnvt.dto.readsuperusers.ReadSuperUsersRequest;
 import com.ktsnvt.ktsnvt.dto.readsuperusers.ReadSuperUsersResponse;
 import com.ktsnvt.ktsnvt.dto.updatepassword.UpdatePasswordRequest;
+import com.ktsnvt.ktsnvt.dto.updatesalary.UpdateSalaryRequest;
 import com.ktsnvt.ktsnvt.dto.updatesuperuser.UpdateSuperUserRequest;
+import com.ktsnvt.ktsnvt.model.Salary;
 import com.ktsnvt.ktsnvt.model.SuperUser;
+import com.ktsnvt.ktsnvt.service.SalaryService;
 import com.ktsnvt.ktsnvt.service.SuperUserService;
 import com.ktsnvt.ktsnvt.support.EntityConverter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,25 +25,33 @@ import javax.validation.Valid;
 @RequestMapping(value = "api/super-users")
 public class SuperUserController {
     private final SuperUserService superUserService;
+    private final SalaryService salaryService;
 
     private final EntityConverter<CreateSuperUserRequest, SuperUser> createSuperUserToSuperUser;
     private final EntityConverter<SuperUser, CreateSuperUserResponse> superUserToCreateSuperUserResponse;
 
     private final EntityConverter<SuperUser, ReadSuperUsersResponse> superUserToReadSuperUserResponse;
 
+    private final EntityConverter<UpdateSalaryRequest, Salary> updateSalaryToSalary;
+
     @Autowired
     public SuperUserController(SuperUserService superUserService,
+                               SalaryService salaryService,
                                EntityConverter<CreateSuperUserRequest, SuperUser> createSuperUserToSuperUser,
-                               EntityConverter<SuperUser, CreateSuperUserResponse> superUserToCreateSuperUserResponse, EntityConverter<SuperUser, ReadSuperUsersResponse> superUserToReadSuperUserResponse) {
+                               EntityConverter<SuperUser, CreateSuperUserResponse> superUserToCreateSuperUserResponse,
+                               EntityConverter<SuperUser, ReadSuperUsersResponse> superUserToReadSuperUserResponse,
+                               EntityConverter<UpdateSalaryRequest, Salary> updateSalaryToSalary) {
         this.superUserService = superUserService;
+        this.salaryService = salaryService;
         this.createSuperUserToSuperUser = createSuperUserToSuperUser;
         this.superUserToCreateSuperUserResponse = superUserToCreateSuperUserResponse;
         this.superUserToReadSuperUserResponse = superUserToReadSuperUserResponse;
+        this.updateSalaryToSalary = updateSalaryToSalary;
     }
 
     // PRE AUTHORIZE (ADMIN, MANAGER)
     // OWNING USER
-    @PutMapping("/{id}/update-password")
+    @PutMapping("/{id}/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updatePassword(@PathVariable Integer id, @RequestBody @Valid UpdatePasswordRequest request) {
         superUserService.updatePassword(id, request.getOldPassword(), request.getNewPassword());
@@ -52,6 +63,15 @@ public class SuperUserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateSuperUser(@PathVariable Integer id, @RequestBody @Valid UpdateSuperUserRequest request) {
         superUserService.update(id, request.getName(), request.getSurname(), request.getEmail());
+    }
+
+    // PRE AUTHORIZE (ADMIN)
+    @PutMapping("/{id}/salary")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateSalary(@PathVariable Integer id, @RequestBody @Valid UpdateSalaryRequest request) {
+        // This will throw if the id is not an id of super user -> prevent updating employee's salary on this endpoint
+        superUserService.read(id);
+        salaryService.updateUserSalary(id, updateSalaryToSalary.convert(request));
     }
 
     // PRE AUTHORIZE (ADMIN)

@@ -5,8 +5,11 @@ import com.ktsnvt.ktsnvt.dto.createemployee.CreateEmployeeResponse;
 import com.ktsnvt.ktsnvt.dto.reademployees.ReadEmployeesRequest;
 import com.ktsnvt.ktsnvt.dto.reademployees.ReadEmployeesResponse;
 import com.ktsnvt.ktsnvt.dto.updateemployee.UpdateEmployeeRequest;
+import com.ktsnvt.ktsnvt.dto.updatesalary.UpdateSalaryRequest;
 import com.ktsnvt.ktsnvt.model.Employee;
+import com.ktsnvt.ktsnvt.model.Salary;
 import com.ktsnvt.ktsnvt.service.EmployeeService;
+import com.ktsnvt.ktsnvt.service.SalaryService;
 import com.ktsnvt.ktsnvt.support.EntityConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,20 +24,28 @@ import javax.validation.Valid;
 @RequestMapping(value = "api/employees")
 public class EmployeeController {
     private final EmployeeService employeeService;
+    private final SalaryService salaryService;
 
     private final EntityConverter<CreateEmployeeRequest, Employee> createEmployeeToEmployee;
     private final EntityConverter<Employee, CreateEmployeeResponse> employeeToCreateEmployee;
 
     private final EntityConverter<Employee, ReadEmployeesResponse> employeeToReadEmployee;
 
+    private final EntityConverter<UpdateSalaryRequest, Salary> updateSalaryToSalary;
+
     @Autowired
     public EmployeeController(EmployeeService employeeService,
+                              SalaryService salaryService,
                               EntityConverter<CreateEmployeeRequest, Employee> createEmployeeToEmployee,
-                              EntityConverter<Employee, CreateEmployeeResponse> employeeToCreateEmployee, EntityConverter<Employee, ReadEmployeesResponse> employeeToReadEmployee) {
+                              EntityConverter<Employee, CreateEmployeeResponse> employeeToCreateEmployee,
+                              EntityConverter<Employee, ReadEmployeesResponse> employeeToReadEmployee,
+                              EntityConverter<UpdateSalaryRequest, Salary> updateSalaryToSalary) {
         this.employeeService = employeeService;
+        this.salaryService = salaryService;
         this.createEmployeeToEmployee = createEmployeeToEmployee;
         this.employeeToCreateEmployee = employeeToCreateEmployee;
         this.employeeToReadEmployee = employeeToReadEmployee;
+        this.updateSalaryToSalary = updateSalaryToSalary;
     }
 
     // PRE AUTHORIZE (ADMIN, MANAGER)
@@ -59,6 +70,15 @@ public class EmployeeController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(@PathVariable Integer id, @RequestBody @Valid UpdateEmployeeRequest request) {
         employeeService.update(id, request.getName(), request.getSurname(), request.getPin(), request.getType());
+    }
+
+    // PRE AUTHORIZE (ADMIN, MANAGER)
+    @PutMapping("/{id}/salary")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateSalary(@PathVariable Integer id, @RequestBody @Valid UpdateSalaryRequest request) {
+        // This will throw if the id is not an id of employee -> prevent updating super user's salary on this endpoint
+        employeeService.read(id);
+        salaryService.updateUserSalary(id, updateSalaryToSalary.convert(request));
     }
 
     // PRE AUTHORIZE (ADMIN, MANAGER)

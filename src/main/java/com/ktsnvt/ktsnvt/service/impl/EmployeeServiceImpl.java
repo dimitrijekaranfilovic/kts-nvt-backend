@@ -52,6 +52,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public Employee read(Integer id) {
+        return employeeRepository
+                .findById(id)
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee with id: " + id + " not found"));
+    }
+
+    @Override
     public Page<Employee> read(String query, BigDecimal salaryFrom, BigDecimal salaryTo, EmployeeType type, Pageable pageable) {
         return employeeRepository.findAll(query.trim().toLowerCase(), salaryFrom, salaryTo, type, pageable);
     }
