@@ -1,7 +1,9 @@
 package com.ktsnvt.ktsnvt.service.impl;
 
 import com.ktsnvt.ktsnvt.exception.EmailAlreadyExistsException;
+import com.ktsnvt.ktsnvt.exception.InvalidPasswordException;
 import com.ktsnvt.ktsnvt.exception.ManagerNotFoundException;
+import com.ktsnvt.ktsnvt.exception.SuperUserNotFoundException;
 import com.ktsnvt.ktsnvt.model.SuperUser;
 import com.ktsnvt.ktsnvt.model.enums.SuperUserType;
 import com.ktsnvt.ktsnvt.repository.SuperUserRepository;
@@ -43,6 +45,14 @@ public class SuperUserServiceImpl implements SuperUserService {
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public SuperUser read(Integer id) {
+        return superUserRepository
+                .findById(id)
+                .orElseThrow(() -> new SuperUserNotFoundException("Cannot find superuser with id: " + id));
+    }
+
+    @Override
     public Page<SuperUser> read(String query, BigDecimal salaryFrom, BigDecimal salaryTo, SuperUserType type, Pageable pageable) {
         return superUserRepository.findAll(query.trim().toLowerCase(), salaryFrom, salaryTo, type, pageable);
     }
@@ -55,5 +65,30 @@ public class SuperUserServiceImpl implements SuperUserService {
                 .orElseThrow(() -> new ManagerNotFoundException("Cannot find manager with id: " + id));
         salaryService.endActiveSalaryForUser(manager);
         manager.setIsActive(false);
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void updatePassword(Integer id, String oldPassword, String newPassword) {
+        var user = read(id);
+        if (!user.getPassword().equals(oldPassword)) {
+            throw new InvalidPasswordException("Incorrect old password provided.");
+        }
+        user.setPassword(newPassword);
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void update(Integer id, String name, String surname, String email) {
+        var user = read(id);
+        var superUserWithSameEmail = superUserRepository.findByEmail(email);
+        superUserWithSameEmail.ifPresent(sameEmail -> {
+            if (!sameEmail.getId().equals(user.getId())) {
+                throw new EmailAlreadyExistsException(user.getEmail());
+            }
+        });
+        user.setName(name);
+        user.setSurname(surname);
+        user.setEmail(email);
     }
 }
