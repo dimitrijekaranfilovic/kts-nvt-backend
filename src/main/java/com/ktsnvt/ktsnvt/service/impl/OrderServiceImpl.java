@@ -15,12 +15,16 @@ import com.ktsnvt.ktsnvt.model.Employee;
 import com.ktsnvt.ktsnvt.repository.OrderRepository;
 import com.ktsnvt.ktsnvt.service.LocalDateTimeService;
 import com.ktsnvt.ktsnvt.service.OrderService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -30,6 +34,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemGroupRepository orderItemGroupRepository;
     private final LocalDateTimeService localDateTimeService;
+    private final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     @Autowired
     public OrderServiceImpl(OrderRepository orderRepository, OrderItemGroupRepository orderItemGroupRepository, LocalDateTimeService localDateTimeService) {
@@ -70,6 +75,11 @@ public class OrderServiceImpl implements OrderService {
 
         this.orderItemGroupRepository.save(orderItemGroup);
 
+    }
+
+    @Override
+    public List<OrderItemGroup> getOrderItemGroups(Integer orderId) {
+        return new ArrayList<>(this.orderItemGroupRepository.getOrderItemGroupsForOrder(orderId));
     }
 
     @Override
