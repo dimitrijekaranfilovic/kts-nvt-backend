@@ -35,12 +35,12 @@ public class SectionController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Collection<ReadSectionResponse> getAllSections() {
-        return sectionService.getAllSections().stream().map(s -> sectionToReadSectionResponse.convert(s)).collect(Collectors.toList());
+        return sectionService.getAllSections().stream().map(sectionToReadSectionResponse::convert).collect(Collectors.toList());
     }
 
     @GetMapping(value = "{sectionId}/tables")
     @ResponseStatus(HttpStatus.OK)
     public Collection<ReadSectionTablesResponse> getAllSectionTables(@PathVariable Integer sectionId) {
-        return restaurantTableService.getAllTablesForSection(sectionId).stream().map(t -> restaurantTableToReadSectionTablesResponse.convert(t)).collect(Collectors.toList());
+        return restaurantTableService.getAllTablesForSection(sectionId).stream().map(restaurantTableToReadSectionTablesResponse::convert).collect(Collectors.toList());
     }
 }

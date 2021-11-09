@@ -2,19 +2,15 @@ package com.ktsnvt.ktsnvt.service;
 
 import com.ktsnvt.ktsnvt.model.Employee;
 import com.ktsnvt.ktsnvt.model.OrderItem;
+import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
+import com.ktsnvt.ktsnvt.model.enums.OrderItemStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 
 public interface OrderItemService {
 
-    Page<OrderItem> getAllFoodRequests(Pageable pageable);
-
-    Page<OrderItem> getAllDrinkRequests(Pageable pageable);
-
-    Page<OrderItem> getAllFoodInPreparation(Pageable pageable);
-
-    Page<OrderItem> getAllDrinksInPreparation(Pageable pageable);
+    Page<OrderItem> getAllItemRequests(Pageable pageable, OrderItemStatus status, ItemCategory category);
 
     void takeItemRequest(Integer itemId, String employeePin);
 
