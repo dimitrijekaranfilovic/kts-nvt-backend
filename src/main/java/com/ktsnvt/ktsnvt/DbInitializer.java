@@ -155,6 +155,7 @@ public class DbInitializer implements ApplicationRunner {
         var orderItem2 = new OrderItem(1, orderGroup1, null, menuItem2, OrderItemStatus.SENT);
         var orderItem3 = new OrderItem(1, orderGroup1, null, menuItem3, OrderItemStatus.SENT);
         var orderItem4 = new OrderItem(1, orderGroup1, null, menuItem3, OrderItemStatus.NEW);
+        // orderItem1.setPreparedBy(employee2);
         orderGroup1.addItem(orderItem1);
         orderItem1.setSentAt(LocalDateTime.now());
         orderGroup1.addItem(orderItem2);

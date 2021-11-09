@@ -2,6 +2,7 @@ package com.ktsnvt.ktsnvt.service.impl;
 
 import com.ktsnvt.ktsnvt.exception.InvalidEmployeeTypeException;
 import com.ktsnvt.ktsnvt.exception.OrderItemNotFoundException;
+import com.ktsnvt.ktsnvt.model.Employee;
 import com.ktsnvt.ktsnvt.model.OrderItem;
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
 import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
@@ -14,13 +15,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Service
 public class OrderItemServiceImpl implements OrderItemService {
-
     private final EmployeeRepository employeeRepository;
     private final OrderItemRepository orderItemRepository;
     private final LocalDateTimeService dateTimeService;
@@ -116,5 +118,11 @@ public class OrderItemServiceImpl implements OrderItemService {
         }
 
         orderItemRepository.save(item);
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public boolean hasActiveOrderItems(Employee employee) {
+        return orderItemRepository.streamActiveOrderItemsForEmployee(employee.getId()).findAny().isPresent();
     }
 }
