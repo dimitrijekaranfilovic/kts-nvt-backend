@@ -2,7 +2,9 @@ package com.ktsnvt.ktsnvt.controller;
 
 
 import com.ktsnvt.ktsnvt.dto.displaypaginatedmenuitems.DisplayMenuItemResponse;
+import com.ktsnvt.ktsnvt.model.MenuItem;
 import com.ktsnvt.ktsnvt.service.MenuItemService;
+import com.ktsnvt.ktsnvt.support.EntityConverter;
 import com.ktsnvt.ktsnvt.support.displaypaginatedmenuitems.MenuItemToDisplayMenuItemResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MenuItemController {
 
     private final MenuItemService menuItemService;
-    private final MenuItemToDisplayMenuItemResponse menuItemToDisplayMenuItemResponse;
+    private final EntityConverter<MenuItem, DisplayMenuItemResponse> menuItemToDisplayMenuItemResponse;
 
     @Autowired
     public MenuItemController(MenuItemService menuItemService, MenuItemToDisplayMenuItemResponse menuItemToDisplayMenuItemResponse) {

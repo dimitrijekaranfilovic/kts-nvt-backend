@@ -34,6 +34,11 @@ public class OrderItemGroup extends BaseEntity {
         super();
     }
 
+    public OrderItemGroup(String name, OrderItemGroupStatus status){
+        this.name = name;
+        this.status = status;
+    }
+
     public OrderItemGroup(String name, OrderItemGroupStatus status, Order order) {
         this();
         this.name = name;
