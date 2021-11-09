@@ -7,11 +7,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import javax.persistence.LockModeType;
 import java.math.BigDecimal;
 import java.util.Optional;
 
+@Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
 
     Optional<Employee> findEmployeeByPin(String pin);

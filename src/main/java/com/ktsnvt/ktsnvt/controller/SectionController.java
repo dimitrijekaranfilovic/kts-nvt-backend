@@ -1,9 +1,14 @@
 package com.ktsnvt.ktsnvt.controller;
 
+import com.ktsnvt.ktsnvt.dto.createrestauranttable.CreateRestaurantTableRequest;
+import com.ktsnvt.ktsnvt.dto.createrestauranttable.CreateRestaurantTableResponse;
 import com.ktsnvt.ktsnvt.dto.readsection.ReadSectionResponse;
 import com.ktsnvt.ktsnvt.dto.readsectiontablesresponse.ReadSectionTablesResponse;
+import com.ktsnvt.ktsnvt.model.RestaurantTable;
 import com.ktsnvt.ktsnvt.service.RestaurantTableService;
 import com.ktsnvt.ktsnvt.service.SectionService;
+import com.ktsnvt.ktsnvt.support.createrestauranttable.CreateRestaurantTableRequestToRestaurantTable;
+import com.ktsnvt.ktsnvt.support.createrestauranttable.RestaurantTableToCreateRestaurantTableResponse;
 import com.ktsnvt.ktsnvt.support.readsection.SectionToReadSectionResponse;
 import com.ktsnvt.ktsnvt.support.readsectiontablesresponse.RestaurantTableToReadSectionTablesResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,16 +25,22 @@ public class SectionController {
     private final RestaurantTableService restaurantTableService;
     private final SectionToReadSectionResponse sectionToReadSectionResponse;
     private final RestaurantTableToReadSectionTablesResponse restaurantTableToReadSectionTablesResponse;
+    private final RestaurantTableToCreateRestaurantTableResponse restaurantTableToCreateRestaurantTableResponse;
+    private final CreateRestaurantTableRequestToRestaurantTable createRestaurantTableRequestToRestaurantTable;
 
     @Autowired
     public SectionController(SectionService sectionService,
                              RestaurantTableService restaurantTableService,
                              SectionToReadSectionResponse sectionToReadSectionResponse,
-                             RestaurantTableToReadSectionTablesResponse restaurantTableToReadSectionTablesResponse) {
+                             RestaurantTableToReadSectionTablesResponse restaurantTableToReadSectionTablesResponse,
+                             RestaurantTableToCreateRestaurantTableResponse restaurantTableToCreateRestaurantTableResponse,
+                             CreateRestaurantTableRequestToRestaurantTable createRestaurantTableRequestToRestaurantTable) {
         this.sectionService = sectionService;
         this.restaurantTableService = restaurantTableService;
         this.sectionToReadSectionResponse = sectionToReadSectionResponse;
         this.restaurantTableToReadSectionTablesResponse = restaurantTableToReadSectionTablesResponse;
+        this.restaurantTableToCreateRestaurantTableResponse = restaurantTableToCreateRestaurantTableResponse;
+        this.createRestaurantTableRequestToRestaurantTable = createRestaurantTableRequestToRestaurantTable;
     }
 
     @GetMapping
@@ -42,5 +53,15 @@ public class SectionController {
     @ResponseStatus(HttpStatus.OK)
     public Collection<ReadSectionTablesResponse> getAllSectionTables(@PathVariable Integer sectionId) {
         return restaurantTableService.getAllTablesForSection(sectionId).stream().map(restaurantTableToReadSectionTablesResponse::convert).collect(Collectors.toList());
+    }
+
+    @PostMapping(value = "{sectionId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CreateRestaurantTableResponse createTable(@RequestBody CreateRestaurantTableRequest request, Integer sectionId){
+        RestaurantTable newTable = createRestaurantTableRequestToRestaurantTable.convert(request);
+
+        restaurantTableService.createRestaurantTable(newTable, sectionId);
+
+        return restaurantTableToCreateRestaurantTableResponse.convert(newTable);
     }
 }
