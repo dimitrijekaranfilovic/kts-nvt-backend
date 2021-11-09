@@ -1,10 +1,13 @@
 package com.ktsnvt.ktsnvt.service.impl;
 
+import com.ktsnvt.ktsnvt.exception.InventoryItemNameAlreadyExistsException;
 import com.ktsnvt.ktsnvt.model.InventoryItem;
 import com.ktsnvt.ktsnvt.repository.InventoryItemRepository;
 import com.ktsnvt.ktsnvt.service.InventoryItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class InventoryItemServiceImpl implements InventoryItemService {
@@ -17,7 +20,12 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public InventoryItem createInventoryItem(InventoryItem inventoryItem) {
+        var sameInventoryItem = inventoryItemRepository.findByName(inventoryItem.getName());
+        if (sameInventoryItem.isPresent()) {
+            throw new InventoryItemNameAlreadyExistsException(inventoryItem.getName());
+        }
         return inventoryItemRepository.save(inventoryItem);
     }
 }

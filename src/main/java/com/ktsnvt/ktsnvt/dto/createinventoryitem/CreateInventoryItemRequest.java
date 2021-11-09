@@ -18,14 +18,11 @@ public class CreateInventoryItemRequest {
     @PositiveOrZero(message = "Inventory item's base price must be a positive number or zero.")
     private BigDecimal basePrice;
 
-    @NotBlank(message = "Inventory item's description can't be blank.")
-    private String description;
+    private String description = "";
 
-    @NotNull(message = "Inventory item's image must be provided.")
-    private String image;
+    private String image = "";
 
-    @NotNull(message = "Inventory item's allergies must be provided.")
-    private String allergies;
+    private String allergies = "";
 
     @NotNull(message = "Inventory item's category is required.")
     private ItemCategory category;
