@@ -20,4 +20,6 @@ public interface OrderService {
 
     List<OrderItemGroup> getOrderItemGroups(Integer orderId);
 
+    void deleteOrderItemGroup(Integer orderId, Integer groupId);
+
 }

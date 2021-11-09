@@ -34,7 +34,6 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemGroupRepository orderItemGroupRepository;
     private final LocalDateTimeService localDateTimeService;
-    private final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     @Autowired
     public OrderServiceImpl(OrderRepository orderRepository, OrderItemGroupRepository orderItemGroupRepository, LocalDateTimeService localDateTimeService) {
@@ -60,11 +59,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void sendOrderItemGroup(Integer orderId, Integer groupId) {
-        var optionalOrderItemGroup = this.orderItemGroupRepository.getGroupByIdAndOrderId(orderId, groupId);
-        if(optionalOrderItemGroup.isEmpty())
-            throw new NotFoundException("Order group with id " + groupId + " for order with id " + orderId + " does not exist.");
-        var orderItemGroup = optionalOrderItemGroup.get();
-        if(orderItemGroup.getStatus() != OrderItemGroupStatus.NEW)
+        var orderItemGroup = this.getOrderItemGroup(orderId, groupId);
+        if (orderItemGroup.getStatus() != OrderItemGroupStatus.NEW)
             throw new OrderItemGroupInvalidStatusException("Order group with id " + groupId + " for order with id " + orderId + " is not NEW, and cannot be sent.");
         orderItemGroup.setStatus(OrderItemGroupStatus.SENT);
         orderItemGroup.getOrderItems().forEach(orderItem -> {
@@ -83,15 +79,33 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public void deleteOrderItemGroup(Integer orderId, Integer groupId) {
+        var orderItemGroup = this.getOrderItemGroup(orderId, groupId);
+        if(orderItemGroup.getStatus() != OrderItemGroupStatus.NEW)
+            throw new OrderItemGroupInvalidStatusException("Order group with id " + groupId + " for order with id " + orderId + " cannot be deleted because its status is not NEW.");
+        orderItemGroup.setIsActive(false);
+        orderItemGroup.getOrderItems().forEach(oig -> oig.setIsActive(false));
+        this.orderItemGroupRepository.save(orderItemGroup);
+    }
+
+    @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public OrderItemGroup createGroupForOrder(Integer orderId, String groupName) {
         var order = this.getOrder(orderId);
         var optionalOrderItemGroup = this.getOrderItemGroup(orderId, groupName);
-        if(optionalOrderItemGroup.isPresent())
+        if (optionalOrderItemGroup.isPresent())
             throw new OrderItemGroupExistsException("Group with name '" + groupName + "' already exists for order with id " + orderId + ".");
         var orderItemGroup = new OrderItemGroup(groupName, OrderItemGroupStatus.NEW, order);
         return this.orderItemGroupRepository.save(orderItemGroup);
     }
+
+    private OrderItemGroup getOrderItemGroup(Integer orderId, Integer groupId) {
+        var optionalOrderItemGroup = this.orderItemGroupRepository.getGroupByIdAndOrderId(orderId, groupId);
+        if (optionalOrderItemGroup.isEmpty())
+            throw new NotFoundException("Order group with id " + groupId + " for order with id " + orderId + " does not exist.");
+        return optionalOrderItemGroup.get();
+    }
+
 }
 
 

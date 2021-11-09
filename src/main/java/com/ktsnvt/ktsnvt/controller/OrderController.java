@@ -50,4 +50,10 @@ public class OrderController {
         return orderItemGroups.stream().map(orderItemGroupToOrderItemGroupResponse::convert).collect(Collectors.toList());
     }
 
+    @DeleteMapping(value = "/{orderId}/groups/{groupId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteOrderItemGroup(@PathVariable("orderId") Integer orderId, @PathVariable("groupId") Integer groupId){
+        this.orderService.deleteOrderItemGroup(orderId, groupId);
+    }
+
 }
