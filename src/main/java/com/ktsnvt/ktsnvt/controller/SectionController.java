@@ -62,6 +62,13 @@ public class SectionController {
         sectionService.update(id, request.getName());
     }
 
+    // PRE AUTHORIZE (ADMIN)
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteSection(@PathVariable Integer id) {
+        sectionService.delete(id);
+    }
+
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Collection<ReadSectionResponse> getAllSections() {

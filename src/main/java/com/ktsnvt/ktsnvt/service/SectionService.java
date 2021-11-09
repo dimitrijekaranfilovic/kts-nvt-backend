@@ -12,4 +12,6 @@ public interface SectionService {
     Section create(Section section);
 
     void update(Integer id, String name);
+
+    void delete(Integer id);
 }

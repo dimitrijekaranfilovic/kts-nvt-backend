@@ -116,9 +116,11 @@ public class DbInitializer implements ApplicationRunner {
         var groundFloor = new Section("Ground Floor");
         var firstFloor = new Section("1st Floor");
         var terrace = new Section("Terrace");
+        var secondFloor = new Section("2nd Floor");
         sectionRepo.save(groundFloor);
         sectionRepo.save(firstFloor);
         sectionRepo.save(terrace);
+        sectionRepo.save(secondFloor);
 
         var restaurantTable1 = new RestaurantTable(1, 0, 0, 0, groundFloor);
         var restaurantTable2 = new RestaurantTable(2, 0, 0, 0, groundFloor);
@@ -129,6 +131,8 @@ public class DbInitializer implements ApplicationRunner {
         var restaurantTable7 = new RestaurantTable(1, 0, 0, 0, terrace);
         var restaurantTable8 = new RestaurantTable(2, 0, 0, 0, terrace);
         var restaurantTable9 = new RestaurantTable(3, 0, 0, 0, terrace);
+        var restaurantTable10 = new RestaurantTable(3, 0, 0, 0, secondFloor);
+        restaurantTable10.setAvailable(false);
         tableRepo.save(restaurantTable1);
         tableRepo.save(restaurantTable2);
         tableRepo.save(restaurantTable3);
@@ -138,6 +142,7 @@ public class DbInitializer implements ApplicationRunner {
         tableRepo.save(restaurantTable7);
         tableRepo.save(restaurantTable8);
         tableRepo.save(restaurantTable9);
+        tableRepo.save(restaurantTable10);
 
         var order1 = new Order(CHARGED, LocalDateTime.parse("2021-01-01 12:12", formatter), LocalDateTime.parse("2021-01-01 12:15", formatter), restaurantTable1, employee3);
         var order2 = new Order(CREATED, LocalDateTime.now(), null, restaurantTable1, employee3);
