@@ -5,6 +5,7 @@ import com.ktsnvt.ktsnvt.exception.OrderItemNotFoundException;
 import com.ktsnvt.ktsnvt.model.OrderItem;
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
 import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
+import com.ktsnvt.ktsnvt.model.enums.OrderItemGroupStatus;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemStatus;
 import com.ktsnvt.ktsnvt.repository.EmployeeRepository;
 import com.ktsnvt.ktsnvt.repository.OrderItemRepository;
@@ -114,7 +115,13 @@ public class OrderItemServiceImpl implements OrderItemService {
             item.setTakenAt(dateTimeService.currentTime());
             item.setPreparedBy(employee.get());
         }
-
         orderItemRepository.save(item);
+
+        var allFromGroup = orderItemRepository.getAllFromOneGroup(item.getOrderItemGroup().getId());
+
+        if(allFromGroup.stream().allMatch(oi -> oi.getStatus() == OrderItemStatus.DONE)){
+            item.getOrderItemGroup().setStatus(OrderItemGroupStatus.DONE);
+            // NOTIFIKACIJA
+        }
     }
 }

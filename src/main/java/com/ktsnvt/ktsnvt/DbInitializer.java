@@ -6,7 +6,6 @@ import com.ktsnvt.ktsnvt.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
@@ -31,12 +30,12 @@ public class DbInitializer implements ApplicationRunner {
     private final SectionRepository sectionRepo;
     private final SuperUserRepository superUserRepo;
     private final UserRepository userRepo;
-    private final TableRepository tableRepo;
+    private final RestaurantTableRepository tableRepo;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     @Autowired
-    public DbInitializer(AuthorityRepository authorityRepo, EmployeeRepository employeeRepo, InventoryItemRepository inventoryItemRepo, MenuItemRepository menuItemRepo, MenuRepository menuRepo, OrderItemGroupRepository orderItemGroupRepo, OrderItemRepository orderItemRepo, OrderRepository orderRepo, SalaryRepository salaryRepo, SectionRepository sectionRepo, SuperUserRepository superUserRepo, UserRepository userRepo, TableRepository tableRepo) {
+    public DbInitializer(AuthorityRepository authorityRepo, EmployeeRepository employeeRepo, InventoryItemRepository inventoryItemRepo, MenuItemRepository menuItemRepo, MenuRepository menuRepo, OrderItemGroupRepository orderItemGroupRepo, OrderItemRepository orderItemRepo, OrderRepository orderRepo, SalaryRepository salaryRepo, SectionRepository sectionRepo, SuperUserRepository superUserRepo, UserRepository userRepo, RestaurantTableRepository tableRepo) {
         this.authorityRepo = authorityRepo;
         this.employeeRepo = employeeRepo;
         this.inventoryItemRepo = inventoryItemRepo;
