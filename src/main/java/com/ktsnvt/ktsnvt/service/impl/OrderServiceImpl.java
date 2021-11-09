@@ -15,8 +15,6 @@ import com.ktsnvt.ktsnvt.model.Employee;
 import com.ktsnvt.ktsnvt.repository.OrderRepository;
 import com.ktsnvt.ktsnvt.service.LocalDateTimeService;
 import com.ktsnvt.ktsnvt.service.OrderService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -45,7 +43,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order getOrder(Integer id) {
-        return this.orderRepository.findById(id).orElseThrow(() -> new NotFoundException("Order with id " + id + " not found."));
+        return this.orderRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Order with id %d not found.", id)));
     }
 
     @Override
@@ -61,7 +59,7 @@ public class OrderServiceImpl implements OrderService {
     public void sendOrderItemGroup(Integer orderId, Integer groupId) {
         var orderItemGroup = this.getOrderItemGroup(orderId, groupId);
         if (orderItemGroup.getStatus() != OrderItemGroupStatus.NEW)
-            throw new OrderItemGroupInvalidStatusException("Order group with id " + groupId + " for order with id " + orderId + " is not NEW, and cannot be sent.");
+            throw new OrderItemGroupInvalidStatusException(String.format("Order group with id %d for order with id %d is not NEW, and cannot be sent.", orderId, groupId));
         orderItemGroup.setStatus(OrderItemGroupStatus.SENT);
         orderItemGroup.getOrderItems().forEach(orderItem -> {
             //send notification here
@@ -81,8 +79,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void deleteOrderItemGroup(Integer orderId, Integer groupId) {
         var orderItemGroup = this.getOrderItemGroup(orderId, groupId);
-        if(orderItemGroup.getStatus() != OrderItemGroupStatus.NEW)
-            throw new OrderItemGroupInvalidStatusException("Order group with id " + groupId + " for order with id " + orderId + " cannot be deleted because its status is not NEW.");
+        if (orderItemGroup.getStatus() != OrderItemGroupStatus.NEW)
+            throw new OrderItemGroupInvalidStatusException(String.format("Order group with id %d for order with id %d cannot be deleted, because its status is not NEW.", orderId, groupId));
         orderItemGroup.setIsActive(false);
         orderItemGroup.getOrderItems().forEach(oig -> oig.setIsActive(false));
         this.orderItemGroupRepository.save(orderItemGroup);
@@ -94,7 +92,7 @@ public class OrderServiceImpl implements OrderService {
         var order = this.getOrder(orderId);
         var optionalOrderItemGroup = this.getOrderItemGroup(orderId, groupName);
         if (optionalOrderItemGroup.isPresent())
-            throw new OrderItemGroupExistsException("Group with name '" + groupName + "' already exists for order with id " + orderId + ".");
+            throw new OrderItemGroupInvalidStatusException(String.format("Group with name %s already exists for order with id %d.", groupName, orderId));
         var orderItemGroup = new OrderItemGroup(groupName, OrderItemGroupStatus.NEW, order);
         return this.orderItemGroupRepository.save(orderItemGroup);
     }
@@ -102,7 +100,7 @@ public class OrderServiceImpl implements OrderService {
     private OrderItemGroup getOrderItemGroup(Integer orderId, Integer groupId) {
         var optionalOrderItemGroup = this.orderItemGroupRepository.getGroupByIdAndOrderId(orderId, groupId);
         if (optionalOrderItemGroup.isEmpty())
-            throw new NotFoundException("Order group with id " + groupId + " for order with id " + orderId + " does not exist.");
+            throw new NotFoundException(String.format("Order group with id %d for order with id %d does not exist.", groupId, orderId));
         return optionalOrderItemGroup.get();
     }
 
