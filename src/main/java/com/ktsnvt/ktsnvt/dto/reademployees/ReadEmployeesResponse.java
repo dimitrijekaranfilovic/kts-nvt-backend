@@ -8,6 +8,8 @@ import java.math.BigDecimal;
 @Data
 public class ReadEmployeesResponse {
 
+    private Integer id;
+
     private String name;
 
     private String surname;
