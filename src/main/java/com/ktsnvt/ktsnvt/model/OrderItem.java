@@ -41,6 +41,9 @@ public class OrderItem extends BaseEntity {
     @Column(name = "status", nullable = false)
     private OrderItemStatus status;
 
+    @Version
+    private Integer version;
+
     public OrderItem() {
         super();
     }

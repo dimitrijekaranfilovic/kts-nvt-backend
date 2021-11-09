@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -54,6 +56,7 @@ public class OrderItemServiceImpl implements OrderItemService {
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void takeItemRequest(Integer itemId, String employeePin) {
         var employee = employeeRepository.findEmployeeByPin(employeePin);
         var orderItem = orderItemRepository.findOneByIdWithItemReference(itemId);
@@ -83,6 +86,7 @@ public class OrderItemServiceImpl implements OrderItemService {
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void finishItemRequest(Integer itemId, String employeePin) {
         var employee = employeeRepository.findEmployeeByPin(employeePin);
         var orderItem = orderItemRepository.findOneInProgressByIdWithItemReference(itemId);
