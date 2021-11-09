@@ -55,7 +55,7 @@ public class SectionController {
         return restaurantTableService.getAllTablesForSection(sectionId).stream().map(restaurantTableToReadSectionTablesResponse::convert).collect(Collectors.toList());
     }
 
-    @PostMapping(value = "table/{sectionId}")
+    @PostMapping(value = "{sectionId}/table")
     @ResponseStatus(HttpStatus.CREATED)
     public CreateRestaurantTableResponse createTable(@RequestBody CreateRestaurantTableRequest request, @PathVariable Integer sectionId){
         RestaurantTable newTable = createRestaurantTableRequestToRestaurantTable.convert(request);
