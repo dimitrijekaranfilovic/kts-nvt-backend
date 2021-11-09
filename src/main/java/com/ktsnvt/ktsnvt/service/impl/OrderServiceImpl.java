@@ -1,0 +1,50 @@
+package com.ktsnvt.ktsnvt.service.impl;
+
+import com.ktsnvt.ktsnvt.exception.NotFoundException;
+import com.ktsnvt.ktsnvt.exception.OrderItemGroupExistsException;
+import com.ktsnvt.ktsnvt.model.Order;
+import com.ktsnvt.ktsnvt.model.OrderItemGroup;
+import com.ktsnvt.ktsnvt.model.enums.OrderItemGroupStatus;
+import com.ktsnvt.ktsnvt.repository.OrderItemGroupRepository;
+import com.ktsnvt.ktsnvt.repository.OrderRepository;
+import com.ktsnvt.ktsnvt.service.OrderService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
+
+@Service
+public class OrderServiceImpl implements OrderService {
+
+    private final OrderRepository orderRepository;
+    private final OrderItemGroupRepository orderItemGroupRepository;
+
+    @Autowired
+    public OrderServiceImpl(OrderRepository orderRepository, OrderItemGroupRepository orderItemGroupRepository) {
+        this.orderRepository = orderRepository;
+        this.orderItemGroupRepository = orderItemGroupRepository;
+    }
+
+
+    @Override
+    public Order getOrder(Integer id) {
+        return this.orderRepository.findById(id).orElseThrow(()-> new NotFoundException("Order with id " + id + " not found."));
+    }
+
+    @Override
+    public Optional<OrderItemGroup> getOrderItemGroup(Integer orderId, String groupName) {
+        return this.orderItemGroupRepository.getGroupByNameAndOrderId(orderId, groupName);
+    }
+
+    @Override
+    public OrderItemGroup createGroupForOrder(Integer orderId, String groupName) {
+        var order = this.getOrder(orderId);
+        var optionalOrderItemGroup = this.getOrderItemGroup(orderId, groupName);
+        if(optionalOrderItemGroup.isPresent())
+            throw new OrderItemGroupExistsException("Group with name '" + groupName + "' already exists for order with id " + orderId + ".");
+        var orderItemGroup = new OrderItemGroup(groupName, OrderItemGroupStatus.NEW, order);
+        return this.orderItemGroupRepository.save(orderItemGroup);
+    }
+
+}

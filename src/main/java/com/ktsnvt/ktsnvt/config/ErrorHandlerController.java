@@ -4,6 +4,7 @@ package com.ktsnvt.ktsnvt.config;
 import com.ktsnvt.ktsnvt.exception.BusinessException;
 import com.ktsnvt.ktsnvt.exception.ErrorInfo;
 import com.ktsnvt.ktsnvt.exception.NotFoundException;
+import com.ktsnvt.ktsnvt.exception.OrderItemGroupExistsException;
 import org.hibernate.QueryException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -44,5 +45,12 @@ public class ErrorHandlerController {
     @ResponseBody
     public ErrorInfo handleQueryException(HttpServletRequest request, QueryException ex){
         return new ErrorInfo(request.getRequestURI(), ex.getCause().getMessage(), LocalDateTime.now(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(OrderItemGroupExistsException.class)
+    @ResponseBody
+    public ErrorInfo handleOrderItemGroupExistsException(HttpServletRequest request, OrderItemGroupExistsException ex){
+        return new ErrorInfo(request.getRequestURI(), ex.getMessage(), LocalDateTime.now(), HttpStatus.CONFLICT);
     }
 }
