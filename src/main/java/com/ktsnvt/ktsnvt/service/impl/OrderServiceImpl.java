@@ -68,7 +68,7 @@ public class OrderServiceImpl implements OrderService {
         if (!order.getStatus().equals(OrderStatus.IN_PROGRESS)) {
             throw new IllegalOrderStateException("Order is not in IN PROGRESS state and thus cannot be charged.");
         }
-        if (order.getItemGroups().stream().anyMatch(ig -> ig.getStatus() != OrderItemGroupStatus.DONE)) {
+        if (order.getItemGroups().stream().anyMatch(ig -> ig.getIsActive() && ig.getStatus() != OrderItemGroupStatus.DONE)) {
             throw new IllegalOrderStateException("Order cannot be charged because not all of its groups are done.");
         }
         order.setStatus(OrderStatus.CHARGED);
