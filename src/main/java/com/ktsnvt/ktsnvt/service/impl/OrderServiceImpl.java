@@ -3,14 +3,17 @@ package com.ktsnvt.ktsnvt.service.impl;
 
 import com.ktsnvt.ktsnvt.exception.NotFoundException;
 import com.ktsnvt.ktsnvt.exception.OrderItemGroupExistsException;
+import com.ktsnvt.ktsnvt.exception.OrderItemGroupInvalidStatusException;
 import com.ktsnvt.ktsnvt.model.Order;
 import com.ktsnvt.ktsnvt.model.OrderItemGroup;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemGroupStatus;
+import com.ktsnvt.ktsnvt.model.enums.OrderItemStatus;
 import com.ktsnvt.ktsnvt.repository.OrderItemGroupRepository;
 
 import com.ktsnvt.ktsnvt.model.Employee;
 
 import com.ktsnvt.ktsnvt.repository.OrderRepository;
+import com.ktsnvt.ktsnvt.service.LocalDateTimeService;
 import com.ktsnvt.ktsnvt.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,11 +29,13 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderItemGroupRepository orderItemGroupRepository;
+    private final LocalDateTimeService localDateTimeService;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, OrderItemGroupRepository orderItemGroupRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, OrderItemGroupRepository orderItemGroupRepository, LocalDateTimeService localDateTimeService) {
         this.orderRepository = orderRepository;
         this.orderItemGroupRepository = orderItemGroupRepository;
+        this.localDateTimeService = localDateTimeService;
     }
 
 
@@ -47,7 +52,26 @@ public class OrderServiceImpl implements OrderService {
     public boolean hasAssignedActiveOrders(Employee employee) {
         return orderRepository.streamAssignedActiveOrdersForEmployee(employee.getId()).findAny().isPresent();
     }
-    
+
+    @Override
+    public void sendOrderItemGroup(Integer orderId, Integer groupId) {
+        var optionalOrderItemGroup = this.orderItemGroupRepository.getGroupByIdAndOrderId(orderId, groupId);
+        if(optionalOrderItemGroup.isEmpty())
+            throw new NotFoundException("Order group with id " + groupId + " for order with id " + orderId + " does not exist.");
+        var orderItemGroup = optionalOrderItemGroup.get();
+        if(orderItemGroup.getStatus() != OrderItemGroupStatus.NEW)
+            throw new OrderItemGroupInvalidStatusException("Order group with id " + groupId + " for order with id " + orderId + " is not NEW, and cannot be sent.");
+        orderItemGroup.setStatus(OrderItemGroupStatus.SENT);
+        orderItemGroup.getOrderItems().forEach(orderItem -> {
+            //send notification here
+            orderItem.setStatus(OrderItemStatus.SENT);
+            orderItem.setSentAt(localDateTimeService.currentTime());
+        });
+
+        this.orderItemGroupRepository.save(orderItemGroup);
+
+    }
+
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public OrderItemGroup createGroupForOrder(Integer orderId, String groupName) {

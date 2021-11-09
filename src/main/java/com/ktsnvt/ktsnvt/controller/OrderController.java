@@ -32,4 +32,11 @@ public class OrderController {
         return  this.orderItemGroupToCreateOrderItemGroupResponse.convert(this.orderService.createGroupForOrder(orderId, request.getGroupName()));
     }
 
+    @PutMapping(value = "/{orderId}/groups/{groupId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void sendOrderItemGroup(@PathVariable("orderId") Integer orderId, @PathVariable("groupId") Integer groupId){
+        this.orderService.sendOrderItemGroup(orderId, groupId);
+
+    }
+
 }

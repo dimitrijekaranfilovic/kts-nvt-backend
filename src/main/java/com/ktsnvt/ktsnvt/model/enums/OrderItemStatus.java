@@ -4,5 +4,5 @@ public enum OrderItemStatus {
     SENT,
     PREPARING,
     DONE,
-    NEW
+    NEW,
 }
