@@ -29,19 +29,8 @@ public class OrderItemController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value ="requests")
-    public Page<ReadFoodAndDrinkRequestResponse> getFoodRequests(Pageable pageable, @RequestParam String query) {
-        switch (query) {
-            case "SENT_FOOD":
-                return orderItemService.getAllItemRequests(pageable, OrderItemStatus.SENT, ItemCategory.FOOD).map(orderItemToReadFoodAndDrinkRequest::convert);
-            case "PREP_FOOD":
-                return orderItemService.getAllItemRequests(pageable, OrderItemStatus.PREPARING, ItemCategory.FOOD).map(orderItemToReadFoodAndDrinkRequest::convert);
-            case "SENT_DRINKS":
-                return orderItemService.getAllItemRequests(pageable, OrderItemStatus.SENT, ItemCategory.DRINK).map(orderItemToReadFoodAndDrinkRequest::convert);
-            case "PREP_DRINKS":
-                return orderItemService.getAllItemRequests(pageable, OrderItemStatus.PREPARING, ItemCategory.DRINK).map(orderItemToReadFoodAndDrinkRequest::convert);
-            default:
-                return null;
-        }
+    public Page<ReadFoodAndDrinkRequestResponse> getFoodRequests(Pageable pageable, @RequestParam OrderItemStatus status, @RequestParam ItemCategory category) {
+        return orderItemService.getAllItemRequests(pageable, status, category).map(orderItemToReadFoodAndDrinkRequest::convert);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
