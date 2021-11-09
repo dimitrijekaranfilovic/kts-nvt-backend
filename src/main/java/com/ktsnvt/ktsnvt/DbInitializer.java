@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -65,11 +66,11 @@ public class DbInitializer implements ApplicationRunner {
         authorityRepo.save(manager);
         authorityRepo.save(admin);
 
-        var salary1 = new Salary(LocalDate.parse("2021-01-01"), null, 500.00, null);
-        var salary2 = new Salary(LocalDate.parse("2021-01-01"), null, 500.00, null);
-        var salary3 = new Salary(LocalDate.parse("2021-01-01"), null, 500.00, null);
-        var salary4 = new Salary(LocalDate.parse("2021-01-01"), null, 500.00, null);
-        var salary5 = new Salary(LocalDate.parse("2021-01-01"), null, 500.00, null);
+        var salary1 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
+        var salary2 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
+        var salary3 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
+        var salary4 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
+        var salary5 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
         salaryRepo.save(salary1);
         salaryRepo.save(salary2);
         salaryRepo.save(salary3);
@@ -100,9 +101,9 @@ public class DbInitializer implements ApplicationRunner {
         inventoryItemRepo.save(item2);
         inventoryItemRepo.save(item3);
 
-        var menuItem1 = new MenuItem(100.00, item1);
-        var menuItem2 = new MenuItem(500.00, item2);
-        var menuItem3 = new MenuItem(100.00, item3);
+        var menuItem1 = new MenuItem(BigDecimal.valueOf(100.00), item1);
+        var menuItem2 = new MenuItem(BigDecimal.valueOf(500.00), item2);
+        var menuItem3 = new MenuItem(BigDecimal.valueOf(100.00), item3);
         menuItemRepo.save(menuItem1);
         menuItemRepo.save(menuItem2);
         menuItemRepo.save(menuItem3);

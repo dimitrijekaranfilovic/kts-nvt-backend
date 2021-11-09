@@ -6,6 +6,7 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.Table;
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Getter
@@ -22,7 +23,7 @@ public class Salary extends BaseEntity {
     private LocalDate endDate;
 
     @Column(name = "amount", nullable = false)
-    private Double amount;
+    private BigDecimal amount;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private User user;
@@ -31,7 +32,7 @@ public class Salary extends BaseEntity {
         super();
     }
 
-    public Salary(LocalDate startDate, LocalDate endDate, Double amount, User user) {
+    public Salary(LocalDate startDate, LocalDate endDate, BigDecimal amount, User user) {
         this();
         this.startDate = startDate;
         this.endDate = endDate;
