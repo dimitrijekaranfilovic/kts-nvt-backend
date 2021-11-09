@@ -1,6 +1,7 @@
 package com.ktsnvt.ktsnvt.controller;
 
 
+import com.ktsnvt.ktsnvt.dto.cancelorder.CancelOrderRequest;
 import com.ktsnvt.ktsnvt.dto.createorderitemgroup.CreateOrderItemGroupRequest;
 import com.ktsnvt.ktsnvt.dto.createorderitemgroup.CreateOrderItemGroupResponse;
 import com.ktsnvt.ktsnvt.model.OrderItemGroup;
@@ -25,6 +26,12 @@ public class OrderController {
         this.orderItemGroupToCreateOrderItemGroupResponse = orderItemGroupToCreateOrderItemGroupResponse;
     }
 
+
+    @PutMapping("/{id}/cancel")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void cancelOrder(@PathVariable Integer id, @RequestBody @Valid CancelOrderRequest request) {
+        orderService.cancelOrder(id, request.getPin());
+    }
 
     @PostMapping(value = "/{id}/groups")
     @ResponseStatus(HttpStatus.CREATED)

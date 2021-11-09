@@ -17,4 +17,5 @@ public interface OrderService {
 
     void sendOrderItemGroup(Integer orderId, Integer groupId);
 
+    void cancelOrder(Integer id, String pin);
 }

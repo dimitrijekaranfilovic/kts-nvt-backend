@@ -1,13 +1,13 @@
 package com.ktsnvt.ktsnvt.service.impl;
 
 
-import com.ktsnvt.ktsnvt.exception.NotFoundException;
-import com.ktsnvt.ktsnvt.exception.OrderItemGroupExistsException;
-import com.ktsnvt.ktsnvt.exception.OrderItemGroupInvalidStatusException;
+import com.ktsnvt.ktsnvt.exception.*;
 import com.ktsnvt.ktsnvt.model.Order;
 import com.ktsnvt.ktsnvt.model.OrderItemGroup;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemGroupStatus;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemStatus;
+import com.ktsnvt.ktsnvt.model.enums.OrderStatus;
+import com.ktsnvt.ktsnvt.repository.EmployeeRepository;
 import com.ktsnvt.ktsnvt.repository.OrderItemGroupRepository;
 
 import com.ktsnvt.ktsnvt.model.Employee;
@@ -26,15 +26,16 @@ import java.util.Optional;
 
 @Service
 public class OrderServiceImpl implements OrderService {
-
     private final OrderRepository orderRepository;
     private final OrderItemGroupRepository orderItemGroupRepository;
+    private final EmployeeRepository employeeRepository;
     private final LocalDateTimeService localDateTimeService;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, OrderItemGroupRepository orderItemGroupRepository, LocalDateTimeService localDateTimeService) {
+    public OrderServiceImpl(OrderRepository orderRepository, OrderItemGroupRepository orderItemGroupRepository, EmployeeRepository employeeRepository, LocalDateTimeService localDateTimeService) {
         this.orderRepository = orderRepository;
         this.orderItemGroupRepository = orderItemGroupRepository;
+        this.employeeRepository = employeeRepository;
         this.localDateTimeService = localDateTimeService;
     }
 
@@ -70,6 +71,26 @@ public class OrderServiceImpl implements OrderService {
 
         this.orderItemGroupRepository.save(orderItemGroup);
 
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void cancelOrder(Integer id, String pin) {
+        var employee = employeeRepository
+                .findByPin(pin)
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee with PIN: " + pin + " not found."));
+        var order = getOrder(id);
+        if (!order.getWaiter().getId().equals(employee.getId())) {
+            throw new InvalidEmployeeException("Employee with PIN: " + pin + " is not responsible for this order.");
+        }
+        if (order.getStatus().equals(OrderStatus.CHARGED) || order.getStatus().equals(OrderStatus.CANCELLED)) {
+            throw new IllegalOrderStateException("Order has already been processed and cannot be canceled.");
+        }
+        if (order.getItemGroups().stream().anyMatch(ig -> ig.getIsActive() && !ig.getStatus().equals(OrderItemGroupStatus.NEW))) {
+            throw new IllegalOrderStateException("Order has already been sent to the kitchen / bar");
+        }
+        order.getItemGroups().forEach(ig -> ig.setIsActive(false));
+        order.setStatus(OrderStatus.CANCELLED);
     }
 
     @Override
