@@ -9,6 +9,8 @@ import com.ktsnvt.ktsnvt.repository.SectionRepository;
 import com.ktsnvt.ktsnvt.service.RestaurantTableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -38,6 +40,7 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public RestaurantTable createRestaurantTable(RestaurantTable newTable, Integer sectionId) {
 
         var restaurants = restaurantTableRepository.findAll();
@@ -45,7 +48,7 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
         var sectionTables = restaurantTableRepository.findAllForSection(sectionId);
 
         if(section.isEmpty()){
-            throw new NotFoundException("Section with ID " + sectionId + "does not exist.");
+            throw new NotFoundException("Section with ID " + sectionId + " does not exist.");
         }
 
         if(sectionTables.stream().anyMatch(t -> Objects.equals(t.getNumber(), newTable.getNumber()))){
@@ -63,4 +66,19 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
 
         return restaurantTableRepository.findByNumberInSection(sectionId, newTable.getNumber());
     }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void deleteRestaurantTable(Integer id) {
+        var restaurantTable = restaurantTableRepository.findByIdForUpdate(id);
+
+        if(restaurantTable.isEmpty()){
+            throw new NotFoundException("Restaurant table with ID " + id + "does not exist.");
+        }
+
+        var table = restaurantTable.get();
+        table.getSection().removeTable(table);
+        restaurantTableRepository.delete(table);
+    }
+
 }

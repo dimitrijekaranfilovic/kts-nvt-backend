@@ -7,4 +7,5 @@ import java.util.Collection;
 public interface RestaurantTableService {
     Collection<RestaurantTable> getAllTablesForSection(Integer sectionId);
     RestaurantTable createRestaurantTable(RestaurantTable newTable, Integer sectionId);
+    void deleteRestaurantTable(Integer id);
 }

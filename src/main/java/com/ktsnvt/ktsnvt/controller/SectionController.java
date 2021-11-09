@@ -55,7 +55,7 @@ public class SectionController {
         return restaurantTableService.getAllTablesForSection(sectionId).stream().map(restaurantTableToReadSectionTablesResponse::convert).collect(Collectors.toList());
     }
 
-    @PostMapping(value = "{sectionId}")
+    @PostMapping(value = "table/{sectionId}")
     @ResponseStatus(HttpStatus.CREATED)
     public CreateRestaurantTableResponse createTable(@RequestBody CreateRestaurantTableRequest request, @PathVariable Integer sectionId){
         RestaurantTable newTable = createRestaurantTableRequestToRestaurantTable.convert(request);
@@ -63,5 +63,11 @@ public class SectionController {
         RestaurantTable createdTable = restaurantTableService.createRestaurantTable(newTable, sectionId);
 
         return restaurantTableToCreateRestaurantTableResponse.convert(createdTable);
+    }
+
+    @DeleteMapping(value = "table/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteTable(@PathVariable Integer id){
+        restaurantTableService.deleteRestaurantTable(id);
     }
 }
