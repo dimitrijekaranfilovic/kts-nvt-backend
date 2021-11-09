@@ -13,4 +13,6 @@ public interface SuperUserService {
     Page<SuperUser> read(String query, BigDecimal salaryFrom, BigDecimal salaryTo, SuperUserType type, Pageable pageable);
 
     void deleteManager(Integer id);
+
+    void updatePassword(Integer id, String oldPassword, String newPassword);
 }

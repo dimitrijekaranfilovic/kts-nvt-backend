@@ -1,7 +1,9 @@
 package com.ktsnvt.ktsnvt.service.impl;
 
 import com.ktsnvt.ktsnvt.exception.EmailAlreadyExistsException;
+import com.ktsnvt.ktsnvt.exception.InvalidPasswordException;
 import com.ktsnvt.ktsnvt.exception.ManagerNotFoundException;
+import com.ktsnvt.ktsnvt.exception.SuperUserNotFoundException;
 import com.ktsnvt.ktsnvt.model.SuperUser;
 import com.ktsnvt.ktsnvt.model.enums.SuperUserType;
 import com.ktsnvt.ktsnvt.repository.SuperUserRepository;
@@ -55,5 +57,17 @@ public class SuperUserServiceImpl implements SuperUserService {
                 .orElseThrow(() -> new ManagerNotFoundException("Cannot find manager with id: " + id));
         salaryService.endActiveSalaryForUser(manager);
         manager.setIsActive(false);
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void updatePassword(Integer id, String oldPassword, String newPassword) {
+        var user = superUserRepository
+                .findById(id)
+                .orElseThrow(() -> new SuperUserNotFoundException("Cannot find superuser with id: " + id));
+        if (!user.getPassword().equals(oldPassword)) {
+            throw new InvalidPasswordException("Incorrect old password provided.");
+        }
+        user.setPassword(newPassword);
     }
 }

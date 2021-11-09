@@ -4,6 +4,7 @@ import com.ktsnvt.ktsnvt.dto.createesuperuser.CreateSuperUserRequest;
 import com.ktsnvt.ktsnvt.dto.createesuperuser.CreateSuperUserResponse;
 import com.ktsnvt.ktsnvt.dto.readsuperusers.ReadSuperUsersRequest;
 import com.ktsnvt.ktsnvt.dto.readsuperusers.ReadSuperUsersResponse;
+import com.ktsnvt.ktsnvt.dto.updatepassword.UpdatePasswordRequest;
 import com.ktsnvt.ktsnvt.model.SuperUser;
 import com.ktsnvt.ktsnvt.service.SuperUserService;
 import com.ktsnvt.ktsnvt.support.EntityConverter;
@@ -34,6 +35,14 @@ public class SuperUserController {
         this.createSuperUserToSuperUser = createSuperUserToSuperUser;
         this.superUserToCreateSuperUserResponse = superUserToCreateSuperUserResponse;
         this.superUserToReadSuperUserResponse = superUserToReadSuperUserResponse;
+    }
+
+    // PRE AUTHORIZE (ADMIN, MANAGER)
+    // OWNING USER
+    @PutMapping("/{id}/update-password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updatePassword(@PathVariable Integer id, @RequestBody @Valid UpdatePasswordRequest request) {
+        superUserService.updatePassword(id, request.getOldPassword(), request.getNewPassword());
     }
 
     // PRE AUTHORIZE (ADMIN)
