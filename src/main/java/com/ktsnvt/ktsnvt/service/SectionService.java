@@ -6,4 +6,6 @@ import java.util.Collection;
 
 public interface SectionService {
     Collection<Section> getAllSections();
+
+    Section create(Section section);
 }
