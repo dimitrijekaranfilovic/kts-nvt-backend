@@ -36,26 +36,20 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order getOrder(Integer id) {
-        return this.orderRepository.findById(id).orElseThrow(()-> new NotFoundException("Order with id " + id + " not found."));
+        return this.orderRepository.findById(id).orElseThrow(() -> new NotFoundException("Order with id " + id + " not found."));
     }
 
     @Override
     public Optional<OrderItemGroup> getOrderItemGroup(Integer orderId, String groupName) {
         return this.orderItemGroupRepository.getGroupByNameAndOrderId(orderId, groupName);
-
-@Service
-public class OrderServiceImpl implements OrderService {
-    private final OrderRepository orderRepository;
-
-    @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository) {
-        this.orderRepository = orderRepository;
-
     }
 
+    public boolean hasAssignedActiveOrders(Employee employee) {
+        return orderRepository.streamAssignedActiveOrdersForEmployee(employee.getId()).findAny().isPresent();
+    }
+    
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
-
     public OrderItemGroup createGroupForOrder(Integer orderId, String groupName) {
         var order = this.getOrder(orderId);
         var optionalOrderItemGroup = this.getOrderItemGroup(orderId, groupName);
@@ -64,10 +58,6 @@ public class OrderServiceImpl implements OrderService {
         var orderItemGroup = new OrderItemGroup(groupName, OrderItemGroupStatus.NEW, order);
         return this.orderItemGroupRepository.save(orderItemGroup);
     }
-
-
-    public boolean hasAssignedActiveOrders(Employee employee) {
-        return orderRepository.streamAssignedActiveOrdersForEmployee(employee.getId()).findAny().isPresent();
-    }
-
 }
+
+
