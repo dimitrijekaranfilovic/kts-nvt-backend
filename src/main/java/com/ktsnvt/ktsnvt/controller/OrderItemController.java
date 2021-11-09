@@ -22,48 +22,42 @@ public class OrderItemController {
         this.orderItemToReadFoodAndDrinkRequest = orderItemToReadFoodAndDrinkRequest;
     }
 
-    @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @RequestMapping("food-requests")
+    @GetMapping(value ="food-requests")
     public Page<ReadFoodAndDrinkRequestResponse> getFoodRequests(Pageable pageable) {
         var foodRequests = orderItemService.getAllFoodRequests(pageable);
         return foodRequests.map(orderItemToReadFoodAndDrinkRequest::convert);
     }
 
-    @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @RequestMapping("drink-requests")
+    @GetMapping(value ="drink-requests")
     public Page<ReadFoodAndDrinkRequestResponse> getDrinkRequests(Pageable pageable) {
         var drinkRequests = orderItemService.getAllDrinkRequests(pageable);
         return drinkRequests.map(orderItemToReadFoodAndDrinkRequest::convert);
     }
 
-    @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @RequestMapping("food-preparation-requests")
+    @GetMapping(value ="food-preparation-requests")
     public Page<ReadFoodAndDrinkRequestResponse> getFoodInPreparation(Pageable pageable) {
         var foodRequests = orderItemService.getAllFoodInPreparation(pageable);
         return foodRequests.map(orderItemToReadFoodAndDrinkRequest::convert);
     }
 
-    @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @RequestMapping("drink-preparation-requests")
+    @GetMapping(value ="drink-preparation-requests")
     public Page<ReadFoodAndDrinkRequestResponse> getDrinksInPreparation(Pageable pageable) {
         var drinkRequests = orderItemService.getAllDrinksInPreparation(pageable);
         return drinkRequests.map(orderItemToReadFoodAndDrinkRequest::convert);
     }
 
-    @PutMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @RequestMapping("prepare/{itemId}/{pin}")
+    @PutMapping(value ="prepare/{itemId}/{pin}")
     public void takeItem(@PathVariable Integer itemId, @PathVariable String pin) {
         orderItemService.takeItemRequest(itemId, pin);
     }
 
-    @PutMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @RequestMapping("finish/{itemId}/{pin}")
+    @PutMapping(value ="finish/{itemId}/{pin}")
     public void finishItem(@PathVariable Integer itemId, @PathVariable String pin) {
         orderItemService.finishItemRequest(itemId, pin);
     }

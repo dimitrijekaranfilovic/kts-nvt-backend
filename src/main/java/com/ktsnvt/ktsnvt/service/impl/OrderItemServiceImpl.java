@@ -6,6 +6,7 @@ import com.ktsnvt.ktsnvt.model.Employee;
 import com.ktsnvt.ktsnvt.model.OrderItem;
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
 import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
+import com.ktsnvt.ktsnvt.model.enums.OrderItemGroupStatus;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemStatus;
 import com.ktsnvt.ktsnvt.repository.EmployeeRepository;
 import com.ktsnvt.ktsnvt.repository.OrderItemRepository;
@@ -55,6 +56,7 @@ public class OrderItemServiceImpl implements OrderItemService {
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void takeItemRequest(Integer itemId, String employeePin) {
         var employee = employeeRepository.findEmployeeByPin(employeePin);
         var orderItem = orderItemRepository.findOneByIdWithItemReference(itemId);
@@ -84,6 +86,7 @@ public class OrderItemServiceImpl implements OrderItemService {
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void finishItemRequest(Integer itemId, String employeePin) {
         var employee = employeeRepository.findEmployeeByPin(employeePin);
         var orderItem = orderItemRepository.findOneInProgressByIdWithItemReference(itemId);
@@ -116,8 +119,14 @@ public class OrderItemServiceImpl implements OrderItemService {
             item.setTakenAt(dateTimeService.currentTime());
             item.setPreparedBy(employee.get());
         }
-
         orderItemRepository.save(item);
+
+        var allFromGroup = orderItemRepository.getAllFromOneGroup(item.getOrderItemGroup().getId());
+
+        if(allFromGroup.stream().allMatch(oi -> oi.getStatus() == OrderItemStatus.DONE)){
+            item.getOrderItemGroup().setStatus(OrderItemGroupStatus.DONE);
+            // NOTIFIKACIJA
+        }
     }
 
     @Override

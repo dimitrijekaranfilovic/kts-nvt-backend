@@ -1,11 +1,14 @@
 package com.ktsnvt.ktsnvt.repository;
 
+import com.ktsnvt.ktsnvt.model.OrderItem;
 import com.ktsnvt.ktsnvt.model.OrderItemGroup;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
+
+import java.util.Collection;
 
 public interface OrderItemGroupRepository extends JpaRepository<OrderItemGroup, Integer> {
 
