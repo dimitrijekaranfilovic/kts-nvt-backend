@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "api/section")
+@RequestMapping(value = "api/sections")
 public class SectionController {
     private final SectionService sectionService;
     private final RestaurantTableService restaurantTableService;
@@ -32,7 +32,7 @@ public class SectionController {
         this.restaurantTableToReadSectionTablesResponse = restaurantTableToReadSectionTablesResponse;
     }
 
-    @GetMapping(value ="all")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Collection<ReadSectionResponse> getAllSections() {
         return sectionService.getAllSections().stream().map(s -> sectionToReadSectionResponse.convert(s)).collect(Collectors.toList());
@@ -40,7 +40,7 @@ public class SectionController {
 
     @GetMapping(value = "{sectionId}/tables")
     @ResponseStatus(HttpStatus.OK)
-    public Collection<ReadSectionTablesResponse> getAllSections(@PathVariable Integer sectionId) {
+    public Collection<ReadSectionTablesResponse> getAllSectionTables(@PathVariable Integer sectionId) {
         return restaurantTableService.getAllTablesForSection(sectionId).stream().map(t -> restaurantTableToReadSectionTablesResponse.convert(t)).collect(Collectors.toList());
     }
 }
