@@ -2,6 +2,7 @@ package com.ktsnvt.ktsnvt.service.impl;
 
 import com.ktsnvt.ktsnvt.exception.InvalidEmployeeTypeException;
 import com.ktsnvt.ktsnvt.exception.OrderItemNotFoundException;
+import com.ktsnvt.ktsnvt.model.Employee;
 import com.ktsnvt.ktsnvt.model.OrderItem;
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
 import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
@@ -23,7 +24,6 @@ import java.util.Objects;
 
 @Service
 public class OrderItemServiceImpl implements OrderItemService {
-
     private final EmployeeRepository employeeRepository;
     private final OrderItemRepository orderItemRepository;
     private final LocalDateTimeService dateTimeService;
@@ -127,5 +127,11 @@ public class OrderItemServiceImpl implements OrderItemService {
             item.getOrderItemGroup().setStatus(OrderItemGroupStatus.DONE);
             // NOTIFIKACIJA
         }
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public boolean hasActiveOrderItems(Employee employee) {
+        return orderItemRepository.streamActiveOrderItemsForEmployee(employee.getId()).findAny().isPresent();
     }
 }

@@ -6,6 +6,7 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.Table;
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,11 +28,15 @@ public abstract class User extends BaseEntity {
     @JoinColumn(name = "authority_id")
     private Authority authority;
 
+    @Column(name = "current_salary", nullable = false)
+    private BigDecimal currentSalary;
+
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Salary> salaries = new HashSet<>();
 
     protected User() {
         super();
+        currentSalary = BigDecimal.valueOf(0);
     }
 
     protected User(String name, String surname, Authority authority) {
@@ -43,6 +48,7 @@ public abstract class User extends BaseEntity {
 
     public void addSalary(Salary salary) {
         salaries.add(salary);
+        currentSalary = salary.getAmount();
         salary.setUser(this);
     }
 

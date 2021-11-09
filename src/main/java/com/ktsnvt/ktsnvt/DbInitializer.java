@@ -66,9 +66,9 @@ public class DbInitializer implements ApplicationRunner {
         authorityRepo.save(admin);
 
         var salary1 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
-        var salary2 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
+        var salary2 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("512.00"), null);
         var salary3 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
-        var salary4 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
+        var salary4 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("550.00"), null);
         var salary5 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
         salaryRepo.save(salary1);
         salaryRepo.save(salary2);
@@ -93,9 +93,9 @@ public class DbInitializer implements ApplicationRunner {
         superUserRepo.save(manager1);
         superUserRepo.save(admin1);
 
-        var item1 = new InventoryItem("Ice cream", 70.00, "Description", "image", "Allergies", ItemCategory.FOOD);
-        var item2 = new InventoryItem("T-bone steak", 440.00, "Description", "image", "Allergies", ItemCategory.FOOD);
-        var item3 = new InventoryItem("Orange juice", 50.00, "Description", "image", "Allergies", ItemCategory.DRINK);
+        var item1 = new InventoryItem("Ice cream", BigDecimal.valueOf(70.00), "Description", "image", "Allergies", ItemCategory.FOOD);
+        var item2 = new InventoryItem("T-bone steak", BigDecimal.valueOf(440.00), "Description", "image", "Allergies", ItemCategory.FOOD);
+        var item3 = new InventoryItem("Orange juice", BigDecimal.valueOf(50.00), "Description", "image", "Allergies", ItemCategory.DRINK);
         inventoryItemRepo.save(item1);
         inventoryItemRepo.save(item2);
         inventoryItemRepo.save(item3);
@@ -154,6 +154,7 @@ public class DbInitializer implements ApplicationRunner {
         var orderItem2 = new OrderItem(1, orderGroup1, null, menuItem2, OrderItemStatus.SENT);
         var orderItem3 = new OrderItem(1, orderGroup1, null, menuItem3, OrderItemStatus.SENT);
         var orderItem4 = new OrderItem(1, orderGroup1, null, menuItem3, OrderItemStatus.NEW);
+        // orderItem1.setPreparedBy(employee2);
         orderGroup1.addItem(orderItem1);
         orderItem1.setSentAt(LocalDateTime.now());
         orderGroup1.addItem(orderItem2);

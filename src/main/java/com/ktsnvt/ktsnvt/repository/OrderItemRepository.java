@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import javax.persistence.LockModeType;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
 
@@ -35,4 +36,9 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
 
     @Query("select oi from OrderItem oi where oi.orderItemGroup.id = :groupId")
     Collection<OrderItem> getAllFromOneGroup(Integer groupId);
+
+    // Order item status != DONE
+    @Query("select oi from OrderItem oi where oi.preparedBy.id = :id and oi.status <> 2")
+    Stream<OrderItem> streamActiveOrderItemsForEmployee(Integer id);
+
 }
