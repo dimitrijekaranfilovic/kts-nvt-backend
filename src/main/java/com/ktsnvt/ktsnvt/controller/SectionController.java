@@ -4,6 +4,7 @@ import com.ktsnvt.ktsnvt.dto.createsection.CreateSectionRequest;
 import com.ktsnvt.ktsnvt.dto.createsection.CreateSectionResponse;
 import com.ktsnvt.ktsnvt.dto.readsection.ReadSectionResponse;
 import com.ktsnvt.ktsnvt.dto.readsectiontablesresponse.ReadSectionTablesResponse;
+import com.ktsnvt.ktsnvt.dto.updatesection.UpdateSectionRequest;
 import com.ktsnvt.ktsnvt.model.Section;
 import com.ktsnvt.ktsnvt.service.RestaurantTableService;
 import com.ktsnvt.ktsnvt.service.SectionService;
@@ -52,6 +53,13 @@ public class SectionController {
         var section = createSectionToSection.convert(request);
         var result = sectionService.create(section);
         return sectionToCreateSection.convert(result);
+    }
+
+    // PRE AUTHORIZE (ADMIN)
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateSection(@PathVariable Integer id, @RequestBody @Valid UpdateSectionRequest request) {
+        sectionService.update(id, request.getName());
     }
 
     @GetMapping
