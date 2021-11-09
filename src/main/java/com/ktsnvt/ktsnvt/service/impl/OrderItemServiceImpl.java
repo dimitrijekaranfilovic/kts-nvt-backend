@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Service
@@ -36,23 +35,8 @@ public class OrderItemServiceImpl implements OrderItemService {
     }
 
     @Override
-    public Page<OrderItem> getAllFoodRequests(Pageable pageable) {
-        return orderItemRepository.findAllFoodRequests(pageable);
-    }
-
-    @Override
-    public Page<OrderItem> getAllDrinkRequests(Pageable pageable) {
-        return orderItemRepository.findAllDrinkRequests(pageable);
-    }
-
-    @Override
-    public Page<OrderItem> getAllFoodInPreparation(Pageable pageable) {
-        return orderItemRepository.findAllFoodInPreparation(pageable);
-    }
-
-    @Override
-    public Page<OrderItem> getAllDrinksInPreparation(Pageable pageable) {
-        return orderItemRepository.findAllDrinksInPreparation(pageable);
+    public Page<OrderItem> getAllItemRequests(Pageable pageable, OrderItemStatus status, ItemCategory category) {
+        return orderItemRepository.findAllItemRequests(pageable, status, category);
     }
 
     @Override
@@ -102,7 +86,7 @@ public class OrderItemServiceImpl implements OrderItemService {
         var item = orderItem.get();
         var employeeCurrent = employee.get();
 
-        if(item.getPreparedBy() != null && !Objects.equals(item.getPreparedBy().getId(), employeeCurrent.getId())){
+        if (item.getPreparedBy() != null && !Objects.equals(item.getPreparedBy().getId(), employeeCurrent.getId())) {
             throw new InvalidEmployeeTypeException(employeePin);
         }
 
@@ -115,7 +99,7 @@ public class OrderItemServiceImpl implements OrderItemService {
         item.setStatus(OrderItemStatus.DONE);
         item.setPreparedAt(dateTimeService.currentTime());
 
-        if(item.getPreparedBy() == null){
+        if (item.getPreparedBy() == null) {
             item.setTakenAt(dateTimeService.currentTime());
             item.setPreparedBy(employee.get());
         }
@@ -123,7 +107,7 @@ public class OrderItemServiceImpl implements OrderItemService {
 
         var allFromGroup = orderItemRepository.getAllFromOneGroup(item.getOrderItemGroup().getId());
 
-        if(allFromGroup.stream().allMatch(oi -> oi.getStatus() == OrderItemStatus.DONE)){
+        if (allFromGroup.stream().allMatch(oi -> oi.getStatus() == OrderItemStatus.DONE)) {
             item.getOrderItemGroup().setStatus(OrderItemGroupStatus.DONE);
             // NOTIFIKACIJA
         }
