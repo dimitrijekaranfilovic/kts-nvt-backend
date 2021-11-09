@@ -1,10 +1,7 @@
 package com.ktsnvt.ktsnvt.config;
 
 
-import com.ktsnvt.ktsnvt.exception.BusinessException;
-import com.ktsnvt.ktsnvt.exception.ErrorInfo;
-import com.ktsnvt.ktsnvt.exception.NotFoundException;
-import com.ktsnvt.ktsnvt.exception.OrderItemGroupExistsException;
+import com.ktsnvt.ktsnvt.exception.*;
 import org.hibernate.QueryException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.dao.PessimisticLockingFailureException;
@@ -90,5 +87,14 @@ public class ErrorHandlerController {
         return new ErrorInfo(request.getRequestURI(), ex.getLocalizedMessage(), LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST, errors);
     }
+
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(OrderItemGroupInvalidStatusException.class)
+    @ResponseBody
+    public ErrorInfo handleOrderItemGroupInvalidStatusException(HttpServletRequest request, OrderItemGroupInvalidStatusException ex){
+        return new ErrorInfo(request.getRequestURI(), ex.getMessage(), LocalDateTime.now(), HttpStatus.BAD_REQUEST);
+    }
+
 
 }

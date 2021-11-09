@@ -27,7 +27,7 @@ public class OrderItemGroup extends BaseEntity {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "orderItemGroup")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "orderItemGroup", cascade = CascadeType.ALL)
     private Set<OrderItem> orderItems = new HashSet<>();
 
     public OrderItemGroup() {

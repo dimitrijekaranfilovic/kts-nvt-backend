@@ -15,5 +15,6 @@ public interface OrderService {
     OrderItemGroup createGroupForOrder(Integer orderId, String groupName);
     boolean hasAssignedActiveOrders(Employee employee);
 
+    void sendOrderItemGroup(Integer orderId, Integer groupId);
 
 }
