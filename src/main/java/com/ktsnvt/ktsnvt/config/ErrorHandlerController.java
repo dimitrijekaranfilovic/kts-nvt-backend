@@ -4,6 +4,7 @@ package com.ktsnvt.ktsnvt.config;
 import com.ktsnvt.ktsnvt.exception.BusinessException;
 import com.ktsnvt.ktsnvt.exception.ErrorInfo;
 import com.ktsnvt.ktsnvt.exception.NotFoundException;
+import org.hibernate.QueryException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -35,5 +36,13 @@ public class ErrorHandlerController {
     @ResponseBody
     public ErrorInfo handleNotFoundException(HttpServletRequest request, NotFoundException ex) {
         return new ErrorInfo(request.getRequestURI(), ex.getMessage(), LocalDateTime.now(), HttpStatus.NOT_FOUND);
+    }
+
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(QueryException.class)
+    @ResponseBody
+    public ErrorInfo handleQueryException(HttpServletRequest request, QueryException ex){
+        return new ErrorInfo(request.getRequestURI(), ex.getCause().getMessage(), LocalDateTime.now(), HttpStatus.BAD_REQUEST);
     }
 }

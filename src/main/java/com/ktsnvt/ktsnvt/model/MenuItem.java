@@ -6,6 +6,7 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.Table;
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -15,7 +16,7 @@ import javax.persistence.*;
 public class MenuItem extends BaseEntity {
 
     @Column(name = "price", nullable = false)
-    private Double price;
+    private BigDecimal price;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     private InventoryItem item;
@@ -24,7 +25,7 @@ public class MenuItem extends BaseEntity {
         super();
     }
 
-    public MenuItem(Double price, InventoryItem item) {
+    public MenuItem(BigDecimal price, InventoryItem item) {
         this();
         this.price = price;
         this.item = item;
