@@ -922,6 +922,15 @@ ConvTablePath=%_HOME%\Resource Files\Conversion Tables
 
 [ModelOptions\Generate]
 
+[ModelOptions\Generate\Xsm]
+GenRootElement=Yes
+GenComplexType=No
+GenAttribute=Yes
+CheckModel=Yes
+SaveLinks=Yes
+ORMapping=No
+NameToCode=No
+
 [ModelOptions\Generate\Cdm]
 CheckModel=Yes
 SaveLinks=Yes
@@ -940,13 +949,7 @@ IndxAKName=%TABLE%_AK
 IndxFKName=%REFR%_FK
 IndxThreshold=
 ColnFKName=%.3:PARENT%_%COLUMN%
-ColnFKNameUse=No
-
-[ModelOptions\Generate\Xsm]
-CheckModel=Yes
-SaveLinks=Yes
-ORMapping=No
-NameToCode=No</a:ModelOptionsText>
+ColnFKNameUse=No</a:ModelOptionsText>
 <c:ObjectLanguage>
 <o:Shortcut Id="o3">
 <a:ObjectID>99C2CEDA-50DD-41D0-B398-4CF57DDAA3D2</a:ObjectID>
@@ -3314,12 +3317,12 @@ LABL 0 Arial,8,N</a:FontList>
 <a:Code>Java</a:Code>
 <a:CreationDate>1635778635</a:CreationDate>
 <a:Creator>Marko</a:Creator>
-<a:ModificationDate>1635778635</a:ModificationDate>
-<a:Modifier>Marko</a:Modifier>
-<a:ExtractionBranchName/>
+<a:ModificationDate>1635944193</a:ModificationDate>
+<a:Modifier>User</a:Modifier>
 <a:TargetModelURL>file:///%_OBJLANG%/java5-j2ee14.xol</a:TargetModelURL>
 <a:TargetModelID>0DEDDB90-46E2-45A0-886E-411709DA0DC9</a:TargetModelID>
 <a:TargetModelClassID>1811206C-1A4B-11D1-83D9-444553540000</a:TargetModelClassID>
+<a:TargetModelLastModificationDate>1302065259</a:TargetModelLastModificationDate>
 <c:SessionShortcuts>
 <o:Shortcut Ref="o3"/>
 </c:SessionShortcuts>
@@ -3330,12 +3333,12 @@ LABL 0 Arial,8,N</a:FontList>
 <a:Code>WSDLJava</a:Code>
 <a:CreationDate>1635778635</a:CreationDate>
 <a:Creator>Marko</a:Creator>
-<a:ModificationDate>1635778635</a:ModificationDate>
-<a:Modifier>Marko</a:Modifier>
-<a:ExtractionBranchName/>
+<a:ModificationDate>1635944193</a:ModificationDate>
+<a:Modifier>User</a:Modifier>
 <a:TargetModelURL>file:///%_XEM%/WSDLJ2EE.xem</a:TargetModelURL>
 <a:TargetModelID>C8F5F7B2-CF9D-4E98-8301-959BB6E86C8A</a:TargetModelID>
 <a:TargetModelClassID>186C8AC3-D3DC-11D3-881C-00508B03C75C</a:TargetModelClassID>
+<a:TargetModelLastModificationDate>1096028631</a:TargetModelLastModificationDate>
 <c:SessionShortcuts>
 <o:Shortcut Ref="o4"/>
 </c:SessionShortcuts>

@@ -16,7 +16,7 @@ public class ReadFoodAndDrinkRequestResponse {
 
     private LocalDateTime takenAt;
 
-    private String item;
+    private String itemItemName;
 
     private String preparedBy;
 

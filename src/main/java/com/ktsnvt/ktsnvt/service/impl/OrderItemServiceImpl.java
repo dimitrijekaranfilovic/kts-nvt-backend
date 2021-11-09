@@ -8,6 +8,7 @@ import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemStatus;
 import com.ktsnvt.ktsnvt.repository.EmployeeRepository;
 import com.ktsnvt.ktsnvt.repository.OrderItemRepository;
+import com.ktsnvt.ktsnvt.service.LocalDateTimeService;
 import com.ktsnvt.ktsnvt.service.OrderItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,60 +16,39 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 public class OrderItemServiceImpl implements OrderItemService {
 
     private final EmployeeRepository employeeRepository;
     private final OrderItemRepository orderItemRepository;
+    private final LocalDateTimeService dateTimeService;
 
     @Autowired
-    public OrderItemServiceImpl(EmployeeRepository employeeRepository, OrderItemRepository orderItemRepository) {
+    public OrderItemServiceImpl(EmployeeRepository employeeRepository, OrderItemRepository orderItemRepository, LocalDateTimeService dateTimeService) {
         this.employeeRepository = employeeRepository;
         this.orderItemRepository = orderItemRepository;
+        this.dateTimeService = dateTimeService;
     }
 
     @Override
-    public Page<OrderItem> getAllFoodRequests(Pageable pageable, String employeePin) {
-        var employee = employeeRepository.findEmployeeByPin(employeePin);
-
-        if (employee.isEmpty() || employee.get().getType() == EmployeeType.BARTENDER) {
-            throw new InvalidEmployeeTypeException(employeePin);
-        }
-
+    public Page<OrderItem> getAllFoodRequests(Pageable pageable) {
         return orderItemRepository.findAllFoodRequests(pageable);
     }
 
     @Override
-    public Page<OrderItem> getAllDrinkRequests(Pageable pageable, String employeePin) {
-        var employee = employeeRepository.findEmployeeByPin(employeePin);
-
-        if (employee.isEmpty() || employee.get().getType() == EmployeeType.CHEF) {
-            throw new InvalidEmployeeTypeException(employeePin);
-        }
-
+    public Page<OrderItem> getAllDrinkRequests(Pageable pageable) {
         return orderItemRepository.findAllDrinkRequests(pageable);
     }
 
     @Override
-    public Page<OrderItem> getAllFoodInPreparation(Pageable pageable, String employeePin) {
-        var employee = employeeRepository.findEmployeeByPin(employeePin);
-
-        if (employee.isEmpty() || employee.get().getType() == EmployeeType.BARTENDER) {
-            throw new InvalidEmployeeTypeException(employeePin);
-        }
-
+    public Page<OrderItem> getAllFoodInPreparation(Pageable pageable) {
         return orderItemRepository.findAllFoodInPreparation(pageable);
     }
 
     @Override
-    public Page<OrderItem> getAllDrinksInPreparation(Pageable pageable, String employeePin) {
-        var employee = employeeRepository.findEmployeeByPin(employeePin);
-
-        if (employee.isEmpty() || employee.get().getType() == EmployeeType.CHEF) {
-            throw new InvalidEmployeeTypeException(employeePin);
-        }
-
+    public Page<OrderItem> getAllDrinksInPreparation(Pageable pageable) {
         return orderItemRepository.findAllDrinksInPreparation(pageable);
     }
 
@@ -85,23 +65,26 @@ public class OrderItemServiceImpl implements OrderItemService {
             throw new OrderItemNotFoundException("Order item with id " + itemId + " is not present.");
         }
 
-        if (employee.get().getType() == EmployeeType.CHEF && orderItem.get().getItem().getItem().getCategory() == ItemCategory.DRINK) {
+        var item = orderItem.get();
+        var employeeCurrent = employee.get();
+
+        if (employeeCurrent.getType() == EmployeeType.CHEF && item.getItem().getItem().getCategory() == ItemCategory.DRINK) {
             throw new InvalidEmployeeTypeException(employeePin);
-        } else if (employee.get().getType() == EmployeeType.BARTENDER && orderItem.get().getItem().getItem().getCategory() == ItemCategory.FOOD) {
+        } else if (employeeCurrent.getType() == EmployeeType.BARTENDER && item.getItem().getItem().getCategory() == ItemCategory.FOOD) {
             throw new InvalidEmployeeTypeException(employeePin);
         }
 
-        orderItem.get().setPreparedBy(employee.get());
-        orderItem.get().setStatus(OrderItemStatus.PREPARING);
-        orderItem.get().setTakenAt(LocalDateTime.now());
+        item.setPreparedBy(employee.get());
+        item.setStatus(OrderItemStatus.PREPARING);
+        item.setTakenAt(dateTimeService.currentTime());
 
-        orderItemRepository.save(orderItem.get());
+        orderItemRepository.save(item);
     }
 
     @Override
     public void finishItemRequest(Integer itemId, String employeePin) {
         var employee = employeeRepository.findEmployeeByPin(employeePin);
-        var orderItem = orderItemRepository.findOneByIdWithItemReference(itemId);
+        var orderItem = orderItemRepository.findOneInProgressByIdWithItemReference(itemId);
 
         if (employee.isEmpty()) {
             throw new InvalidEmployeeTypeException(employeePin);
@@ -111,15 +94,27 @@ public class OrderItemServiceImpl implements OrderItemService {
             throw new OrderItemNotFoundException("Order item with id " + itemId + " is not present.");
         }
 
-        if (employee.get().getType() == EmployeeType.CHEF && orderItem.get().getItem().getItem().getCategory() == ItemCategory.DRINK) {
-            throw new InvalidEmployeeTypeException(employeePin);
-        } else if (employee.get().getType() == EmployeeType.BARTENDER && orderItem.get().getItem().getItem().getCategory() == ItemCategory.FOOD) {
+        var item = orderItem.get();
+        var employeeCurrent = employee.get();
+
+        if(item.getPreparedBy() != null && !Objects.equals(item.getPreparedBy().getId(), employeeCurrent.getId())){
             throw new InvalidEmployeeTypeException(employeePin);
         }
 
-        orderItem.get().setStatus(OrderItemStatus.DONE);
-        orderItem.get().setPreparedAt(LocalDateTime.now());
+        if (employeeCurrent.getType() == EmployeeType.CHEF && item.getItem().getItem().getCategory() == ItemCategory.DRINK) {
+            throw new InvalidEmployeeTypeException(employeePin);
+        } else if (employeeCurrent.getType() == EmployeeType.BARTENDER && item.getItem().getItem().getCategory() == ItemCategory.FOOD) {
+            throw new InvalidEmployeeTypeException(employeePin);
+        }
 
-        orderItemRepository.save(orderItem.get());
+        item.setStatus(OrderItemStatus.DONE);
+        item.setPreparedAt(dateTimeService.currentTime());
+
+        if(item.getPreparedBy() == null){
+            item.setTakenAt(dateTimeService.currentTime());
+            item.setPreparedBy(employee.get());
+        }
+
+        orderItemRepository.save(item);
     }
 }

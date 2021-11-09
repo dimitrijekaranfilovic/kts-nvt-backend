@@ -28,14 +28,14 @@ public class OrderItem extends BaseEntity {
     @Column(name = "prepared_at", nullable = true)
     private LocalDateTime preparedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "orderItemGroup_id")
     private OrderItemGroup orderItemGroup;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private Employee preparedBy;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private MenuItem item;
 
     @Column(name = "status", nullable = false)

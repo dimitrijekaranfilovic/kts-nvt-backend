@@ -7,13 +7,13 @@ import org.springframework.data.domain.Pageable;
 
 public interface OrderItemService {
 
-    Page<OrderItem> getAllFoodRequests(Pageable pageable, String employeePin);
+    Page<OrderItem> getAllFoodRequests(Pageable pageable);
 
-    Page<OrderItem> getAllDrinkRequests(Pageable pageable, String employeePin);
+    Page<OrderItem> getAllDrinkRequests(Pageable pageable);
 
-    Page<OrderItem> getAllFoodInPreparation(Pageable pageable, String employeePin);
+    Page<OrderItem> getAllFoodInPreparation(Pageable pageable);
 
-    Page<OrderItem> getAllDrinksInPreparation(Pageable pageable, String employeePin);
+    Page<OrderItem> getAllDrinksInPreparation(Pageable pageable);
 
     void takeItemRequest(Integer itemId, String employeePin);
 

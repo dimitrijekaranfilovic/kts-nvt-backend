@@ -12,7 +12,6 @@ public class OrderItemToReadFoodAndDrinkRequest extends AbstractConverter<OrderI
     @Override
     public ReadFoodAndDrinkRequestResponse convert(@NonNull OrderItem response) {
         var foodAndDrinkRequest = getModelMapper().map(response, ReadFoodAndDrinkRequestResponse.class);
-        foodAndDrinkRequest.setItem(response.getItem().getItem().getName());
         
         if(response.getPreparedBy() != null)
             foodAndDrinkRequest.setPreparedBy(response.getPreparedBy().getName() + " " + response.getPreparedBy().getSurname());

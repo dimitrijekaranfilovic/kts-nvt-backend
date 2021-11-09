@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "api/orderItems")
+@RequestMapping(value = "api/order-items")
 public class OrderItemController {
     private final OrderItemService orderItemService;
 
@@ -23,33 +23,33 @@ public class OrderItemController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @RequestMapping("food_requests/{pin}")
-    public Page<ReadFoodAndDrinkRequestResponse> getFoodRequests(Pageable pageable, @PathVariable String pin) {
-        var foodRequests = orderItemService.getAllFoodRequests(pageable, pin);
+    @RequestMapping("food-requests")
+    public Page<ReadFoodAndDrinkRequestResponse> getFoodRequests(Pageable pageable) {
+        var foodRequests = orderItemService.getAllFoodRequests(pageable);
         return foodRequests.map(orderItemToReadFoodAndDrinkRequest::convert);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @RequestMapping("drink_requests/{pin}")
-    public Page<ReadFoodAndDrinkRequestResponse> getDrinkRequests(Pageable pageable, @PathVariable String pin) {
-        var drinkRequests = orderItemService.getAllDrinkRequests(pageable, pin);
+    @RequestMapping("drink-requests")
+    public Page<ReadFoodAndDrinkRequestResponse> getDrinkRequests(Pageable pageable) {
+        var drinkRequests = orderItemService.getAllDrinkRequests(pageable);
         return drinkRequests.map(orderItemToReadFoodAndDrinkRequest::convert);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @RequestMapping("food_preparation_requests/{pin}")
-    public Page<ReadFoodAndDrinkRequestResponse> getFoodInPreparation(Pageable pageable, @PathVariable String pin) {
-        var foodRequests = orderItemService.getAllFoodInPreparation(pageable, pin);
+    @RequestMapping("food-preparation-requests")
+    public Page<ReadFoodAndDrinkRequestResponse> getFoodInPreparation(Pageable pageable) {
+        var foodRequests = orderItemService.getAllFoodInPreparation(pageable);
         return foodRequests.map(orderItemToReadFoodAndDrinkRequest::convert);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @RequestMapping("drink_preparation_requests/{pin}")
-    public Page<ReadFoodAndDrinkRequestResponse> getDrinksInPreparation(Pageable pageable, @PathVariable String pin) {
-        var drinkRequests = orderItemService.getAllDrinksInPreparation(pageable, pin);
+    @RequestMapping("drink-preparation-requests")
+    public Page<ReadFoodAndDrinkRequestResponse> getDrinksInPreparation(Pageable pageable) {
+        var drinkRequests = orderItemService.getAllDrinksInPreparation(pageable);
         return drinkRequests.map(orderItemToReadFoodAndDrinkRequest::convert);
     }
 
