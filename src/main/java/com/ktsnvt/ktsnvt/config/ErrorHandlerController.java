@@ -6,6 +6,8 @@ import com.ktsnvt.ktsnvt.exception.ErrorInfo;
 import com.ktsnvt.ktsnvt.exception.NotFoundException;
 import org.hibernate.QueryException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -13,6 +15,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @ControllerAdvice
 public class ErrorHandlerController {
@@ -45,4 +49,29 @@ public class ErrorHandlerController {
     public ErrorInfo handleQueryException(HttpServletRequest request, QueryException ex){
         return new ErrorInfo(request.getRequestURI(), ex.getCause().getMessage(), LocalDateTime.now(), HttpStatus.BAD_REQUEST);
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseBody
+    public ErrorInfo handleNotReadableException(HttpServletRequest request, RuntimeException ex) {
+        return new ErrorInfo(request.getRequestURI(), ex.getMessage(), LocalDateTime.now(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseBody
+    public ErrorInfo handleMethodArgumentNotValidException(HttpServletRequest request, MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+
+        ex.getBindingResult().getFieldErrors()
+                .forEach(e -> errors.put(e.getField(), e.getDefaultMessage()));
+
+        ex.getBindingResult().getGlobalErrors()
+                .forEach(e -> errors.put(e.getObjectName(), e.getDefaultMessage()));
+
+        return new ErrorInfo(request.getRequestURI(), ex.getLocalizedMessage(), LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST, errors);
+    }
+
+
 }
