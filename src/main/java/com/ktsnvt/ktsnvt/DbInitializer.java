@@ -103,9 +103,9 @@ public class DbInitializer implements ApplicationRunner {
         inventoryItemRepo.save(item2);
         inventoryItemRepo.save(item3);
 
-        var menuItem1 = new MenuItem(100.00, item1);
-        var menuItem2 = new MenuItem(500.00, item2);
-        var menuItem3 = new MenuItem(100.00, item3);
+        var menuItem1 = new MenuItem(BigDecimal.valueOf(100.00), item1);
+        var menuItem2 = new MenuItem(BigDecimal.valueOf(500.00), item2);
+        var menuItem3 = new MenuItem(BigDecimal.valueOf(100.00), item3);
         menuItemRepo.save(menuItem1);
         menuItemRepo.save(menuItem2);
         menuItemRepo.save(menuItem3);
