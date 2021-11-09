@@ -5,7 +5,8 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+
+import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 
 @Data
@@ -21,7 +22,7 @@ public class CreateEmployeeRequest {
     private String surname;
 
     @NotNull(message = "Salary must be provided.")
-    @Positive(message = "Salary must be greater than zero.")
+    @PositiveOrZero(message = "Salary must not be negative.")
     private BigDecimal salary;
 
     @NotNull(message = "Employee type is required.")
