@@ -4,6 +4,7 @@ import com.ktsnvt.ktsnvt.dto.readfoodanddrinkrequests.ReadFoodAndDrinkRequestRes
 import com.ktsnvt.ktsnvt.model.OrderItem;
 import com.ktsnvt.ktsnvt.service.OrderItemService;
 import com.ktsnvt.ktsnvt.support.EntityConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -13,9 +14,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "api/order-items")
 public class OrderItemController {
     private final OrderItemService orderItemService;
-
     private final EntityConverter<OrderItem, ReadFoodAndDrinkRequestResponse> orderItemToReadFoodAndDrinkRequest;
 
+    @Autowired
     public OrderItemController(OrderItemService orderItemService, EntityConverter<OrderItem, ReadFoodAndDrinkRequestResponse> orderItemToReadFoodAndDrinkRequest) {
         this.orderItemService = orderItemService;
         this.orderItemToReadFoodAndDrinkRequest = orderItemToReadFoodAndDrinkRequest;
