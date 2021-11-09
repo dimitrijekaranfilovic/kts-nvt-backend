@@ -1,17 +1,22 @@
 package com.ktsnvt.ktsnvt.service.impl;
 
+
 import com.ktsnvt.ktsnvt.exception.NotFoundException;
 import com.ktsnvt.ktsnvt.exception.OrderItemGroupExistsException;
 import com.ktsnvt.ktsnvt.model.Order;
 import com.ktsnvt.ktsnvt.model.OrderItemGroup;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemGroupStatus;
 import com.ktsnvt.ktsnvt.repository.OrderItemGroupRepository;
+
+import com.ktsnvt.ktsnvt.model.Employee;
+
 import com.ktsnvt.ktsnvt.repository.OrderRepository;
 import com.ktsnvt.ktsnvt.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.Optional;
 
@@ -37,10 +42,20 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Optional<OrderItemGroup> getOrderItemGroup(Integer orderId, String groupName) {
         return this.orderItemGroupRepository.getGroupByNameAndOrderId(orderId, groupName);
+
+@Service
+public class OrderServiceImpl implements OrderService {
+    private final OrderRepository orderRepository;
+
+    @Autowired
+    public OrderServiceImpl(OrderRepository orderRepository) {
+        this.orderRepository = orderRepository;
+
     }
 
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
+
     public OrderItemGroup createGroupForOrder(Integer orderId, String groupName) {
         var order = this.getOrder(orderId);
         var optionalOrderItemGroup = this.getOrderItemGroup(orderId, groupName);
@@ -48,6 +63,11 @@ public class OrderServiceImpl implements OrderService {
             throw new OrderItemGroupExistsException("Group with name '" + groupName + "' already exists for order with id " + orderId + ".");
         var orderItemGroup = new OrderItemGroup(groupName, OrderItemGroupStatus.NEW, order);
         return this.orderItemGroupRepository.save(orderItemGroup);
+    }
+
+
+    public boolean hasAssignedActiveOrders(Employee employee) {
+        return orderRepository.streamAssignedActiveOrdersForEmployee(employee.getId()).findAny().isPresent();
     }
 
 }

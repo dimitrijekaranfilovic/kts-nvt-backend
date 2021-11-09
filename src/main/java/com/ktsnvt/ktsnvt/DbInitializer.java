@@ -94,9 +94,9 @@ public class DbInitializer implements ApplicationRunner {
         superUserRepo.save(manager1);
         superUserRepo.save(admin1);
 
-        var item1 = new InventoryItem("Ice cream", 70.00, "Description", "image", "Allergies", ItemCategory.FOOD);
-        var item2 = new InventoryItem("T-bone steak", 440.00, "Description", "image", "Allergies", ItemCategory.FOOD);
-        var item3 = new InventoryItem("Orange juice", 50.00, "Description", "image", "Allergies", ItemCategory.DRINK);
+        var item1 = new InventoryItem("Ice cream", BigDecimal.valueOf(70.00), "Description", "image", "Allergies", ItemCategory.FOOD);
+        var item2 = new InventoryItem("T-bone steak", BigDecimal.valueOf(440.00), "Description", "image", "Allergies", ItemCategory.FOOD);
+        var item3 = new InventoryItem("Orange juice", BigDecimal.valueOf(50.00), "Description", "image", "Allergies", ItemCategory.DRINK);
         inventoryItemRepo.save(item1);
         inventoryItemRepo.save(item2);
         inventoryItemRepo.save(item3);
@@ -155,6 +155,7 @@ public class DbInitializer implements ApplicationRunner {
         var orderItem2 = new OrderItem(1, orderGroup1, null, menuItem2, OrderItemStatus.SENT);
         var orderItem3 = new OrderItem(1, orderGroup1, null, menuItem3, OrderItemStatus.SENT);
         var orderItem4 = new OrderItem(1, orderGroup1, null, menuItem3, OrderItemStatus.NEW);
+        // orderItem1.setPreparedBy(employee2);
         orderGroup1.addItem(orderItem1);
         orderItem1.setSentAt(LocalDateTime.now());
         orderGroup1.addItem(orderItem2);

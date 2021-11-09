@@ -11,4 +11,6 @@ public interface EmployeeService {
     Employee create(Employee employee);
 
     Page<Employee> read(String query, BigDecimal salaryFrom, BigDecimal salaryTo, EmployeeType type, Pageable pageable);
+
+    void delete(Integer id);
 }

@@ -8,6 +8,7 @@ import org.hibernate.annotations.Where;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -20,7 +21,7 @@ public class InventoryItem extends BaseEntity {
     private String name;
 
     @Column(name = "base_price", nullable = false)
-    private Double basePrice;
+    private BigDecimal basePrice;
 
     @Column(name = "description", nullable = false)
     private String description;
@@ -38,7 +39,7 @@ public class InventoryItem extends BaseEntity {
         super();
     }
 
-    public InventoryItem(String name, Double basePrice, String description, String image, String allergies, ItemCategory category) {
+    public InventoryItem(String name, BigDecimal basePrice, String description, String image, String allergies, ItemCategory category) {
         this();
         this.name = name;
         this.basePrice = basePrice;

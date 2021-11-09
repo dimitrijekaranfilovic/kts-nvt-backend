@@ -9,8 +9,14 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Stream;
+
 
 public interface OrderRepository extends JpaRepository<Order, Integer> {
+
+    // Order status: CREATED or IN_PROGRESS 
+    @Query("select o from Order o where o.waiter.id = :id and (o.status = 0 or o.status = 1)")
+    Stream<Order> streamAssignedActiveOrdersForEmployee(Integer id);
 
     @Query("select o from Order o where o.id > 1")
     Collection<Order> example(); // za potrebe testiranja
