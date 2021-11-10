@@ -30,7 +30,7 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "table_id")
     private RestaurantTable restaurantTable;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Employee waiter;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "order")

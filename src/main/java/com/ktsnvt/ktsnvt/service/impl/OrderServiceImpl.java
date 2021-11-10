@@ -1,13 +1,16 @@
 package com.ktsnvt.ktsnvt.service.impl;
 
 
+import com.ktsnvt.ktsnvt.exception.EmployeeNotFoundException;
+import com.ktsnvt.ktsnvt.exception.InvalidEmployeeTypeException;
 import com.ktsnvt.ktsnvt.exception.NotFoundException;
-import com.ktsnvt.ktsnvt.exception.OrderItemGroupExistsException;
 import com.ktsnvt.ktsnvt.exception.OrderItemGroupInvalidStatusException;
 import com.ktsnvt.ktsnvt.model.Order;
 import com.ktsnvt.ktsnvt.model.OrderItemGroup;
+import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemGroupStatus;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemStatus;
+import com.ktsnvt.ktsnvt.repository.EmployeeRepository;
 import com.ktsnvt.ktsnvt.repository.OrderItemGroupRepository;
 
 import com.ktsnvt.ktsnvt.model.Employee;
@@ -32,12 +35,14 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemGroupRepository orderItemGroupRepository;
     private final LocalDateTimeService localDateTimeService;
+    private final EmployeeRepository employeeRepository;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, OrderItemGroupRepository orderItemGroupRepository, LocalDateTimeService localDateTimeService) {
+    public OrderServiceImpl(OrderRepository orderRepository, OrderItemGroupRepository orderItemGroupRepository, LocalDateTimeService localDateTimeService, EmployeeRepository employeeRepository) {
         this.orderRepository = orderRepository;
         this.orderItemGroupRepository = orderItemGroupRepository;
         this.localDateTimeService = localDateTimeService;
+        this.employeeRepository = employeeRepository;
     }
 
 
@@ -77,10 +82,22 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void deleteOrderItemGroup(Integer orderId, Integer groupId) {
+    public void deleteOrderItemGroup(Integer orderId, Integer groupId, String pin) {
         var orderItemGroup = this.getOrderItemGroup(orderId, groupId);
         if (orderItemGroup.getStatus() != OrderItemGroupStatus.NEW)
             throw new OrderItemGroupInvalidStatusException(String.format("Order group with id %d for order with id %d cannot be deleted, because its status is not NEW.", orderId, groupId));
+        var optionalEmployee = this.employeeRepository.findEmployeeByPin(pin);
+
+        if(optionalEmployee.isEmpty())
+            throw new EmployeeNotFoundException("Employee does not exist.");
+        var employee = optionalEmployee.get();
+        if(employee.getType() != EmployeeType.WAITER)
+            throw new InvalidEmployeeTypeException(pin);
+        if(!employee.getId().equals(orderItemGroup.getOrder().getWaiter().getId())){
+            throw new InvalidEmployeeTypeException(pin);
+        }
+
+
         orderItemGroup.setIsActive(false);
         orderItemGroup.getOrderItems().forEach(oig -> oig.setIsActive(false));
         this.orderItemGroupRepository.save(orderItemGroup);

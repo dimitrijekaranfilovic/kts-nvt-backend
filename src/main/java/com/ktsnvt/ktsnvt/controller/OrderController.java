@@ -3,6 +3,7 @@ package com.ktsnvt.ktsnvt.controller;
 
 import com.ktsnvt.ktsnvt.dto.createorderitemgroup.CreateOrderItemGroupRequest;
 import com.ktsnvt.ktsnvt.dto.createorderitemgroup.CreateOrderItemGroupResponse;
+import com.ktsnvt.ktsnvt.dto.deleteorderitem.DeleteOrderItemRequest;
 import com.ktsnvt.ktsnvt.dto.readorderitemgroups.OrderItemGroupResponse;
 import com.ktsnvt.ktsnvt.model.OrderItemGroup;
 import com.ktsnvt.ktsnvt.service.OrderService;
@@ -52,8 +53,8 @@ public class OrderController {
 
     @DeleteMapping(value = "/{orderId}/groups/{groupId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteOrderItemGroup(@PathVariable("orderId") Integer orderId, @PathVariable("groupId") Integer groupId){
-        this.orderService.deleteOrderItemGroup(orderId, groupId);
+    public void deleteOrderItemGroup(@PathVariable("orderId") Integer orderId, @PathVariable("groupId") Integer groupId, @RequestBody @Valid DeleteOrderItemRequest request){
+        this.orderService.deleteOrderItemGroup(orderId, groupId, request.getPin());
     }
 
 }

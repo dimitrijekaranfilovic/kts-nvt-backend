@@ -23,7 +23,7 @@ public class OrderItemGroup extends BaseEntity {
     @Column(name = "status", nullable = false)
     private OrderItemGroupStatus status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "order_id")
     private Order order;
 
