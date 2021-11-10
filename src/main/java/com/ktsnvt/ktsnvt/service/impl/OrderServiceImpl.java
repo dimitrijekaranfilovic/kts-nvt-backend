@@ -1,13 +1,13 @@
 package com.ktsnvt.ktsnvt.service.impl;
 
 
-import com.ktsnvt.ktsnvt.exception.NotFoundException;
-import com.ktsnvt.ktsnvt.exception.OrderItemGroupExistsException;
-import com.ktsnvt.ktsnvt.exception.OrderItemGroupInvalidStatusException;
+import com.ktsnvt.ktsnvt.exception.*;
 import com.ktsnvt.ktsnvt.model.Order;
 import com.ktsnvt.ktsnvt.model.OrderItemGroup;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemGroupStatus;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemStatus;
+import com.ktsnvt.ktsnvt.model.enums.OrderStatus;
+import com.ktsnvt.ktsnvt.repository.EmployeeRepository;
 import com.ktsnvt.ktsnvt.repository.OrderItemGroupRepository;
 
 import com.ktsnvt.ktsnvt.model.Employee;
@@ -30,21 +30,25 @@ import java.util.Optional;
 
 @Service
 public class OrderServiceImpl implements OrderService {
-
     private final OrderRepository orderRepository;
     private final OrderItemGroupRepository orderItemGroupRepository;
+    private final EmployeeRepository employeeRepository;
+    
     private final LocalDateTimeService localDateTimeService;
+
     private final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, OrderItemGroupRepository orderItemGroupRepository, LocalDateTimeService localDateTimeService) {
+    public OrderServiceImpl(OrderRepository orderRepository, OrderItemGroupRepository orderItemGroupRepository, EmployeeRepository employeeRepository, LocalDateTimeService localDateTimeService) {
         this.orderRepository = orderRepository;
         this.orderItemGroupRepository = orderItemGroupRepository;
+        this.employeeRepository = employeeRepository;
         this.localDateTimeService = localDateTimeService;
     }
 
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Order getOrder(Integer id) {
         return this.orderRepository.findById(id).orElseThrow(() -> new NotFoundException("Order with id " + id + " not found."));
     }
@@ -54,11 +58,14 @@ public class OrderServiceImpl implements OrderService {
         return this.orderItemGroupRepository.getGroupByNameAndOrderId(orderId, groupName);
     }
 
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public boolean hasAssignedActiveOrders(Employee employee) {
         return orderRepository.streamAssignedActiveOrdersForEmployee(employee.getId()).findAny().isPresent();
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void sendOrderItemGroup(Integer orderId, Integer groupId) {
         var optionalOrderItemGroup = this.orderItemGroupRepository.getGroupByIdAndOrderId(orderId, groupId);
         if(optionalOrderItemGroup.isEmpty())
@@ -80,6 +87,27 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderItemGroup> getOrderItemGroups(Integer orderId) {
         return new ArrayList<>(this.orderItemGroupRepository.getOrderItemGroupsForOrder(orderId));
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void chargeOrder(Integer id, String pin) {
+        var employee = employeeRepository
+                .findByPin(pin)
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee with PIN: " + pin + " not found."));
+        var order = getOrder(id);
+        if (!order.getWaiter().getId().equals(employee.getId())) {
+            throw new InvalidEmployeeException("Employee with PIN: " + pin + " is not responsible for this order.");
+        }
+        if (!order.getStatus().equals(OrderStatus.IN_PROGRESS)) {
+            throw new IllegalOrderStateException("Order is not in IN PROGRESS state and thus cannot be charged.");
+        }
+        if (order.getItemGroups().stream().anyMatch(ig -> ig.getIsActive() && ig.getStatus() != OrderItemGroupStatus.DONE)) {
+            throw new IllegalOrderStateException("Order cannot be charged because not all of its groups are done.");
+        }
+        order.setStatus(OrderStatus.CHARGED);
+        order.setServedAt(localDateTimeService.currentTime());
+        order.getRestaurantTable().freeTable();
     }
 
     @Override
