@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -15,7 +14,9 @@ public interface OrderItemGroupRepository extends JpaRepository<OrderItemGroup, 
     @Query("select oig from OrderItemGroup oig where oig.name like :groupName and oig.order.id = :orderId")
     Optional<OrderItemGroup> getGroupByNameAndOrderId(@Param("orderId") Integer orderId, @Param("groupName") String groupName);
 
-    @Query("select oig from OrderItemGroup oig join fetch oig.orderItems where oig.id = :groupId and oig.order.id = :orderId")
+    @Query("select oig from OrderItemGroup oig " +
+            "join fetch oig.orderItems " +
+            "where oig.id = :groupId and oig.order.id = :orderId")
     Optional<OrderItemGroup> getGroupByIdAndOrderId(@Param("orderId") Integer orderId, @Param("groupId") Integer groupId);
 
     //if list is used, then when using join fetch hibernate returns duplicates

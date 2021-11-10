@@ -24,4 +24,7 @@ public interface OrderService {
     void chargeOrder(Integer id, String pin);
     
     void cancelOrder(Integer id, String pin);
+
+    void deleteOrderItemGroup(Integer orderId, Integer groupId, String pin);
+
 }

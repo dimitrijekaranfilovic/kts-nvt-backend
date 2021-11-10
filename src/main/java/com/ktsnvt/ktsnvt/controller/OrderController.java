@@ -5,6 +5,7 @@ import com.ktsnvt.ktsnvt.dto.chargeorder.ChargeOrderRequest;
 import com.ktsnvt.ktsnvt.dto.cancelorder.CancelOrderRequest;
 import com.ktsnvt.ktsnvt.dto.createorderitemgroup.CreateOrderItemGroupRequest;
 import com.ktsnvt.ktsnvt.dto.createorderitemgroup.CreateOrderItemGroupResponse;
+import com.ktsnvt.ktsnvt.dto.deleteorderitem.DeleteOrderItemRequest;
 import com.ktsnvt.ktsnvt.dto.readorderitemgroups.OrderItemGroupResponse;
 import com.ktsnvt.ktsnvt.model.OrderItemGroup;
 import com.ktsnvt.ktsnvt.service.EmployeeService;
@@ -63,6 +64,12 @@ public class OrderController {
     public List<OrderItemGroupResponse> getOrderItemGroups(@PathVariable("id") Integer orderId){
         var orderItemGroups = this.orderService.getOrderItemGroups(orderId);
         return orderItemGroups.stream().map(orderItemGroupToOrderItemGroupResponse::convert).collect(Collectors.toList());
+    }
+
+    @DeleteMapping(value = "/{orderId}/groups/{groupId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteOrderItemGroup(@PathVariable("orderId") Integer orderId, @PathVariable("groupId") Integer groupId, @RequestBody @Valid DeleteOrderItemRequest request){
+        this.orderService.deleteOrderItemGroup(orderId, groupId, request.getPin());
     }
 
 }
