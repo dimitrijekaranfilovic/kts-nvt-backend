@@ -22,4 +22,6 @@ public interface OrderService {
     boolean hasAssignedActiveOrders(Employee employee);
 
     void chargeOrder(Integer id, String pin);
+    
+    void cancelOrder(Integer id, String pin);
 }

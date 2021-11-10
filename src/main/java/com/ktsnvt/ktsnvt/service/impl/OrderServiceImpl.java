@@ -112,6 +112,26 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void cancelOrder(Integer id, String pin) {
+        var employee = employeeRepository
+                .findByPin(pin)
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee with PIN: " + pin + " not found."));
+        var order = getOrder(id);
+        if (!order.getWaiter().getId().equals(employee.getId())) {
+            throw new InvalidEmployeeException("Employee with PIN: " + pin + " is not responsible for this order.");
+        }
+        if (order.getStatus().equals(OrderStatus.CHARGED) || order.getStatus().equals(OrderStatus.CANCELLED)) {
+            throw new IllegalOrderStateException("Order has already been processed and cannot be canceled.");
+        }
+        if (order.getItemGroups().stream().anyMatch(ig -> ig.getIsActive() && !ig.getStatus().equals(OrderItemGroupStatus.NEW))) {
+            throw new IllegalOrderStateException("Order has already been sent to the kitchen / bar");
+        }
+        order.getItemGroups().forEach(ig -> ig.setIsActive(false));
+        order.setStatus(OrderStatus.CANCELLED);
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public OrderItemGroup createGroupForOrder(Integer orderId, String groupName) {
         var order = this.getOrder(orderId);
         var optionalOrderItemGroup = this.getOrderItemGroup(orderId, groupName);
