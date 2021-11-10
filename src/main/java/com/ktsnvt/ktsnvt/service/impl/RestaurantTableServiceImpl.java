@@ -30,7 +30,7 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
     public RestaurantTable readForUpdate(Integer id) {
         return restaurantTableRepository
                 .findByIdForUpdate(id)
-                .orElseThrow(() -> new RestaurantTableNotFoundException("Table with id: " + id + " not found."));
+                .orElseThrow(() -> new RestaurantTableNotFoundException("Restaurant table with id: " + id + " not found."));
     }
 
     @Override

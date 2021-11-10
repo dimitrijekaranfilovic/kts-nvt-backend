@@ -11,6 +11,8 @@ public interface OrderService {
 
     Order getOrder(Integer id);
 
+    Order createOrder(Integer tableId, String waiterPin);
+
     Optional<OrderItemGroup> getOrderItemGroup(Integer orderId, String groupName);
 
     OrderItemGroup createGroupForOrder(Integer orderId, String groupName);
@@ -26,5 +28,4 @@ public interface OrderService {
     void cancelOrder(Integer id, String pin);
 
     void deleteOrderItemGroup(Integer orderId, Integer groupId, String pin);
-
 }
