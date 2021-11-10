@@ -17,7 +17,7 @@ public interface OrderService {
 
     OrderItemGroup createGroupForOrder(Integer orderId, String groupName);
 
-    void sendOrderItemGroup(Integer orderId, Integer groupId);
+    void sendOrderItemGroup(Integer orderId, Integer groupId, String pin);
 
     List<OrderItemGroup> getOrderItemGroups(Integer orderId);
     

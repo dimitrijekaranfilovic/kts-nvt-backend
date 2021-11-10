@@ -9,6 +9,7 @@ import com.ktsnvt.ktsnvt.dto.createorderitemgroup.CreateOrderItemGroupRequest;
 import com.ktsnvt.ktsnvt.dto.createorderitemgroup.CreateOrderItemGroupResponse;
 import com.ktsnvt.ktsnvt.dto.deleteorderitem.DeleteOrderItemRequest;
 import com.ktsnvt.ktsnvt.dto.readorderitemgroups.OrderItemGroupResponse;
+import com.ktsnvt.ktsnvt.dto.sendorderitemgroup.SendOrderItemGroupRequest;
 import com.ktsnvt.ktsnvt.model.Order;
 import com.ktsnvt.ktsnvt.model.OrderItemGroup;
 import com.ktsnvt.ktsnvt.service.OrderService;
@@ -69,8 +70,8 @@ public class OrderController {
 
     @PutMapping(value = "/{orderId}/groups/{groupId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void sendOrderItemGroup(@PathVariable("orderId") Integer orderId, @PathVariable("groupId") Integer groupId){
-        this.orderService.sendOrderItemGroup(orderId, groupId);
+    public void sendOrderItemGroup(@PathVariable("orderId") Integer orderId, @PathVariable("groupId") Integer groupId, @RequestBody @Valid SendOrderItemGroupRequest request){
+        this.orderService.sendOrderItemGroup(orderId, groupId, request.getPin());
     }
 
     @GetMapping(value = "/{id}/groups")
