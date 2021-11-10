@@ -51,7 +51,7 @@ public class OrderController {
     @PostMapping(value = "/{id}/groups")
     @ResponseStatus(HttpStatus.CREATED)
     public CreateOrderItemGroupResponse createOrderItemGroup(@PathVariable("id") Integer orderId, @RequestBody @Valid CreateOrderItemGroupRequest request){
-        return this.orderItemGroupToCreateOrderItemGroupResponse.convert(this.orderService.createGroupForOrder(orderId, request.getGroupName()));
+        return this.orderItemGroupToCreateOrderItemGroupResponse.convert(this.orderService.createGroupForOrder(orderId, request.getGroupName(), request.getPin()));
     }
 
     @PutMapping(value = "/{orderId}/groups/{groupId}")

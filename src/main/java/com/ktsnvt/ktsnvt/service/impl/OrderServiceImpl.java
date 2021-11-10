@@ -153,11 +153,18 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public OrderItemGroup createGroupForOrder(Integer orderId, String groupName) {
+    public OrderItemGroup createGroupForOrder(Integer orderId, String groupName, String pin) {
         var order = this.getOrder(orderId);
         var optionalOrderItemGroup = this.getOrderItemGroup(orderId, groupName);
         if (optionalOrderItemGroup.isPresent())
             throw new OrderItemGroupInvalidStatusException(String.format("Group with name %s already exists for order with id %d.", groupName, orderId));
+        var employee = employeeRepository
+                .findByPin(pin)
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee with PIN: " + pin + " not found."));
+        if(!order.getWaiter().getId().equals(employee.getId()))
+            throw new InvalidEmployeeException("Employee with PIN: " + pin + " is not responsible for this order.");
+
+
         var orderItemGroup = new OrderItemGroup(groupName, OrderItemGroupStatus.NEW, order);
         return this.orderItemGroupRepository.save(orderItemGroup);
     }
