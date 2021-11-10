@@ -12,10 +12,6 @@ public interface SectionRepository extends JpaRepository<Section, Integer> {
     Optional<Section> findByName(String name);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select s from Section s where s.id = :id")
-    Optional<Section> findOneForUpdate(Integer id);
-
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select s from Section s join fetch s.restaurantTables where s.id = :id")
-    Optional<Section> findByIdWithTables(Integer id);
+    Optional<Section> findByIdWithTablesForUpdate(Integer id);
 }

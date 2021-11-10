@@ -7,6 +7,8 @@ import java.util.Collection;
 public interface SectionService {
     Collection<Section> getAllSections();
 
+    Section read(Integer id);
+
     Section readForUpdate(Integer id);
 
     Section create(Section section);

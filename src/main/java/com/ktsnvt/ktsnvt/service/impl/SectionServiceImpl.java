@@ -32,9 +32,17 @@ public class SectionServiceImpl implements SectionService {
 
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
+    public Section read(Integer id) {
+        return sectionRepository
+                .findById(id)
+                .orElseThrow(() -> new SectionNotFoundException("Cannot find section with id: " + id));
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Section readForUpdate(Integer id) {
         return sectionRepository
-                .findOneForUpdate(id)
+                .findByIdWithTablesForUpdate(id)
                 .orElseThrow(() -> new SectionNotFoundException("Cannot find section with id: " + id));
     }
 
