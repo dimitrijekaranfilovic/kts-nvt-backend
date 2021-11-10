@@ -1,9 +1,6 @@
 package com.ktsnvt.ktsnvt.service.impl;
 
-import com.ktsnvt.ktsnvt.exception.DuplicateTableNumberException;
-import com.ktsnvt.ktsnvt.exception.NotFoundException;
-import com.ktsnvt.ktsnvt.exception.OccupiedTableException;
-import com.ktsnvt.ktsnvt.exception.TableIntersectionException;
+import com.ktsnvt.ktsnvt.exception.*;
 import com.ktsnvt.ktsnvt.model.RestaurantTable;
 import com.ktsnvt.ktsnvt.repository.RestaurantTableRepository;
 import com.ktsnvt.ktsnvt.repository.SectionRepository;
@@ -18,7 +15,6 @@ import java.util.Objects;
 
 @Service
 public class RestaurantTableServiceImpl implements RestaurantTableService {
-
     private final RestaurantTableRepository restaurantTableRepository;
     private final SectionRepository sectionRepository;
 
@@ -27,6 +23,14 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
                                       SectionRepository sectionRepository) {
         this.restaurantTableRepository = restaurantTableRepository;
         this.sectionRepository = sectionRepository;
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public RestaurantTable readForUpdate(Integer id) {
+        return restaurantTableRepository
+                .findByIdForUpdate(id)
+                .orElseThrow(() -> new RestaurantTableNotFoundException("Restaurant table with id: " + id + " not found."));
     }
 
     @Override

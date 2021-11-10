@@ -26,4 +26,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select e from Employee e where e.id = :id")
     Optional<Employee> findOneForUpdate(Integer id);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select e from Employee e where e.pin = :waiterPin and e.type = :type")
+    Optional<Employee> getEmployeeByPinForUpdate(String waiterPin, EmployeeType type);
 }
