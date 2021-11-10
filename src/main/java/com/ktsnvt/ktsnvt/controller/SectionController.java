@@ -1,14 +1,20 @@
 package com.ktsnvt.ktsnvt.controller;
 
+
+import com.ktsnvt.ktsnvt.dto.createrestauranttable.CreateRestaurantTableRequest;
+import com.ktsnvt.ktsnvt.dto.createrestauranttable.CreateRestaurantTableResponse;
 import com.ktsnvt.ktsnvt.dto.createsection.CreateSectionRequest;
 import com.ktsnvt.ktsnvt.dto.createsection.CreateSectionResponse;
 import com.ktsnvt.ktsnvt.dto.readsection.ReadSectionResponse;
 import com.ktsnvt.ktsnvt.dto.readsectiontablesresponse.ReadSectionTablesResponse;
 import com.ktsnvt.ktsnvt.dto.updatesection.UpdateSectionRequest;
+import com.ktsnvt.ktsnvt.model.RestaurantTable;
 import com.ktsnvt.ktsnvt.model.Section;
 import com.ktsnvt.ktsnvt.service.RestaurantTableService;
 import com.ktsnvt.ktsnvt.service.SectionService;
 import com.ktsnvt.ktsnvt.support.EntityConverter;
+import com.ktsnvt.ktsnvt.support.createrestauranttable.CreateRestaurantTableRequestToRestaurantTable;
+import com.ktsnvt.ktsnvt.support.createrestauranttable.RestaurantTableToCreateRestaurantTableResponse;
 import com.ktsnvt.ktsnvt.support.readsection.SectionToReadSectionResponse;
 import com.ktsnvt.ktsnvt.support.readsectiontablesresponse.RestaurantTableToReadSectionTablesResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +33,8 @@ public class SectionController {
 
     private final SectionToReadSectionResponse sectionToReadSectionResponse;
     private final RestaurantTableToReadSectionTablesResponse restaurantTableToReadSectionTablesResponse;
+    private final CreateRestaurantTableRequestToRestaurantTable createRestaurantTableRequestToRestaurantTable;
+    private final RestaurantTableToCreateRestaurantTableResponse restaurantTableToCreateRestaurantTableResponse;
 
     private final EntityConverter<CreateSectionRequest, Section> createSectionToSection;
     private final EntityConverter<Section, CreateSectionResponse> sectionToCreateSection;
@@ -36,15 +44,20 @@ public class SectionController {
                              RestaurantTableService restaurantTableService,
                              SectionToReadSectionResponse sectionToReadSectionResponse,
                              RestaurantTableToReadSectionTablesResponse restaurantTableToReadSectionTablesResponse,
+                             CreateRestaurantTableRequestToRestaurantTable createRestaurantTableRequestToRestaurantTable,
+                             RestaurantTableToCreateRestaurantTableResponse restaurantTableToCreateRestaurantTableResponse,
                              EntityConverter<CreateSectionRequest, Section> createSectionToSection,
                              EntityConverter<Section, CreateSectionResponse> sectionToCreateSection) {
         this.sectionService = sectionService;
         this.restaurantTableService = restaurantTableService;
         this.sectionToReadSectionResponse = sectionToReadSectionResponse;
         this.restaurantTableToReadSectionTablesResponse = restaurantTableToReadSectionTablesResponse;
+        this.createRestaurantTableRequestToRestaurantTable = createRestaurantTableRequestToRestaurantTable;
+        this.restaurantTableToCreateRestaurantTableResponse = restaurantTableToCreateRestaurantTableResponse;
         this.createSectionToSection = createSectionToSection;
         this.sectionToCreateSection = sectionToCreateSection;
     }
+
 
     // PRE AUTHORIZE (ADMIN)
     @PostMapping
@@ -80,4 +93,22 @@ public class SectionController {
     public Collection<ReadSectionTablesResponse> getAllSectionTables(@PathVariable Integer sectionId) {
         return restaurantTableService.getAllTablesForSection(sectionId).stream().map(restaurantTableToReadSectionTablesResponse::convert).collect(Collectors.toList());
     }
+
+    @PostMapping(value = "{sectionId}/table")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CreateRestaurantTableResponse createTable(@RequestBody CreateRestaurantTableRequest
+                                                             request, @PathVariable Integer sectionId) {
+        RestaurantTable newTable = createRestaurantTableRequestToRestaurantTable.convert(request);
+
+        RestaurantTable createdTable = restaurantTableService.createRestaurantTable(newTable, sectionId);
+
+        return restaurantTableToCreateRestaurantTableResponse.convert(createdTable);
+    }
+
+    @DeleteMapping(value = "table/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteTable(@PathVariable Integer id) {
+        restaurantTableService.deleteRestaurantTable(id);
+    }
+
 }

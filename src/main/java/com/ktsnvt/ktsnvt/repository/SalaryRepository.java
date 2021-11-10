@@ -3,6 +3,7 @@ package com.ktsnvt.ktsnvt.repository;
 import com.ktsnvt.ktsnvt.model.Salary;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
