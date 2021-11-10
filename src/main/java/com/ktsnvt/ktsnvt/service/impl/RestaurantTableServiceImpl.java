@@ -74,7 +74,7 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
         var restaurantTable = restaurantTableRepository.findByIdForUpdate(id);
 
         if(restaurantTable.isEmpty()){
-            throw new NotFoundException("Restaurant table with ID " + id + "does not exist.");
+            throw new NotFoundException("Restaurant table with ID " + id + " does not exist.");
         }
 
         var table = restaurantTable.get();
@@ -83,8 +83,8 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
             throw new OccupiedTableException("Table number " + table.getNumber() + " is occupied at the moment.");
         }
 
-        table.getSection().removeTable(table);
-        restaurantTableRepository.delete(table);
+        table.setIsActive(false);
+        restaurantTableRepository.save(table);
     }
 
 }

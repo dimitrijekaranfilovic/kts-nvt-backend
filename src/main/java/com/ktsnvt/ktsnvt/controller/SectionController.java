@@ -96,7 +96,7 @@ public class SectionController {
 
     @PostMapping(value = "{sectionId}/table")
     @ResponseStatus(HttpStatus.CREATED)
-    public CreateRestaurantTableResponse createTable(@RequestBody CreateRestaurantTableRequest
+    public CreateRestaurantTableResponse createTable(@RequestBody @Valid CreateRestaurantTableRequest
                                                              request, @PathVariable Integer sectionId) {
         RestaurantTable newTable = createRestaurantTableRequestToRestaurantTable.convert(request);
 

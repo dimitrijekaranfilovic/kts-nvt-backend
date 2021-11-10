@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 
 @Data
 public class CreateRestaurantTableRequest {
-    @NotBlank
+    @NotNull
     private Integer number;
 
     @NotNull
