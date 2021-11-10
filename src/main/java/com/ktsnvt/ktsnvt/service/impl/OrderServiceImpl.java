@@ -68,10 +68,17 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void sendOrderItemGroup(Integer orderId, Integer groupId) {
+    public void sendOrderItemGroup(Integer orderId, Integer groupId, String pin) {
         var orderItemGroup = this.getOrderItemGroup(orderId, groupId);
         if (orderItemGroup.getStatus() != OrderItemGroupStatus.NEW)
             throw new OrderItemGroupInvalidStatusException(String.format("Order group with id %d for order with id %d is not NEW, and cannot be sent.", orderId, groupId));
+        //maybe we can put this check in a separate function
+        var employee = employeeRepository
+                .findByPin(pin)
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee with PIN: " + pin + " not found."));
+        if(!orderItemGroup.getOrder().getWaiter().getId().equals(employee.getId()))
+            throw new InvalidEmployeeException("Employee with PIN: " + pin + " is not responsible for this order.");
+
         orderItemGroup.setStatus(OrderItemGroupStatus.SENT);
         orderItemGroup.getOrderItems().forEach(orderItem -> {
             //send notification here
