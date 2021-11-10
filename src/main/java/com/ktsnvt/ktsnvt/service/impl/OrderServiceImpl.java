@@ -8,6 +8,7 @@ import com.ktsnvt.ktsnvt.exception.NotFoundException;
 import com.ktsnvt.ktsnvt.exception.OrderItemGroupInvalidStatusException;
 import com.ktsnvt.ktsnvt.model.Order;
 import com.ktsnvt.ktsnvt.model.OrderItemGroup;
+import com.ktsnvt.ktsnvt.model.RestaurantTable;
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemGroupStatus;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemStatus;
@@ -20,12 +21,14 @@ import com.ktsnvt.ktsnvt.model.Employee;
 
 import com.ktsnvt.ktsnvt.service.LocalDateTimeService;
 import com.ktsnvt.ktsnvt.service.OrderService;
+import com.ktsnvt.ktsnvt.service.RestaurantTableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,18 +36,19 @@ import java.util.Optional;
 
 @Service
 public class OrderServiceImpl implements OrderService {
-
-
     private final OrderRepository orderRepository;
     private final OrderItemGroupRepository orderItemGroupRepository;
     private final EmployeeRepository employeeRepository;
+
+    private final RestaurantTableService restaurantTableService;
     private final LocalDateTimeService localDateTimeService;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, OrderItemGroupRepository orderItemGroupRepository, EmployeeRepository employeeRepository, LocalDateTimeService localDateTimeService) {
+    public OrderServiceImpl(OrderRepository orderRepository, OrderItemGroupRepository orderItemGroupRepository, EmployeeRepository employeeRepository, RestaurantTableService restaurantTableService, LocalDateTimeService localDateTimeService) {
         this.orderRepository = orderRepository;
         this.orderItemGroupRepository = orderItemGroupRepository;
         this.employeeRepository = employeeRepository;
+        this.restaurantTableService = restaurantTableService;
         this.localDateTimeService = localDateTimeService;
     }
 
@@ -53,6 +57,21 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public Order getOrder(Integer id) {
         return this.orderRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Order with id %d not found.", id)));
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public Order createOrder(Integer tableId, String waiterPin) {
+        var table = restaurantTableService.readForUpdate(tableId);
+        if (Boolean.FALSE.equals(table.getAvailable())) {
+            throw new OccupiedTableException("Table with id: " + tableId + " is occupied at the moment.");
+        }
+        var waiter = employeeRepository
+                .getEmployeeByPinForUpdate(waiterPin, EmployeeType.WAITER)
+                .orElseThrow(() -> new EmployeeNotFoundException("Cannot find waiter with pin: " + waiterPin));
+        Order order = new Order(OrderStatus.CREATED, localDateTimeService.currentTime(), null, table, waiter);
+        table.setAvailable(false);
+        return orderRepository.save(order);
     }
 
     @Override

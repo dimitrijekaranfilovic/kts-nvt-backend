@@ -5,6 +5,7 @@ import com.ktsnvt.ktsnvt.dto.createrestauranttable.CreateRestaurantTableRequest;
 import com.ktsnvt.ktsnvt.dto.createrestauranttable.CreateRestaurantTableResponse;
 import com.ktsnvt.ktsnvt.dto.createsection.CreateSectionRequest;
 import com.ktsnvt.ktsnvt.dto.createsection.CreateSectionResponse;
+import com.ktsnvt.ktsnvt.dto.movetable.MoveTableRequest;
 import com.ktsnvt.ktsnvt.dto.readsection.ReadSectionResponse;
 import com.ktsnvt.ktsnvt.dto.readsectiontablesresponse.ReadSectionTablesResponse;
 import com.ktsnvt.ktsnvt.dto.updatesection.UpdateSectionRequest;
@@ -94,7 +95,7 @@ public class SectionController {
         return restaurantTableService.getAllTablesForSection(sectionId).stream().map(restaurantTableToReadSectionTablesResponse::convert).collect(Collectors.toList());
     }
 
-    @PostMapping(value = "{sectionId}/table")
+    @PostMapping(value = "{sectionId}/tables")
     @ResponseStatus(HttpStatus.CREATED)
     public CreateRestaurantTableResponse createTable(@RequestBody @Valid CreateRestaurantTableRequest
                                                              request, @PathVariable Integer sectionId) {
@@ -105,10 +106,16 @@ public class SectionController {
         return restaurantTableToCreateRestaurantTableResponse.convert(createdTable);
     }
 
-    @DeleteMapping(value = "table/{id}")
+    @DeleteMapping(value = "tables/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTable(@PathVariable Integer id) {
         restaurantTableService.deleteRestaurantTable(id);
+    }
+
+    @PutMapping("/{sectionId}/tables/{tableId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateTable(@PathVariable Integer sectionId, @PathVariable Integer tableId, @RequestBody @Valid MoveTableRequest request) {
+        restaurantTableService.updateTablePosition(sectionId, tableId, request.getNewX(), request.getNewY());
     }
 
 }
