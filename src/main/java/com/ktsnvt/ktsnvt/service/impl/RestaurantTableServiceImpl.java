@@ -2,6 +2,7 @@ package com.ktsnvt.ktsnvt.service.impl;
 
 import com.ktsnvt.ktsnvt.exception.DuplicateTableNumberException;
 import com.ktsnvt.ktsnvt.exception.NotFoundException;
+import com.ktsnvt.ktsnvt.exception.OccupiedTableException;
 import com.ktsnvt.ktsnvt.exception.TableIntersectionException;
 import com.ktsnvt.ktsnvt.model.RestaurantTable;
 import com.ktsnvt.ktsnvt.repository.RestaurantTableRepository;
@@ -77,6 +78,11 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
         }
 
         var table = restaurantTable.get();
+
+        if(Boolean.FALSE.equals(table.getAvailable())){
+            throw new OccupiedTableException("Table number " + table.getNumber() + " is occupied at the moment.");
+        }
+
         table.getSection().removeTable(table);
         restaurantTableRepository.delete(table);
     }
