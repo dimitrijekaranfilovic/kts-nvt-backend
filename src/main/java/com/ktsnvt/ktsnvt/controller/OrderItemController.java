@@ -1,12 +1,14 @@
 package com.ktsnvt.ktsnvt.controller;
 
 import com.ktsnvt.ktsnvt.dto.readfoodanddrinkrequests.ReadFoodAndDrinkRequestResponse;
+import com.ktsnvt.ktsnvt.dto.updateorderitem.UpdateOrderItemRequest;
 import com.ktsnvt.ktsnvt.dto.updateorderitemrequest.UpdateOrderItemRequestsRequest;
 import com.ktsnvt.ktsnvt.model.OrderItem;
 import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemStatus;
 import com.ktsnvt.ktsnvt.service.OrderItemService;
 import com.ktsnvt.ktsnvt.support.EntityConverter;
+import org.hibernate.sql.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,5 +43,14 @@ public class OrderItemController {
         } else if (request.getAction().equals("FINISH")) {
             orderItemService.finishItemRequest(request.getItemId(), request.getEmployeePin());
         }
+    }
+
+
+
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PutMapping(value = "/{orderItemId}")
+    public void updateOrderItem(@PathVariable("orderItemId") Integer orderItemId, @RequestBody @Valid UpdateOrderItemRequest request){
+        this.orderItemService.updateOrderItem(orderItemId, request.getAmount(), request.getPin());
     }
 }
