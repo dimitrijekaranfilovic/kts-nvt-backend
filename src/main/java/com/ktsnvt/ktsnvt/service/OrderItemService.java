@@ -17,4 +17,6 @@ public interface OrderItemService {
     void finishItemRequest(Integer itemId, String employeePin);
 
     boolean hasActiveOrderItems(Employee employee);
+
+    OrderItem addOrderItem(Integer orderGroupId, Integer menuItemId, Integer amount, String pin);
 }

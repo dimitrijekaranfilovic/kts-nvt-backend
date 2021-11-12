@@ -56,4 +56,11 @@ public class OrderItem extends BaseEntity {
         this.item = item;
         this.status = status;
     }
+
+    public OrderItem(Integer amount, OrderItemGroup group, MenuItem item, OrderItemStatus status){
+        this.amount = amount;
+        this.orderItemGroup = group;
+        this.item = item;
+        this.status = status;
+    }
 }
