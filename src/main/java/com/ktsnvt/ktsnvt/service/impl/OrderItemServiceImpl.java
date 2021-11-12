@@ -1,7 +1,6 @@
 package com.ktsnvt.ktsnvt.service.impl;
 
-import com.ktsnvt.ktsnvt.exception.InvalidEmployeeTypeException;
-import com.ktsnvt.ktsnvt.exception.OrderItemNotFoundException;
+import com.ktsnvt.ktsnvt.exception.*;
 import com.ktsnvt.ktsnvt.model.Employee;
 import com.ktsnvt.ktsnvt.model.OrderItem;
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
@@ -9,6 +8,8 @@ import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemGroupStatus;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemStatus;
 import com.ktsnvt.ktsnvt.repository.EmployeeRepository;
+import com.ktsnvt.ktsnvt.repository.MenuItemRepository;
+import com.ktsnvt.ktsnvt.repository.OrderItemGroupRepository;
 import com.ktsnvt.ktsnvt.repository.OrderItemRepository;
 import com.ktsnvt.ktsnvt.service.LocalDateTimeService;
 import com.ktsnvt.ktsnvt.service.OrderItemService;
@@ -25,12 +26,16 @@ import java.util.Objects;
 public class OrderItemServiceImpl implements OrderItemService {
     private final EmployeeRepository employeeRepository;
     private final OrderItemRepository orderItemRepository;
+    private final OrderItemGroupRepository orderItemGroupRepository;
+    private final MenuItemRepository menuItemRepository;
     private final LocalDateTimeService dateTimeService;
 
     @Autowired
-    public OrderItemServiceImpl(EmployeeRepository employeeRepository, OrderItemRepository orderItemRepository, LocalDateTimeService dateTimeService) {
+    public OrderItemServiceImpl(EmployeeRepository employeeRepository, OrderItemRepository orderItemRepository, OrderItemGroupRepository orderItemGroupRepository, MenuItemRepository menuItemRepository, LocalDateTimeService dateTimeService) {
         this.employeeRepository = employeeRepository;
         this.orderItemRepository = orderItemRepository;
+        this.orderItemGroupRepository = orderItemGroupRepository;
+        this.menuItemRepository = menuItemRepository;
         this.dateTimeService = dateTimeService;
     }
 
@@ -117,5 +122,29 @@ public class OrderItemServiceImpl implements OrderItemService {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public boolean hasActiveOrderItems(Employee employee) {
         return orderItemRepository.streamActiveOrderItemsForEmployee(employee.getId()).findAny().isPresent();
+    }
+
+    @Override
+    public OrderItem addOrderItem(Integer orderGroupId, Integer menuItemId, Integer amount, String pin) {
+        var orderGroup = this.orderItemGroupRepository.findById(orderGroupId)
+                .orElseThrow(()->
+                        new NotFoundException(String.format("Order item group with id %d does not exist.", orderGroupId)));
+        if(orderGroup.getStatus() != OrderItemGroupStatus.NEW)
+            throw new OrderItemGroupInvalidStatusException(String.format("Items cannot be added to order item group with id %d because its status is not NEW.", orderGroupId));
+
+        var menuItem = this.menuItemRepository.findById(menuItemId)
+                .orElseThrow(()-> new NotFoundException(String.format("Menu item with id %d does not exist.", menuItemId)));
+        if(amount <= 0)
+            throw new IllegalAmountException(amount);
+
+        var employee = this.employeeRepository.findEmployeeByPin(pin)
+                .orElseThrow(()->new EmployeeNotFoundException("Employee does not exist."));
+
+        if(!employee.getId().equals(orderGroup.getOrder().getWaiter().getId()))
+            throw new InvalidEmployeeTypeException(pin);
+
+
+        var orderItem = new OrderItem(amount, orderGroup, menuItem, OrderItemStatus.NEW);
+        return this.orderItemRepository.save(orderItem);
     }
 }
