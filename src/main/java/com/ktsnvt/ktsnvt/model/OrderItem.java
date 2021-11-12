@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Where;
 
-import javax.persistence.Table;
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -41,11 +41,19 @@ public class OrderItem extends BaseEntity {
     @Column(name = "status", nullable = false)
     private OrderItemStatus status;
 
+    @Column(name = "current_base_price", nullable = false)
+    private BigDecimal currentBasePrice;
+
+    @Column(name = "current_menu_price", nullable = false)
+    private BigDecimal currentMenuPrice;
+
     @Version
     private Integer version;
 
     public OrderItem() {
         super();
+        this.currentBasePrice = BigDecimal.ZERO;
+        this.currentMenuPrice = BigDecimal.ZERO;
     }
 
     public OrderItem(Integer amount, OrderItemGroup group, Employee preparedBy, MenuItem item, OrderItemStatus status) {
@@ -55,12 +63,17 @@ public class OrderItem extends BaseEntity {
         this.preparedBy = preparedBy;
         this.item = item;
         this.status = status;
+        this.currentBasePrice = item.getItem().getCurrentBasePrice();
+        this.currentMenuPrice = item.getPrice();
     }
 
-    public OrderItem(Integer amount, OrderItemGroup group, MenuItem item, OrderItemStatus status){
+    public OrderItem(Integer amount, OrderItemGroup group, MenuItem item, OrderItemStatus status) {
+        this();
         this.amount = amount;
         this.orderItemGroup = group;
         this.item = item;
         this.status = status;
+        this.currentBasePrice = item.getItem().getCurrentBasePrice();
+        this.currentMenuPrice = item.getPrice();
     }
 }

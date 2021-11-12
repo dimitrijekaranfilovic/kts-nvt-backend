@@ -22,7 +22,6 @@ public class DbInitializer implements ApplicationRunner {
     private final EmployeeRepository employeeRepo;
     private final InventoryItemRepository inventoryItemRepo;
     private final MenuItemRepository menuItemRepo;
-    private final MenuRepository menuRepo;
     private final OrderItemGroupRepository orderItemGroupRepo;
     private final OrderItemRepository orderItemRepo;
     private final OrderRepository orderRepo;
@@ -31,16 +30,21 @@ public class DbInitializer implements ApplicationRunner {
     private final SuperUserRepository superUserRepo;
     private final UserRepository userRepo;
     private final RestaurantTableRepository tableRepo;
+    private final BasePriceRepository basePriceRepo;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     @Autowired
-    public DbInitializer(AuthorityRepository authorityRepo, EmployeeRepository employeeRepo, InventoryItemRepository inventoryItemRepo, MenuItemRepository menuItemRepo, MenuRepository menuRepo, OrderItemGroupRepository orderItemGroupRepo, OrderItemRepository orderItemRepo, OrderRepository orderRepo, SalaryRepository salaryRepo, SectionRepository sectionRepo, SuperUserRepository superUserRepo, UserRepository userRepo, RestaurantTableRepository tableRepo) {
+    public DbInitializer(AuthorityRepository authorityRepo, EmployeeRepository employeeRepo,
+                         InventoryItemRepository inventoryItemRepo, MenuItemRepository menuItemRepo,
+                         OrderItemGroupRepository orderItemGroupRepo,
+                         OrderItemRepository orderItemRepo, OrderRepository orderRepo, SalaryRepository salaryRepo,
+                         SectionRepository sectionRepo, SuperUserRepository superUserRepo, UserRepository userRepo,
+                         RestaurantTableRepository tableRepo, BasePriceRepository basePriceRepo) {
         this.authorityRepo = authorityRepo;
         this.employeeRepo = employeeRepo;
         this.inventoryItemRepo = inventoryItemRepo;
         this.menuItemRepo = menuItemRepo;
-        this.menuRepo = menuRepo;
         this.orderItemGroupRepo = orderItemGroupRepo;
         this.orderItemRepo = orderItemRepo;
         this.orderRepo = orderRepo;
@@ -49,6 +53,7 @@ public class DbInitializer implements ApplicationRunner {
         this.superUserRepo = superUserRepo;
         this.userRepo = userRepo;
         this.tableRepo = tableRepo;
+        this.basePriceRepo = basePriceRepo;
     }
 
     @Override
@@ -93,25 +98,29 @@ public class DbInitializer implements ApplicationRunner {
         superUserRepo.save(manager1);
         superUserRepo.save(admin1);
 
-        var item1 = new InventoryItem("Ice cream", BigDecimal.valueOf(70.00), "Description", "image", "Allergies", ItemCategory.FOOD);
-        var item2 = new InventoryItem("T-bone steak", BigDecimal.valueOf(440.00), "Description", "image", "Allergies", ItemCategory.FOOD);
-        var item3 = new InventoryItem("Orange juice", BigDecimal.valueOf(50.00), "Description", "image", "Allergies", ItemCategory.DRINK);
+        var basePrice1 = new BasePrice(LocalDateTime.parse("2021-01-01 12:12", formatter), null, BigDecimal.valueOf(30.00), null);
+        var basePrice2 = new BasePrice(LocalDateTime.parse("2021-01-02 12:12", formatter), null, BigDecimal.valueOf(440.00), null);
+        var basePrice3 = new BasePrice(LocalDateTime.parse("2021-01-03 12:12", formatter), null, BigDecimal.valueOf(50.00), null);
+        basePriceRepo.save(basePrice1);
+        basePriceRepo.save(basePrice2);
+        basePriceRepo.save(basePrice3);
+
+        var item1 = new InventoryItem("Ice cream", "Description", "image", "Allergies", ItemCategory.FOOD);
+        item1.addBasePrice(basePrice1);
+        var item2 = new InventoryItem("T-bone steak", "Description", "image", "Allergies", ItemCategory.FOOD);
+        item2.addBasePrice(basePrice2);
+        var item3 = new InventoryItem("Orange juice", "Description", "image", "Allergies", ItemCategory.DRINK);
+        item3.addBasePrice(basePrice3);
         inventoryItemRepo.save(item1);
         inventoryItemRepo.save(item2);
         inventoryItemRepo.save(item3);
 
-        var menuItem1 = new MenuItem(BigDecimal.valueOf(100.00), item1);
-        var menuItem2 = new MenuItem(BigDecimal.valueOf(500.00), item2);
-        var menuItem3 = new MenuItem(BigDecimal.valueOf(100.00), item3);
+        var menuItem1 = new MenuItem(BigDecimal.valueOf(100.00), LocalDateTime.parse("2021-01-01 12:12", formatter), null, item1);
+        var menuItem2 = new MenuItem(BigDecimal.valueOf(500.00), LocalDateTime.parse("2021-01-01 12:12", formatter), null, item2);
+        var menuItem3 = new MenuItem(BigDecimal.valueOf(100.00), LocalDateTime.parse("2021-01-01 12:12", formatter), null, item3);
         menuItemRepo.save(menuItem1);
         menuItemRepo.save(menuItem2);
         menuItemRepo.save(menuItem3);
-
-        var menu1 = new Menu(LocalDate.parse("2021-01-01"), null);
-        menu1.getMenuItems().add(menuItem1);
-        menu1.getMenuItems().add(menuItem2);
-        menu1.getMenuItems().add(menuItem3);
-        menuRepo.save(menu1);
 
         var groundFloor = new Section("Ground Floor");
         var firstFloor = new Section("1st Floor");
@@ -164,7 +173,6 @@ public class DbInitializer implements ApplicationRunner {
         orderItemGroupRepo.save(orderGroup3);
 
 
-
         var orderItem1 = new OrderItem(2, orderGroup1, null, menuItem1, OrderItemStatus.SENT);
         var orderItem2 = new OrderItem(1, orderGroup1, null, menuItem2, OrderItemStatus.SENT);
         var orderItem3 = new OrderItem(1, orderGroup1, null, menuItem3, OrderItemStatus.SENT);
@@ -173,7 +181,6 @@ public class DbInitializer implements ApplicationRunner {
         var orderItem5 = new OrderItem(1, orderGroup2, null, menuItem3, OrderItemStatus.NEW);
         var orderItem6 = new OrderItem(1, orderGroup2, null, menuItem3, OrderItemStatus.NEW);
         var orderItem7 = new OrderItem(1, orderGroup2, null, menuItem3, OrderItemStatus.NEW);
-
 
 
         // orderItem1.setPreparedBy(employee2);
@@ -197,7 +204,6 @@ public class DbInitializer implements ApplicationRunner {
         orderItemRepo.save(orderItem5);
         orderItemRepo.save(orderItem6);
         orderItemRepo.save(orderItem7);
-
 
 
     }

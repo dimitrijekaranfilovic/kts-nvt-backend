@@ -11,12 +11,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "menu_items")
+@Table(name = "base_prices")
 @Where(clause = "is_active = true")
-public class MenuItem extends BaseEntity {
-
-    @Column(name = "price", nullable = false)
-    private BigDecimal price;
+public class BasePrice extends BaseEntity {
 
     @Column(name = "start_date", nullable = false)
     private LocalDateTime startDate;
@@ -24,18 +21,21 @@ public class MenuItem extends BaseEntity {
     @Column(name = "end_date", nullable = true)
     private LocalDateTime endDate;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-    private InventoryItem item;
+    @Column(name = "amount", nullable = false)
+    private BigDecimal amount;
 
-    public MenuItem() {
+    @ManyToOne(fetch = FetchType.EAGER)
+    private InventoryItem inventoryItem;
+
+    public BasePrice() {
         super();
     }
 
-    public MenuItem(BigDecimal price, LocalDateTime startDate, LocalDateTime endDate, InventoryItem item) {
+    public BasePrice(LocalDateTime startDate, LocalDateTime endDate, BigDecimal amount, InventoryItem inventoryItem) {
         this();
-        this.price = price;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.item = item;
+        this.amount = amount;
+        this.inventoryItem = inventoryItem;
     }
 }
