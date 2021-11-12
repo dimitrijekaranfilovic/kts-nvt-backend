@@ -5,10 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Where;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -19,9 +19,6 @@ public class InventoryItem extends BaseEntity {
 
     @Column(name = "name", nullable = false)
     private String name;
-
-    @Column(name = "base_price", nullable = false)
-    private BigDecimal basePrice;
 
     @Column(name = "description", nullable = false)
     private String description;
@@ -35,18 +32,31 @@ public class InventoryItem extends BaseEntity {
     @Column(name = "category", nullable = false)
     private ItemCategory category;
 
+    @Column(name = "current_base_price", nullable = false)
+    private BigDecimal currentBasePrice;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<BasePrice> basePrices = new HashSet<>();
+
     public InventoryItem() {
         super();
+        this.currentBasePrice = BigDecimal.ZERO;
     }
 
-    public InventoryItem(String name, BigDecimal basePrice, String description, String image, String allergies, ItemCategory category) {
+    public InventoryItem(String name, String description,
+                         String image, String allergies, ItemCategory category) {
         this();
         this.name = name;
-        this.basePrice = basePrice;
         this.description = description;
         this.image = image;
         this.allergies = allergies;
         this.category = category;
+    }
+
+    public void addBasePrice(BasePrice basePrice) {
+        basePrices.add(basePrice);
+        currentBasePrice = basePrice.getAmount();
+        basePrice.setInventoryItem(this);
     }
 
 }
