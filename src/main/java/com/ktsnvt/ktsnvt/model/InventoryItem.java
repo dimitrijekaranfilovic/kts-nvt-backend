@@ -38,6 +38,9 @@ public class InventoryItem extends BaseEntity {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<BasePrice> basePrices = new HashSet<>();
 
+    @Column(name = "is_in_menu", nullable = false)
+    private Boolean isInMenu;
+
     public InventoryItem() {
         super();
         this.currentBasePrice = BigDecimal.ZERO;
@@ -51,6 +54,18 @@ public class InventoryItem extends BaseEntity {
         this.image = image;
         this.allergies = allergies;
         this.category = category;
+        this.isInMenu = Boolean.FALSE;
+    }
+
+    public InventoryItem(String name, String description,
+                         String image, String allergies, ItemCategory category, Boolean isInMenu) {
+        this();
+        this.name = name;
+        this.description = description;
+        this.image = image;
+        this.allergies = allergies;
+        this.category = category;
+        this.isInMenu = isInMenu;
     }
 
     public void addBasePrice(BasePrice basePrice) {
