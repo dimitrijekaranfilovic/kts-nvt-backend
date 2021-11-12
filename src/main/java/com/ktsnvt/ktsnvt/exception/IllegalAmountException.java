@@ -9,3 +9,4 @@ public class IllegalAmountException extends BusinessException{
         super(String.format("Amount cannot be lower than or equal to 0; %d provided.", providedAmount));
     }
 }
+

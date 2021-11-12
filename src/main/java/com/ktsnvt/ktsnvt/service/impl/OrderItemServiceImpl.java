@@ -127,24 +127,39 @@ public class OrderItemServiceImpl implements OrderItemService {
     @Override
     public OrderItem addOrderItem(Integer orderGroupId, Integer menuItemId, Integer amount, String pin) {
         var orderGroup = this.orderItemGroupRepository.findById(orderGroupId)
-                .orElseThrow(()->
+                .orElseThrow(() ->
                         new NotFoundException(String.format("Order item group with id %d does not exist.", orderGroupId)));
-        if(orderGroup.getStatus() != OrderItemGroupStatus.NEW)
+        if (orderGroup.getStatus() != OrderItemGroupStatus.NEW)
             throw new OrderItemGroupInvalidStatusException(String.format("Items cannot be added to order item group with id %d because its status is not NEW.", orderGroupId));
 
         var menuItem = this.menuItemRepository.findById(menuItemId)
-                .orElseThrow(()-> new NotFoundException(String.format("Menu item with id %d does not exist.", menuItemId)));
-        if(amount <= 0)
+                .orElseThrow(() -> new NotFoundException(String.format("Menu item with id %d does not exist.", menuItemId)));
+        if (amount <= 0)
             throw new IllegalAmountException(amount);
 
         var employee = this.employeeRepository.findEmployeeByPin(pin)
-                .orElseThrow(()->new EmployeeNotFoundException("Employee does not exist."));
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee does not exist."));
 
-        if(!employee.getId().equals(orderGroup.getOrder().getWaiter().getId()))
+        if (!employee.getId().equals(orderGroup.getOrder().getWaiter().getId()))
             throw new InvalidEmployeeTypeException(pin);
 
 
         var orderItem = new OrderItem(amount, orderGroup, menuItem, OrderItemStatus.NEW);
         return this.orderItemRepository.save(orderItem);
+    }
+    public void updateOrderItem(Integer orderItemId, Integer amount, String pin) {
+        var orderItem = this.orderItemRepository.findById(orderItemId)
+                .orElseThrow(()  -> new NotFoundException(String.format("Order item with id %d does not exist.", orderItemId)));
+        if(orderItem.getStatus() != OrderItemStatus.NEW)
+            throw new OrderItemInvalidStatusException(String.format("Status of order item with id %d is not NEW, and it cannot be updated.", orderItemId));
+        if (amount <= 0)
+            throw new IllegalAmountException(amount);
+        var employee = this.employeeRepository.findEmployeeByPin(pin)
+                        .orElseThrow(()->new EmployeeNotFoundException(String.format("Employee with pin %s does not exist.", pin)));
+        if (!employee.getId().equals(orderItem.getOrderItemGroup().getOrder().getWaiter().getId()))
+            throw new InvalidEmployeeTypeException(pin);
+
+        orderItem.setAmount(amount);
+        this.orderItemRepository.save(orderItem);
     }
 }
