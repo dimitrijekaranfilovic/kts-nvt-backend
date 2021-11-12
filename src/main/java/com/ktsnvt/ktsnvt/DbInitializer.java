@@ -22,7 +22,6 @@ public class DbInitializer implements ApplicationRunner {
     private final EmployeeRepository employeeRepo;
     private final InventoryItemRepository inventoryItemRepo;
     private final MenuItemRepository menuItemRepo;
-    private final MenuRepository menuRepo;
     private final OrderItemGroupRepository orderItemGroupRepo;
     private final OrderItemRepository orderItemRepo;
     private final OrderRepository orderRepo;
@@ -38,7 +37,7 @@ public class DbInitializer implements ApplicationRunner {
     @Autowired
     public DbInitializer(AuthorityRepository authorityRepo, EmployeeRepository employeeRepo,
                          InventoryItemRepository inventoryItemRepo, MenuItemRepository menuItemRepo,
-                         MenuRepository menuRepo, OrderItemGroupRepository orderItemGroupRepo,
+                         OrderItemGroupRepository orderItemGroupRepo,
                          OrderItemRepository orderItemRepo, OrderRepository orderRepo, SalaryRepository salaryRepo,
                          SectionRepository sectionRepo, SuperUserRepository superUserRepo, UserRepository userRepo,
                          RestaurantTableRepository tableRepo, BasePriceRepository basePriceRepo) {
@@ -46,7 +45,6 @@ public class DbInitializer implements ApplicationRunner {
         this.employeeRepo = employeeRepo;
         this.inventoryItemRepo = inventoryItemRepo;
         this.menuItemRepo = menuItemRepo;
-        this.menuRepo = menuRepo;
         this.orderItemGroupRepo = orderItemGroupRepo;
         this.orderItemRepo = orderItemRepo;
         this.orderRepo = orderRepo;
@@ -123,12 +121,6 @@ public class DbInitializer implements ApplicationRunner {
         menuItemRepo.save(menuItem1);
         menuItemRepo.save(menuItem2);
         menuItemRepo.save(menuItem3);
-
-        var menu1 = new Menu(LocalDate.parse("2021-01-01"), null);
-        menu1.getMenuItems().add(menuItem1);
-        menu1.getMenuItems().add(menuItem2);
-        menu1.getMenuItems().add(menuItem3);
-        menuRepo.save(menu1);
 
         var groundFloor = new Section("Ground Floor");
         var firstFloor = new Section("1st Floor");
