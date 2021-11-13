@@ -11,7 +11,12 @@ import org.springframework.stereotype.Repository;
 public interface MenuItemRepository extends JpaRepository<MenuItem, Integer> {
 
 
-    @Query(value = "select mi from MenuItem mi where lower(mi.item.name) like concat('%', lower(:name), '%') or :name is null",
-            countQuery = "select count(mi) from MenuItem mi where lower(mi.item.name) like concat('%', lower(:name), '%') or :name is null")
+    @Query(value = "select mi from " +
+            "MenuItem mi where " +
+            "(lower(mi.item.name) like concat('%', lower(:name), '%') or :name is null) and (mi.endDate is not null)",
+            countQuery = "select count(mi) from " +
+                    "MenuItem mi where " +
+                    "(lower(mi.item.name) like concat('%', lower(:name), '%') or :name is null) and (mi.endDate is not null)"
+    )
     Page<MenuItem> getMenuItems(@Param("name") String name, Pageable pageable);
 }
