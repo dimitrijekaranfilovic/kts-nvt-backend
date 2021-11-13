@@ -48,4 +48,10 @@ public class MenuItemController {
                 .convert(this.menuItemService.createMenuItem(request.getPrice(), request.getInventoryItemId()));
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deactivateMenuItem(@PathVariable Integer id) {
+        menuItemService.deactivateMenuItem(id);
+    }
+
 }

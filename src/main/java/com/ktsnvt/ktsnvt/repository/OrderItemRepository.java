@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
 import javax.persistence.LockModeType;
 import java.util.Collection;
@@ -34,5 +33,10 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
     // Order item status != DONE
     @Query("select oi from OrderItem oi where oi.preparedBy.id = :id and oi.status <> 2")
     Stream<OrderItem> streamActiveOrderItemsForEmployee(Integer id);
+
+    // Order item status != DONE
+    @Query("select oi from OrderItem oi where oi.item.id = :id and oi.status <> 2")
+    Stream<OrderItem> streamActiveOrderItemsForMenuItem(Integer id);
+
 
 }

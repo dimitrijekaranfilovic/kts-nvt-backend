@@ -23,4 +23,9 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, Integer> {
             " where mi.item.id = :inventoryItemId" +
             " and mi.endDate is null")
     Optional<MenuItem> findActiveForInventoryItem(Integer inventoryItemId);
+
+
+    @Lock(LockModeType.OPTIMISTIC)
+    @Query(value = "select mi from MenuItem mi where mi.id = :id")
+    Optional<MenuItem> findOneForUpdate(Integer id);
 }

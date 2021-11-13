@@ -101,9 +101,11 @@ public class DbInitializer implements ApplicationRunner {
         var basePrice1 = new BasePrice(LocalDateTime.parse("2021-01-01 12:12", formatter), null, BigDecimal.valueOf(30.00), null);
         var basePrice2 = new BasePrice(LocalDateTime.parse("2021-01-02 12:12", formatter), null, BigDecimal.valueOf(440.00), null);
         var basePrice3 = new BasePrice(LocalDateTime.parse("2021-01-03 12:12", formatter), null, BigDecimal.valueOf(50.00), null);
+        var basePrice4 = new BasePrice(LocalDateTime.parse("2021-01-03 12:12", formatter), null, BigDecimal.valueOf(42.00), null);
         basePriceRepo.save(basePrice1);
         basePriceRepo.save(basePrice2);
         basePriceRepo.save(basePrice3);
+        basePriceRepo.save(basePrice4);
 
         var item1 = new InventoryItem("Ice cream", "Description", "image", "Allergies", ItemCategory.FOOD);
         item1.addBasePrice(basePrice1);
@@ -111,9 +113,12 @@ public class DbInitializer implements ApplicationRunner {
         item2.addBasePrice(basePrice2);
         var item3 = new InventoryItem("Orange juice", "Description", "image", "Allergies", ItemCategory.DRINK);
         item3.addBasePrice(basePrice3);
+        var item4 = new InventoryItem("Pizza", "Description", "image", "Allergies", ItemCategory.FOOD);
+        item4.addBasePrice(basePrice4);
         inventoryItemRepo.save(item1);
         inventoryItemRepo.save(item2);
         inventoryItemRepo.save(item3);
+        inventoryItemRepo.save(item4);
 
         var menuItem1 = new MenuItem(BigDecimal.valueOf(100.00), LocalDateTime.parse("2021-01-01 12:12", formatter), null, item1);
         item1.addMenuItem(menuItem1);
@@ -121,9 +126,11 @@ public class DbInitializer implements ApplicationRunner {
         item2.addMenuItem(menuItem2);
         var menuItem3 = new MenuItem(BigDecimal.valueOf(100.00), LocalDateTime.parse("2021-01-01 12:12", formatter), null, item3);
         item3.addMenuItem(menuItem3);
+        var menuItem4 = new MenuItem(BigDecimal.valueOf(322.00), LocalDateTime.parse("2021-01-01 12:12", formatter), null, item4);
         menuItemRepo.save(menuItem1);
         menuItemRepo.save(menuItem2);
         menuItemRepo.save(menuItem3);
+        menuItemRepo.save(menuItem4);
 
         var groundFloor = new Section("Ground Floor");
         var firstFloor = new Section("1st Floor");
