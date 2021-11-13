@@ -1,8 +1,12 @@
 package com.ktsnvt.ktsnvt.config;
 
 
-import com.ktsnvt.ktsnvt.exception.*;
+import com.ktsnvt.ktsnvt.exception.BusinessException;
+import com.ktsnvt.ktsnvt.exception.ErrorInfo;
+import com.ktsnvt.ktsnvt.exception.NotFoundException;
+import com.ktsnvt.ktsnvt.exception.OrderItemGroupExistsException;
 import org.hibernate.QueryException;
+import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
@@ -46,7 +50,7 @@ public class ErrorHandlerController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(QueryException.class)
     @ResponseBody
-    public ErrorInfo handleQueryException(HttpServletRequest request, QueryException ex){
+    public ErrorInfo handleQueryException(HttpServletRequest request, QueryException ex) {
         return new ErrorInfo(request.getRequestURI(), ex.getCause().getMessage(), LocalDateTime.now(), HttpStatus.BAD_REQUEST);
     }
 
@@ -54,14 +58,14 @@ public class ErrorHandlerController {
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler({OptimisticLockingFailureException.class, PessimisticLockingFailureException.class})
     @ResponseBody
-    public ErrorInfo handleOptimisticLockingFailureException(HttpServletRequest request, QueryException ex){
+    public ErrorInfo handleConcurrencyFailureException(HttpServletRequest request, ConcurrencyFailureException ex) {
         return new ErrorInfo(request.getRequestURI(), ex.getCause().getMessage(), LocalDateTime.now(), HttpStatus.CONFLICT);
     }
 
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(OrderItemGroupExistsException.class)
     @ResponseBody
-    public ErrorInfo handleOrderItemGroupExistsException(HttpServletRequest request, OrderItemGroupExistsException ex){
+    public ErrorInfo handleOrderItemGroupExistsException(HttpServletRequest request, OrderItemGroupExistsException ex) {
         return new ErrorInfo(request.getRequestURI(), ex.getMessage(), LocalDateTime.now(), HttpStatus.CONFLICT);
     }
 
@@ -87,7 +91,6 @@ public class ErrorHandlerController {
         return new ErrorInfo(request.getRequestURI(), ex.getLocalizedMessage(), LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST, errors);
     }
-
 
 
 }
