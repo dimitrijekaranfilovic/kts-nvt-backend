@@ -1,6 +1,7 @@
 package com.ktsnvt.ktsnvt.service.impl;
 
 import com.ktsnvt.ktsnvt.exception.InventoryItemNameAlreadyExistsException;
+import com.ktsnvt.ktsnvt.exception.InventoryItemNotFoundException;
 import com.ktsnvt.ktsnvt.model.InventoryItem;
 import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
 import com.ktsnvt.ktsnvt.repository.InventoryItemRepository;
@@ -32,6 +33,13 @@ public class InventoryItemServiceImpl implements InventoryItemService {
             throw new InventoryItemNameAlreadyExistsException(inventoryItem.getName());
         }
         return inventoryItemRepository.save(inventoryItem);
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public InventoryItem readForUpdate(Integer id) {
+        return inventoryItemRepository.findOneForUpdate(id)
+                .orElseThrow(() -> new InventoryItemNotFoundException("Inventory Item with id: " + id + " not found"));
     }
 
     @Override

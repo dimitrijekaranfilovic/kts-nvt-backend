@@ -41,6 +41,9 @@ public class InventoryItem extends BaseEntity {
     @Column(name = "is_in_menu", nullable = false)
     private Boolean isInMenu;
 
+    @Version
+    private Integer version;
+
     public InventoryItem() {
         super();
         this.currentBasePrice = BigDecimal.ZERO;
@@ -73,6 +76,11 @@ public class InventoryItem extends BaseEntity {
         basePrices.add(basePrice);
         currentBasePrice = basePrice.getAmount();
         basePrice.setInventoryItem(this);
+    }
+
+    public void addMenuItem(MenuItem menuItem){
+        this.isInMenu = Boolean.TRUE;
+        menuItem.setItem(this);
     }
 
 }

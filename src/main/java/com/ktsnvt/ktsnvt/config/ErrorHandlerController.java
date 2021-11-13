@@ -6,6 +6,7 @@ import com.ktsnvt.ktsnvt.exception.ErrorInfo;
 import com.ktsnvt.ktsnvt.exception.NotFoundException;
 import com.ktsnvt.ktsnvt.exception.OrderItemGroupExistsException;
 import org.hibernate.QueryException;
+import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
@@ -57,7 +58,7 @@ public class ErrorHandlerController {
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler({OptimisticLockingFailureException.class, PessimisticLockingFailureException.class})
     @ResponseBody
-    public ErrorInfo handleOptimisticLockingFailureException(HttpServletRequest request, QueryException ex) {
+    public ErrorInfo handleConcurrencyFailureException(HttpServletRequest request, ConcurrencyFailureException ex) {
         return new ErrorInfo(request.getRequestURI(), ex.getCause().getMessage(), LocalDateTime.now(), HttpStatus.CONFLICT);
     }
 

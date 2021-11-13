@@ -11,6 +11,8 @@ public interface InventoryItemService {
 
     InventoryItem createInventoryItem(InventoryItem inventoryItem);
 
+    InventoryItem readForUpdate(Integer id);
+
     Page<InventoryItem> read(String query, BigDecimal basePriceFrom, BigDecimal basePriceTo,
                              ItemCategory itemCategory, Pageable pageable);
 }
