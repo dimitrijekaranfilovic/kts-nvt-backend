@@ -7,7 +7,7 @@ import com.ktsnvt.ktsnvt.dto.createorder.CreateOrderRequest;
 import com.ktsnvt.ktsnvt.dto.createorder.CreateOrderResponse;
 import com.ktsnvt.ktsnvt.dto.createorderitemgroup.CreateOrderItemGroupRequest;
 import com.ktsnvt.ktsnvt.dto.createorderitemgroup.CreateOrderItemGroupResponse;
-import com.ktsnvt.ktsnvt.dto.deleteorderitem.DeleteOrderItemRequest;
+import com.ktsnvt.ktsnvt.dto.deleteorderitemgroup.DeleteOrderItemGroupRequest;
 import com.ktsnvt.ktsnvt.dto.readorderitemgroups.OrderItemGroupResponse;
 import com.ktsnvt.ktsnvt.dto.sendorderitemgroup.SendOrderItemGroupRequest;
 import com.ktsnvt.ktsnvt.model.Order;
@@ -82,7 +82,7 @@ public class OrderController {
 
     @DeleteMapping(value = "/{orderId}/groups/{groupId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteOrderItemGroup(@PathVariable("orderId") Integer orderId, @PathVariable("groupId") Integer groupId, @RequestBody @Valid DeleteOrderItemRequest request){
+    public void deleteOrderItemGroup(@PathVariable("orderId") Integer orderId, @PathVariable("groupId") Integer groupId, @RequestBody @Valid DeleteOrderItemGroupRequest request){
         this.orderService.deleteOrderItemGroup(orderId, groupId, request.getPin());
     }
 

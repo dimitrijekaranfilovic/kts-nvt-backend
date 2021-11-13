@@ -2,6 +2,7 @@ package com.ktsnvt.ktsnvt.controller;
 
 import com.ktsnvt.ktsnvt.dto.addorderitem.AddOrderItemRequest;
 import com.ktsnvt.ktsnvt.dto.addorderitem.AddOrderItemResponse;
+import com.ktsnvt.ktsnvt.dto.deleteorderitem.DeleteOrderItemRequest;
 import com.ktsnvt.ktsnvt.dto.readfoodanddrinkrequests.ReadFoodAndDrinkRequestResponse;
 import com.ktsnvt.ktsnvt.dto.updateorderitem.UpdateOrderItemRequest;
 import com.ktsnvt.ktsnvt.dto.updateorderitemrequest.UpdateOrderItemRequestsRequest;
@@ -61,5 +62,11 @@ public class OrderItemController {
     @PutMapping(value = "/{orderItemId}")
     public void updateOrderItem(@PathVariable("orderItemId") Integer orderItemId, @RequestBody @Valid UpdateOrderItemRequest request){
         this.orderItemService.updateOrderItem(orderItemId, request.getAmount(), request.getPin());
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping(value = "/{orderItemId}")
+    public void deleteOrderItem(@PathVariable("orderItemId") Integer orderItemId, @RequestBody @Valid DeleteOrderItemRequest request){
+        this.orderItemService.deleteOrderItem(orderItemId, request.getPin());
     }
 }
