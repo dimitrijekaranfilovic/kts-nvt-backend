@@ -2,13 +2,16 @@ package com.ktsnvt.ktsnvt.dto.readreports;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 
 @Data
 public class ReadReportsRequest {
 
-    private LocalDateTime from;
+    @NotNull(message = "From date must be provided")
+    private LocalDate from;
 
-    private LocalDateTime to;
+    @NotNull(message = "To date must be provided.")
+    private LocalDate to;
 
 }
