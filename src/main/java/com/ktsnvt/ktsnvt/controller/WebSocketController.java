@@ -25,8 +25,8 @@ public class WebSocketController {
      * Message is sent to all clients subscribed on /socket-publisher topic.
      */
     @MessageMapping("send/message")
-    public Map<String, String> broadcastNotification(String message) {
-        Map<String, String> convertedMessage = parseMessage(message);
+    public Map<String, String> broadcastNotification(String notificationJSON) {
+        Map<String, String> convertedMessage = parseMessage(notificationJSON);
 
         this.simpMessagingTemplate.convertAndSend("/socket-publisher", convertedMessage);
 
