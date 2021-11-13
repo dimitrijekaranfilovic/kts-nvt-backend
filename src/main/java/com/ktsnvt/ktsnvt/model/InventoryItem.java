@@ -44,6 +44,7 @@ public class InventoryItem extends BaseEntity {
     public InventoryItem() {
         super();
         this.currentBasePrice = BigDecimal.ZERO;
+        this.isInMenu = Boolean.FALSE;
     }
 
     public InventoryItem(String name, String description,
