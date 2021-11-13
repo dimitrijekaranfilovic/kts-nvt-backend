@@ -21,4 +21,6 @@ public interface OrderItemService {
     OrderItem addOrderItem(Integer orderGroupId, Integer menuItemId, Integer amount, String pin);
 
     void updateOrderItem(Integer orderItemId, Integer amount, String pin);
+
+    void deleteOrderItem(Integer orderItemId, String pin);
 }

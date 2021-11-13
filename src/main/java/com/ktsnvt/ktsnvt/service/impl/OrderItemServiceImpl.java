@@ -162,4 +162,21 @@ public class OrderItemServiceImpl implements OrderItemService {
         orderItem.setAmount(amount);
         this.orderItemRepository.save(orderItem);
     }
+
+    @Override
+    public void deleteOrderItem(Integer orderItemId, String pin) {
+        var orderItem = this.orderItemRepository.findById(orderItemId)
+                .orElseThrow(() -> new NotFoundException(String.format("Order item with id %d does not exist.", orderItemId)));
+        if (orderItem.getStatus() != OrderItemStatus.NEW)
+            throw new OrderItemInvalidStatusException(String.format("Status of order item with id %s is not NEW, and it cannot be deleted.", orderItemId));
+
+        var employee = this.employeeRepository.findEmployeeByPin(pin)
+                .orElseThrow(() -> new EmployeeNotFoundException(String.format("Employee with pin %s does not exist.", pin)));
+        if(!employee.getId().equals(orderItem.getOrderItemGroup().getOrder().getWaiter().getId()))
+            throw new InvalidEmployeeTypeException(pin);
+
+        orderItem.setIsActive(false);
+        this.orderItemRepository.save(orderItem);
+
+    }
 }
