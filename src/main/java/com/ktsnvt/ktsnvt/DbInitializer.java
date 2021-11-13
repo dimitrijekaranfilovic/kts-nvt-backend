@@ -116,8 +116,11 @@ public class DbInitializer implements ApplicationRunner {
         inventoryItemRepo.save(item3);
 
         var menuItem1 = new MenuItem(BigDecimal.valueOf(100.00), LocalDateTime.parse("2021-01-01 12:12", formatter), null, item1);
+        item1.addMenuItem(menuItem1);
         var menuItem2 = new MenuItem(BigDecimal.valueOf(500.00), LocalDateTime.parse("2021-01-01 12:12", formatter), null, item2);
+        item2.addMenuItem(menuItem2);
         var menuItem3 = new MenuItem(BigDecimal.valueOf(100.00), LocalDateTime.parse("2021-01-01 12:12", formatter), null, item3);
+        item3.addMenuItem(menuItem3);
         menuItemRepo.save(menuItem1);
         menuItemRepo.save(menuItem2);
         menuItemRepo.save(menuItem3);

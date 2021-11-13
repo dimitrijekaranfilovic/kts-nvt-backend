@@ -27,6 +27,9 @@ public class MenuItem extends BaseEntity {
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     private InventoryItem item;
 
+    @Version
+    private Integer version;
+
     public MenuItem() {
         super();
     }
@@ -37,5 +40,12 @@ public class MenuItem extends BaseEntity {
         this.startDate = startDate;
         this.endDate = endDate;
         this.item = item;
+    }
+
+    public void deactivateMenuItem(LocalDateTime endDate) {
+        this.endDate = endDate;
+        if (this.item != null) {
+            this.item.setIsInMenu(Boolean.FALSE);
+        }
     }
 }
