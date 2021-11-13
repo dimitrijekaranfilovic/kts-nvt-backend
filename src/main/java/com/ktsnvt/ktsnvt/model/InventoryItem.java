@@ -58,7 +58,6 @@ public class InventoryItem extends BaseEntity {
         this.image = image;
         this.allergies = allergies;
         this.category = category;
-        this.isInMenu = Boolean.FALSE;
     }
 
     public InventoryItem(String name, String description,
