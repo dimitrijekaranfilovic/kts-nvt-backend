@@ -71,6 +71,13 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
+    public MenuItem updateMenuItemPrice(BigDecimal price, Integer menuItemId) {
+        var menuItem = readForUpdate(menuItemId);
+        return createMenuItem(price, menuItem.getItem().getId());
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public MenuItem createMenuItem(BigDecimal price, Integer inventoryItemId) {
         var inventoryItem = inventoryItemService.readForUpdate(inventoryItemId);
         removeActiveMenuItemForInventoryItem(inventoryItemId);

@@ -18,4 +18,6 @@ public interface MenuItemService {
     void deactivateMenuItem(Integer id);
 
     MenuItem readForUpdate(Integer id);
+
+    MenuItem updateMenuItemPrice(BigDecimal price, Integer menuItemId);
 }
