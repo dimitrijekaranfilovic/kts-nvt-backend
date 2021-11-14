@@ -17,4 +17,7 @@ public interface InventoryItemService {
                              ItemCategory itemCategory, Pageable pageable);
 
     void delete(Integer id);
+
+    void update(Integer id, String name, String description, String allergies, String image, ItemCategory category,
+                BigDecimal basePrice);
 }

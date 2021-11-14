@@ -73,4 +73,22 @@ public class InventoryItemServiceImpl implements InventoryItemService {
         menuItemService.removeActiveMenuItemForInventoryItem(id);
         inventoryItem.setIsActive(Boolean.FALSE);
     }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void update(Integer id, String name, String description, String allergies, String image, ItemCategory category,
+                       BigDecimal basePrice) {
+        var inventoryItem = readForUpdate(id);
+
+        var sameInventoryItem = inventoryItemRepository.findByName(inventoryItem.getName());
+        if (sameInventoryItem.isPresent()) {
+            throw new InventoryItemNameAlreadyExistsException(inventoryItem.getName());
+        }
+
+        inventoryItem.setName(name);
+        inventoryItem.setDescription(description);
+        inventoryItem.setAllergies(allergies);
+        inventoryItem.setImage(image);
+        inventoryItem.setCategory(category);
+    }
 }

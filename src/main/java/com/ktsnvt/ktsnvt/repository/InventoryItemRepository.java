@@ -14,6 +14,7 @@ import java.util.Optional;
 
 public interface InventoryItemRepository extends JpaRepository<InventoryItem, Integer> {
 
+    @Lock(LockModeType.OPTIMISTIC)
     Optional<InventoryItem> findByName(String name);
 
     @Lock(LockModeType.OPTIMISTIC)
