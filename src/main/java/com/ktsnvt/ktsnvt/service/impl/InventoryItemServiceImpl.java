@@ -88,8 +88,10 @@ public class InventoryItemServiceImpl implements InventoryItemService {
                     });
         }
 
-        basePriceService.updateInventoryItemBasePrice(id,
-                new BasePrice(localDateTimeService.currentTime(), null, basePrice, inventoryItem));
+        if (basePrice.compareTo(inventoryItem.getCurrentBasePrice()) != 0) {
+            basePriceService.updateInventoryItemBasePrice(id,
+                    new BasePrice(localDateTimeService.currentTime(), null, basePrice, inventoryItem));
+        }
 
         inventoryItem.setName(name);
         inventoryItem.setDescription(description);
