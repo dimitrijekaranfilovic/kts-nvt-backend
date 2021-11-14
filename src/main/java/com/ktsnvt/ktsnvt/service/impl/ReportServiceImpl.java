@@ -39,6 +39,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public ReportStatistics<LocalDate, BigDecimal> readOrderIncomes(LocalDate from, LocalDate to) {
         var lookup = new HashMap<LocalDate, BigDecimal>();
         orderRepository
@@ -46,6 +47,19 @@ public class ReportServiceImpl implements ReportService {
                 .forEach(order -> {
                     var income = lookup.getOrDefault(order.getServedAt().toLocalDate(), BigDecimal.ZERO);
                     lookup.put(order.getServedAt().toLocalDate(), income.add(order.getTotalIncome()));
+                });
+        return readReportTemplate(from, to, date -> lookup.getOrDefault(date, BigDecimal.ZERO));
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public ReportStatistics<LocalDate, BigDecimal> readOrderCosts(LocalDate from, LocalDate to) {
+        var lookup = new HashMap<LocalDate, BigDecimal>();
+        orderRepository
+                .streamChargedOrdersInTimeRange(from.atStartOfDay(), to.plusDays(1).atStartOfDay())
+                .forEach(order -> {
+                    var cost = lookup.getOrDefault(order.getServedAt().toLocalDate(), BigDecimal.ZERO);
+                    lookup.put(order.getServedAt().toLocalDate(), cost.add(order.getTotalCost()));
                 });
         return readReportTemplate(from, to, date -> lookup.getOrDefault(date, BigDecimal.ZERO));
     }

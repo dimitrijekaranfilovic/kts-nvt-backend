@@ -11,4 +11,6 @@ public interface ReportService {
 
     ReportStatistics<LocalDate, BigDecimal> readOrderIncomes(LocalDate from, LocalDate to);
 
+    ReportStatistics<LocalDate, BigDecimal> readOrderCosts(LocalDate from, LocalDate to);
+
 }
