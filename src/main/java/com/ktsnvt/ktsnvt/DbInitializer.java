@@ -179,8 +179,8 @@ public class DbInitializer implements ApplicationRunner {
         order1.addOrderItemGroup(orderGroup2);
         orderItemGroupRepo.save(orderGroup2);
 
-        var orderGroup3 = new OrderItemGroup("Group 1", OrderItemGroupStatus.SENT, null);
-        order2.addOrderItemGroup(orderGroup3);
+        var orderGroup3 = new OrderItemGroup("Group 1", OrderItemGroupStatus.DONE, null);
+        order3.addOrderItemGroup(orderGroup3);
         orderItemGroupRepo.save(orderGroup3);
 
 
@@ -189,9 +189,9 @@ public class DbInitializer implements ApplicationRunner {
         var orderItem3 = new OrderItem(1, orderGroup1, null, menuItem3, OrderItemStatus.SENT);
         var orderItem4 = new OrderItem(1, orderGroup1, null, menuItem3, OrderItemStatus.SENT);
 
-        var orderItem5 = new OrderItem(1, orderGroup2, null, menuItem3, OrderItemStatus.NEW);
-        var orderItem6 = new OrderItem(1, orderGroup2, null, menuItem3, OrderItemStatus.NEW);
-        var orderItem7 = new OrderItem(1, orderGroup2, null, menuItem3, OrderItemStatus.NEW);
+        var orderItem5 = new OrderItem(1, orderGroup3, null, menuItem3, OrderItemStatus.DONE);
+        var orderItem6 = new OrderItem(1, orderGroup3, null, menuItem3, OrderItemStatus.DONE);
+        var orderItem7 = new OrderItem(1, orderGroup3, null, menuItem3, OrderItemStatus.DONE);
 
 
         // orderItem1.setPreparedBy(employee2);
@@ -204,9 +204,9 @@ public class DbInitializer implements ApplicationRunner {
         orderGroup1.addItem(orderItem4);
         orderItem4.setSentAt(LocalDateTime.now());
 
-        orderGroup2.addItem(orderItem5);
-        orderGroup2.addItem(orderItem6);
-        orderGroup2.addItem(orderItem7);
+        orderGroup3.addItem(orderItem5);
+        orderGroup3.addItem(orderItem6);
+        orderGroup3.addItem(orderItem7);
 
         orderItemRepo.save(orderItem1);
         orderItemRepo.save(orderItem2);

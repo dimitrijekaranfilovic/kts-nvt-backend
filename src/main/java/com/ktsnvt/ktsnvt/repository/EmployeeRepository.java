@@ -20,7 +20,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
     Optional<Employee> findByPin(String pin);
 
     @Query("select e from Employee e where ((lower(e.name) like concat('%', :query, '%')) or (lower(e.surname) like concat('%', :query, '%')))" +
-            " and e.currentSalary >= :salaryFrom and e.currentSalary <= :salaryTo and (:type is null or e.type = : type)")
+            " and (:salaryFrom is null or e.currentSalary >= :salaryFrom) and (:salaryTo is null or e.currentSalary <= :salaryTo) " +
+            " and (:type is null or e.type = : type)")
     Page<Employee> findAll(String query, BigDecimal salaryFrom, BigDecimal salaryTo, EmployeeType type, Pageable pageable);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)

@@ -161,6 +161,7 @@ public class OrderItemServiceImpl implements OrderItemService {
         return this.orderItemRepository.save(orderItem);
     }
 
+    @Override
     public void updateOrderItem(Integer orderItemId, Integer amount, String pin) {
         var orderItem = this.orderItemRepository.findById(orderItemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Order item with id %d does not exist.", orderItemId)));
