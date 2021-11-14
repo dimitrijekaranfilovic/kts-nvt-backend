@@ -22,7 +22,7 @@ public class SendMonthlyFinancialReport {
     }
 
     @Async
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 0 1 * *")
     public void sendReport() {
         reportService.generateMonthlyFinancialReport(localDateTimeService.currentDate().minusMonths(1),
                 localDateTimeService.currentDate());

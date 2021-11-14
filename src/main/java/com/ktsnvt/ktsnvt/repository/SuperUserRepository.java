@@ -7,11 +7,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
 import javax.persistence.LockModeType;
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public interface SuperUserRepository extends JpaRepository<SuperUser, Integer> {
 
@@ -24,4 +24,6 @@ public interface SuperUserRepository extends JpaRepository<SuperUser, Integer> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select u from SuperUser u where u.id = :id and u.type = :type")
     Optional<SuperUser> getSuperUserForUpdate(Integer id, SuperUserType type);
+
+    Stream<SuperUser> findAllByIsActiveTrue();
 }

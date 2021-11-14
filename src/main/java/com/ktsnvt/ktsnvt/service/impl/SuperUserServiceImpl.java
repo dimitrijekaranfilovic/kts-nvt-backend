@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.stream.Stream;
 
 @Service
 public class SuperUserServiceImpl implements SuperUserService {
@@ -90,5 +91,11 @@ public class SuperUserServiceImpl implements SuperUserService {
         user.setName(name);
         user.setSurname(surname);
         user.setEmail(email);
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public Stream<SuperUser> readAll() {
+        return superUserRepository.findAllByIsActiveTrue();
     }
 }

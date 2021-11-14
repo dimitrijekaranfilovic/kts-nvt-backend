@@ -111,9 +111,12 @@ public class ReportServiceImpl implements ReportService {
     @Async
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void generateMonthlyFinancialReport(LocalDate from, LocalDate to) {
-        var superuser = superUserService.read(4);
-        emailService.sendMonthlyFinancialReport(superuser, readTotalSalaryExpense(from, to),
-                readTotalOrderIncome(from, to), readTotalOrderCost(from, to));
+        superUserService.readAll()
+                .forEach(superUser -> emailService.sendMonthlyFinancialReport(superUser,
+                        readTotalSalaryExpense(from, to),
+                        readTotalOrderIncome(from, to),
+                        readTotalOrderCost(from, to)));
+
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
