@@ -61,4 +61,10 @@ public class InventoryItemController {
         return page.map(inventoryItemToReadInventoryItemsResponse::convert);
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteInventoryItem(@PathVariable Integer id) {
+        inventoryItemService.delete(id);
+    }
+
 }

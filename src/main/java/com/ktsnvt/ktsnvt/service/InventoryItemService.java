@@ -15,4 +15,6 @@ public interface InventoryItemService {
 
     Page<InventoryItem> read(String query, BigDecimal basePriceFrom, BigDecimal basePriceTo,
                              ItemCategory itemCategory, Pageable pageable);
+
+    void delete(Integer id);
 }

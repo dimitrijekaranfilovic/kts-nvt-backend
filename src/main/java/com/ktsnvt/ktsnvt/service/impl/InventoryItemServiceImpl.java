@@ -48,4 +48,9 @@ public class InventoryItemServiceImpl implements InventoryItemService {
         return inventoryItemRepository.findAll(query.trim().toLowerCase(), basePriceFrom,
                 basePriceTo, itemCategory, pageable);
     }
+
+    @Override
+    public void delete(Integer id) {
+
+    }
 }
