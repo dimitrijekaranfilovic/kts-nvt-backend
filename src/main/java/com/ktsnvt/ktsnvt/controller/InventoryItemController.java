@@ -4,6 +4,7 @@ import com.ktsnvt.ktsnvt.dto.createinventoryitem.CreateInventoryItemRequest;
 import com.ktsnvt.ktsnvt.dto.createinventoryitem.CreateInventoryItemResponse;
 import com.ktsnvt.ktsnvt.dto.readinventoryitems.ReadInventoryItemsRequest;
 import com.ktsnvt.ktsnvt.dto.readinventoryitems.ReadInventoryItemsResponse;
+import com.ktsnvt.ktsnvt.dto.updateinventoryitem.UpdateInventoryItemRequest;
 import com.ktsnvt.ktsnvt.model.InventoryItem;
 import com.ktsnvt.ktsnvt.service.InventoryItemService;
 import com.ktsnvt.ktsnvt.support.EntityConverter;
@@ -67,5 +68,14 @@ public class InventoryItemController {
     public void deleteInventoryItem(@PathVariable Integer id) {
         inventoryItemService.delete(id);
     }
+
+    // PRE AUTHORIZE (ADMIN, MANAGER)
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void update(@PathVariable Integer id, @RequestBody @Valid UpdateInventoryItemRequest request) {
+        inventoryItemService.update(id, request.getName(), request.getDescription(), request.getAllergies(),
+                request.getImage(), request.getCategory(), request.getBasePrice());
+    }
+
 
 }
