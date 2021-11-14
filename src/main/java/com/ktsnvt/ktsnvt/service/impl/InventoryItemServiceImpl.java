@@ -2,10 +2,13 @@ package com.ktsnvt.ktsnvt.service.impl;
 
 import com.ktsnvt.ktsnvt.exception.InventoryItemNameAlreadyExistsException;
 import com.ktsnvt.ktsnvt.exception.InventoryItemNotFoundException;
+import com.ktsnvt.ktsnvt.exception.UsedInventoryItemDeletionException;
 import com.ktsnvt.ktsnvt.model.InventoryItem;
 import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
 import com.ktsnvt.ktsnvt.repository.InventoryItemRepository;
+import com.ktsnvt.ktsnvt.service.BasePriceService;
 import com.ktsnvt.ktsnvt.service.InventoryItemService;
+import com.ktsnvt.ktsnvt.service.OrderItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,10 +22,15 @@ import java.math.BigDecimal;
 public class InventoryItemServiceImpl implements InventoryItemService {
 
     private final InventoryItemRepository inventoryItemRepository;
+    private final OrderItemService orderItemService;
+    private final BasePriceService basePriceService;
 
     @Autowired
-    public InventoryItemServiceImpl(InventoryItemRepository inventoryItemRepository) {
+    public InventoryItemServiceImpl(InventoryItemRepository inventoryItemRepository, OrderItemService orderItemService,
+                                    BasePriceService basePriceService) {
         this.inventoryItemRepository = inventoryItemRepository;
+        this.orderItemService = orderItemService;
+        this.basePriceService = basePriceService;
     }
 
     @Override
@@ -50,7 +58,14 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void delete(Integer id) {
-
+        var inventoryItem = readForUpdate(id);
+        if (orderItemService.hasActiveOrderItems(inventoryItem)) {
+            throw new UsedInventoryItemDeletionException(
+                    String.format("Inventory Item with id: %d is contained in orders that are not finalized.", id));
+        }
+        basePriceService.endActiveBasePriceForInventoryItem(inventoryItem);
+        inventoryItem.setIsActive(Boolean.FALSE);
     }
 }

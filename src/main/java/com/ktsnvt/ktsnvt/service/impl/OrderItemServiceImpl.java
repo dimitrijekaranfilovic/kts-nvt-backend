@@ -2,6 +2,7 @@ package com.ktsnvt.ktsnvt.service.impl;
 
 import com.ktsnvt.ktsnvt.exception.*;
 import com.ktsnvt.ktsnvt.model.Employee;
+import com.ktsnvt.ktsnvt.model.InventoryItem;
 import com.ktsnvt.ktsnvt.model.MenuItem;
 import com.ktsnvt.ktsnvt.model.OrderItem;
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
@@ -132,6 +133,11 @@ public class OrderItemServiceImpl implements OrderItemService {
     }
 
     @Override
+    public boolean hasActiveOrderItems(InventoryItem inventoryItem) {
+        return orderItemRepository.streamActiveOrderItemsForInventoryItem(inventoryItem.getId()).findAny().isPresent();
+    }
+
+    @Override
     public OrderItem addOrderItem(Integer orderGroupId, Integer menuItemId, Integer amount, String pin) {
         var orderGroup = this.orderItemGroupRepository.findById(orderGroupId)
                 .orElseThrow(() ->
@@ -180,7 +186,7 @@ public class OrderItemServiceImpl implements OrderItemService {
 
         var employee = this.employeeRepository.findEmployeeByPin(pin)
                 .orElseThrow(() -> new EmployeeNotFoundException(String.format("Employee with pin %s does not exist.", pin)));
-        if(!employee.getId().equals(orderItem.getOrderItemGroup().getOrder().getWaiter().getId()))
+        if (!employee.getId().equals(orderItem.getOrderItemGroup().getOrder().getWaiter().getId()))
             throw new InvalidEmployeeTypeException(pin);
 
         orderItem.setIsActive(false);

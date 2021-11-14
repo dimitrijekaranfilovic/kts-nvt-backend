@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
-import java.math.BigDecimal;
 import javax.persistence.LockModeType;
+import java.math.BigDecimal;
 import java.util.Optional;
 
 public interface InventoryItemRepository extends JpaRepository<InventoryItem, Integer> {
@@ -27,5 +27,6 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, In
             " and (:basePriceFrom is null or i.currentBasePrice >= :basePriceFrom) " +
             " and (:basePriceTo is null or i.currentBasePrice <= :basePriceTo)" +
             " and (:itemCategory is null or i.category = :itemCategory)")
-    Page<InventoryItem> findAll(String query, BigDecimal basePriceFrom, BigDecimal basePriceTo, ItemCategory itemCategory, Pageable pageable);
+    Page<InventoryItem> findAll(String query, BigDecimal basePriceFrom, BigDecimal basePriceTo,
+                                ItemCategory itemCategory, Pageable pageable);
 }
