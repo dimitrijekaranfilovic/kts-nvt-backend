@@ -1,7 +1,7 @@
 package com.ktsnvt.ktsnvt.service.impl;
 
-import com.ktsnvt.ktsnvt.model.projections.ReportStatistics;
-import com.ktsnvt.ktsnvt.repository.OrderItemRepository;
+import com.ktsnvt.ktsnvt.model.ReportStatistics;
+import com.ktsnvt.ktsnvt.repository.OrderRepository;
 import com.ktsnvt.ktsnvt.repository.SalaryRepository;
 import com.ktsnvt.ktsnvt.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +17,12 @@ import java.util.HashMap;
 @Service
 public class ReportServiceImpl implements ReportService {
     private final SalaryRepository salaryRepository;
-    private final OrderItemRepository orderItemRepository;
+    private final OrderRepository orderRepository;
 
     @Autowired
-    public ReportServiceImpl(SalaryRepository salaryRepository, OrderItemRepository orderItemRepository) {
+    public ReportServiceImpl(SalaryRepository salaryRepository, OrderRepository orderRepository) {
         this.salaryRepository = salaryRepository;
-        this.orderItemRepository = orderItemRepository;
+        this.orderRepository = orderRepository;
     }
 
     protected interface StatisticsCollector<T> {
@@ -40,7 +40,14 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public ReportStatistics<LocalDate, BigDecimal> readOrderIncomes(LocalDate from, LocalDate to) {
-        return null;
+        var lookup = new HashMap<LocalDate, BigDecimal>();
+        orderRepository
+                .streamChargedOrdersInTimeRange(from.atStartOfDay(), to.plusDays(1).atStartOfDay())
+                .forEach(order -> {
+                    var income = lookup.getOrDefault(order.getServedAt().toLocalDate(), BigDecimal.ZERO);
+                    lookup.put(order.getServedAt().toLocalDate(), income.add(order.getTotalIncome()));
+                });
+        return readReportTemplate(from, to, date -> lookup.getOrDefault(date, BigDecimal.ZERO));
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
