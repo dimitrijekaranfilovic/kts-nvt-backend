@@ -76,7 +76,7 @@ public class ReportServiceImpl implements ReportService {
         from = from == null ? localDateTimeService.currentDate().minusDays(30) : from;
         to = to == null ? localDateTimeService.currentDate() : to;
         ReportStatistics<LocalDate, T> statistics = new ReportStatistics<>();
-        while (from.isBefore(to)) {
+        while (from.isBefore(to) || from.isEqual(to)) {
             statistics.addSample(from, collector.collect(from));
             from = from.plusDays(1);
         }
