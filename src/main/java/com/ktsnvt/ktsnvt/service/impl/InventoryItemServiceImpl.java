@@ -8,8 +8,10 @@ import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
 import com.ktsnvt.ktsnvt.repository.InventoryItemRepository;
 import com.ktsnvt.ktsnvt.service.BasePriceService;
 import com.ktsnvt.ktsnvt.service.InventoryItemService;
+import com.ktsnvt.ktsnvt.service.MenuItemService;
 import com.ktsnvt.ktsnvt.service.OrderItemService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,13 +26,15 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     private final InventoryItemRepository inventoryItemRepository;
     private final OrderItemService orderItemService;
     private final BasePriceService basePriceService;
+    private final MenuItemService menuItemService;
 
     @Autowired
     public InventoryItemServiceImpl(InventoryItemRepository inventoryItemRepository, OrderItemService orderItemService,
-                                    BasePriceService basePriceService) {
+                                    BasePriceService basePriceService, @Lazy MenuItemService menuItemService) {
         this.inventoryItemRepository = inventoryItemRepository;
         this.orderItemService = orderItemService;
         this.basePriceService = basePriceService;
+        this.menuItemService = menuItemService;
     }
 
     @Override
@@ -66,6 +70,7 @@ public class InventoryItemServiceImpl implements InventoryItemService {
                     String.format("Inventory Item with id: %d is contained in orders that are not finalized.", id));
         }
         basePriceService.endActiveBasePriceForInventoryItem(inventoryItem);
+        menuItemService.removeActiveMenuItemForInventoryItem(id);
         inventoryItem.setIsActive(Boolean.FALSE);
     }
 }
