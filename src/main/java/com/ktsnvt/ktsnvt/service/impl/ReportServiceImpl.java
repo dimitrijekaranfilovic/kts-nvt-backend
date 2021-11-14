@@ -3,9 +3,12 @@ package com.ktsnvt.ktsnvt.service.impl;
 import com.ktsnvt.ktsnvt.model.ReportStatistics;
 import com.ktsnvt.ktsnvt.repository.OrderRepository;
 import com.ktsnvt.ktsnvt.repository.SalaryRepository;
+import com.ktsnvt.ktsnvt.service.EmailService;
 import com.ktsnvt.ktsnvt.service.LocalDateTimeService;
 import com.ktsnvt.ktsnvt.service.ReportService;
+import com.ktsnvt.ktsnvt.service.SuperUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,13 +22,19 @@ import java.util.HashMap;
 public class ReportServiceImpl implements ReportService {
     private final SalaryRepository salaryRepository;
     private final OrderRepository orderRepository;
+    private final EmailService emailService;
+    private final SuperUserService superUserService;
 
     private final LocalDateTimeService localDateTimeService;
 
     @Autowired
-    public ReportServiceImpl(SalaryRepository salaryRepository, OrderRepository orderRepository, LocalDateTimeService localDateTimeService) {
+    public ReportServiceImpl(SalaryRepository salaryRepository, OrderRepository orderRepository,
+                             EmailService emailService, SuperUserService superUserService,
+                             LocalDateTimeService localDateTimeService) {
         this.salaryRepository = salaryRepository;
         this.orderRepository = orderRepository;
+        this.emailService = emailService;
+        this.superUserService = superUserService;
         this.localDateTimeService = localDateTimeService;
     }
 
@@ -69,6 +78,14 @@ public class ReportServiceImpl implements ReportService {
                     lookup.put(order.getServedAt().toLocalDate(), cost.add(order.getTotalCost()));
                 });
         return readReportTemplate(from, to, date -> lookup.getOrDefault(date, BigDecimal.ZERO));
+    }
+
+    @Override
+    @Async
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void generateMonthlyFinancialReport() {
+        var superuser = superUserService.read(4);
+        emailService.sendMonthlyFinancialReport(superuser, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE);
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)

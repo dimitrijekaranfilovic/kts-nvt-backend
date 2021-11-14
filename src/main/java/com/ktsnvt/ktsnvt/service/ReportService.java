@@ -1,6 +1,7 @@
 package com.ktsnvt.ktsnvt.service;
 
 import com.ktsnvt.ktsnvt.model.ReportStatistics;
+import org.springframework.scheduling.annotation.Async;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -12,5 +13,8 @@ public interface ReportService {
     ReportStatistics<LocalDate, BigDecimal> readOrderIncomes(LocalDate from, LocalDate to);
 
     ReportStatistics<LocalDate, BigDecimal> readOrderCosts(LocalDate from, LocalDate to);
+
+    @Async
+    void generateMonthlyFinancialReport();
 
 }
