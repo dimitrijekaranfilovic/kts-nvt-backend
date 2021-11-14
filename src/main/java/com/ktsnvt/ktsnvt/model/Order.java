@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,6 +36,12 @@ public class Order extends BaseEntity {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "order")
     private Set<OrderItemGroup> itemGroups = new HashSet<>();
+
+    @Column(name = "total_income", nullable = true)
+    private BigDecimal totalIncome = BigDecimal.ZERO;
+
+    @Column(name = "total_cost", nullable = true)
+    private BigDecimal totalCost = BigDecimal.ZERO;
 
     public Order() {
         super();

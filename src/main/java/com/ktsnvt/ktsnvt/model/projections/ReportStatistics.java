@@ -1,4 +1,4 @@
-package com.ktsnvt.ktsnvt.model;
+package com.ktsnvt.ktsnvt.model.projections;
 
 import lombok.Data;
 

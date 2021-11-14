@@ -6,9 +6,7 @@ import com.ktsnvt.ktsnvt.exception.EmployeeNotFoundException;
 import com.ktsnvt.ktsnvt.exception.InvalidEmployeeTypeException;
 import com.ktsnvt.ktsnvt.exception.NotFoundException;
 import com.ktsnvt.ktsnvt.exception.OrderItemGroupInvalidStatusException;
-import com.ktsnvt.ktsnvt.model.Order;
-import com.ktsnvt.ktsnvt.model.OrderItemGroup;
-import com.ktsnvt.ktsnvt.model.RestaurantTable;
+import com.ktsnvt.ktsnvt.model.*;
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemGroupStatus;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemStatus;
@@ -16,8 +14,6 @@ import com.ktsnvt.ktsnvt.model.enums.OrderStatus;
 import com.ktsnvt.ktsnvt.repository.EmployeeRepository;
 import com.ktsnvt.ktsnvt.repository.OrderItemGroupRepository;
 import com.ktsnvt.ktsnvt.repository.OrderRepository;
-
-import com.ktsnvt.ktsnvt.model.Employee;
 
 import com.ktsnvt.ktsnvt.service.LocalDateTimeService;
 import com.ktsnvt.ktsnvt.service.OrderService;
@@ -28,6 +24,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -152,6 +149,18 @@ public class OrderServiceImpl implements OrderService {
         if (order.getItemGroups().stream().anyMatch(ig -> ig.getIsActive() && ig.getStatus() != OrderItemGroupStatus.DONE)) {
             throw new IllegalOrderStateException("Order cannot be charged because not all of its groups are done.");
         }
+        order.getItemGroups()
+                .stream()
+                .filter(BaseEntity::getIsActive)
+                .forEach(ig -> {
+                    ig.getOrderItems()
+                            .stream()
+                            .filter(BaseEntity::getIsActive)
+                            .forEach(item -> {
+                                order.setTotalIncome(order.getTotalIncome().add(item.getCurrentMenuPrice()));
+                                order.setTotalCost(order.getTotalCost().add(item.getCurrentBasePrice()));
+                            });
+                });
         order.setStatus(OrderStatus.CHARGED);
         order.setServedAt(localDateTimeService.currentTime());
         order.getRestaurantTable().freeTable();
