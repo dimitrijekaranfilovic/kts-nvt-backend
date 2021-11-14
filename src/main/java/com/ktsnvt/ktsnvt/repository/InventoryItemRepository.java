@@ -17,7 +17,7 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, In
     Optional<InventoryItem> findByName(String name);
 
     @Lock(LockModeType.OPTIMISTIC)
-    @Query("select i from InventoryItem i where i.id = :id")
+    @Query("select i from InventoryItem i where i.id = :id and i.isActive = true")
     Optional<InventoryItem> findOneForUpdate(Integer id);
 
     @Query("select i from InventoryItem i " +
@@ -26,7 +26,8 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, In
             " or lower(i.allergies) like concat('%', :query, '%'))" +
             " and (:basePriceFrom is null or i.currentBasePrice >= :basePriceFrom) " +
             " and (:basePriceTo is null or i.currentBasePrice <= :basePriceTo)" +
-            " and (:itemCategory is null or i.category = :itemCategory)")
+            " and (:itemCategory is null or i.category = :itemCategory)" +
+            " and i.isActive = true")
     Page<InventoryItem> findAll(String query, BigDecimal basePriceFrom, BigDecimal basePriceTo,
                                 ItemCategory itemCategory, Pageable pageable);
 }
