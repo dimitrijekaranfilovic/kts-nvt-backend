@@ -2,11 +2,16 @@ package com.ktsnvt.ktsnvt.service.impl;
 
 import com.ktsnvt.ktsnvt.exception.InventoryItemNameAlreadyExistsException;
 import com.ktsnvt.ktsnvt.exception.InventoryItemNotFoundException;
+import com.ktsnvt.ktsnvt.exception.UsedInventoryItemDeletionException;
 import com.ktsnvt.ktsnvt.model.InventoryItem;
 import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
 import com.ktsnvt.ktsnvt.repository.InventoryItemRepository;
+import com.ktsnvt.ktsnvt.service.BasePriceService;
 import com.ktsnvt.ktsnvt.service.InventoryItemService;
+import com.ktsnvt.ktsnvt.service.MenuItemService;
+import com.ktsnvt.ktsnvt.service.OrderItemService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,10 +24,17 @@ import java.math.BigDecimal;
 public class InventoryItemServiceImpl implements InventoryItemService {
 
     private final InventoryItemRepository inventoryItemRepository;
+    private final OrderItemService orderItemService;
+    private final BasePriceService basePriceService;
+    private final MenuItemService menuItemService;
 
     @Autowired
-    public InventoryItemServiceImpl(InventoryItemRepository inventoryItemRepository) {
+    public InventoryItemServiceImpl(InventoryItemRepository inventoryItemRepository, OrderItemService orderItemService,
+                                    BasePriceService basePriceService, @Lazy MenuItemService menuItemService) {
         this.inventoryItemRepository = inventoryItemRepository;
+        this.orderItemService = orderItemService;
+        this.basePriceService = basePriceService;
+        this.menuItemService = menuItemService;
     }
 
     @Override
@@ -47,5 +59,18 @@ public class InventoryItemServiceImpl implements InventoryItemService {
                                     ItemCategory itemCategory, Pageable pageable) {
         return inventoryItemRepository.findAll(query.trim().toLowerCase(), basePriceFrom,
                 basePriceTo, itemCategory, pageable);
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void delete(Integer id) {
+        var inventoryItem = readForUpdate(id);
+        if (orderItemService.hasActiveOrderItems(inventoryItem)) {
+            throw new UsedInventoryItemDeletionException(
+                    String.format("Inventory Item with id: %d is contained in orders that are not finalized.", id));
+        }
+        basePriceService.endActiveBasePriceForInventoryItem(inventoryItem);
+        menuItemService.removeActiveMenuItemForInventoryItem(id);
+        inventoryItem.setIsActive(Boolean.FALSE);
     }
 }

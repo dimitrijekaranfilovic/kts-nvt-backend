@@ -4,6 +4,8 @@ package com.ktsnvt.ktsnvt.controller;
 import com.ktsnvt.ktsnvt.dto.createmenuitem.CreateMenuItemRequest;
 import com.ktsnvt.ktsnvt.dto.createmenuitem.CreateMenuItemResponse;
 import com.ktsnvt.ktsnvt.dto.displaypaginatedmenuitems.DisplayMenuItemResponse;
+import com.ktsnvt.ktsnvt.dto.updatemenuitemprice.UpdateMenuItemPriceRequest;
+import com.ktsnvt.ktsnvt.dto.updatemenuitemprice.UpdateMenuItemPriceResponse;
 import com.ktsnvt.ktsnvt.model.MenuItem;
 import com.ktsnvt.ktsnvt.service.MenuItemService;
 import com.ktsnvt.ktsnvt.support.EntityConverter;
@@ -24,14 +26,17 @@ public class MenuItemController {
     private final MenuItemService menuItemService;
     private final EntityConverter<MenuItem, DisplayMenuItemResponse> menuItemToDisplayMenuItemResponse;
     private final EntityConverter<MenuItem, CreateMenuItemResponse> menuItemToCreateMenuItemResponse;
+    private final EntityConverter<MenuItem, UpdateMenuItemPriceResponse> menuItemToUpdateMenuItemPriceResponse;
 
     @Autowired
     public MenuItemController(MenuItemService menuItemService,
                               MenuItemToDisplayMenuItemResponse menuItemToDisplayMenuItemResponse,
-                              EntityConverter<MenuItem, CreateMenuItemResponse> menuItemToCreateMenuItemResponse) {
+                              EntityConverter<MenuItem, CreateMenuItemResponse> menuItemToCreateMenuItemResponse,
+                              EntityConverter<MenuItem, UpdateMenuItemPriceResponse> menuItemToUpdateMenuItemPriceResponse) {
         this.menuItemService = menuItemService;
         this.menuItemToDisplayMenuItemResponse = menuItemToDisplayMenuItemResponse;
         this.menuItemToCreateMenuItemResponse = menuItemToCreateMenuItemResponse;
+        this.menuItemToUpdateMenuItemPriceResponse = menuItemToUpdateMenuItemPriceResponse;
     }
 
 
@@ -46,6 +51,21 @@ public class MenuItemController {
     public CreateMenuItemResponse createMenuItem(@RequestBody @Valid CreateMenuItemRequest request) {
         return menuItemToCreateMenuItemResponse
                 .convert(this.menuItemService.createMenuItem(request.getPrice(), request.getInventoryItemId()));
+    }
+
+    // PRE AUTHORIZE (ADMIN, MANAGER)
+    @PostMapping("/{id}/price")
+    @ResponseStatus(HttpStatus.CREATED)
+    public UpdateMenuItemPriceResponse updatePrice(@PathVariable Integer id, @RequestBody @Valid UpdateMenuItemPriceRequest request) {
+        return menuItemToUpdateMenuItemPriceResponse
+                .convert(this.menuItemService.updateMenuItemPrice(request.getPrice(), id));
+    }
+
+    // PRE AUTHORIZE (ADMIN, MANAGER)
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deactivateMenuItem(@PathVariable Integer id) {
+        menuItemService.deactivateMenuItem(id);
     }
 
 }

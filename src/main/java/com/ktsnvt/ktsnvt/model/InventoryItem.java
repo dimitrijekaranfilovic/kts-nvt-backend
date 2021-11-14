@@ -3,7 +3,6 @@ package com.ktsnvt.ktsnvt.model;
 import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -14,7 +13,6 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "inventory_items")
-@Where(clause = "is_active = true")
 public class InventoryItem extends BaseEntity {
 
     @Column(name = "name", nullable = false)
@@ -77,7 +75,7 @@ public class InventoryItem extends BaseEntity {
         basePrice.setInventoryItem(this);
     }
 
-    public void addMenuItem(MenuItem menuItem){
+    public void addMenuItem(MenuItem menuItem) {
         this.isInMenu = Boolean.TRUE;
         menuItem.setItem(this);
     }

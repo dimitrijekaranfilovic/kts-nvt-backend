@@ -14,4 +14,10 @@ public interface MenuItemService {
     MenuItem createMenuItem(BigDecimal price, Integer inventoryItemId);
 
     void removeActiveMenuItemForInventoryItem(Integer inventoryItemId);
+
+    void deactivateMenuItem(Integer id);
+
+    MenuItem readForUpdate(Integer id);
+
+    MenuItem updateMenuItemPrice(BigDecimal price, Integer menuItemId);
 }

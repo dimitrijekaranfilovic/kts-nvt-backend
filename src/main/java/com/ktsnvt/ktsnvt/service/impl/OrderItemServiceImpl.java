@@ -2,6 +2,8 @@ package com.ktsnvt.ktsnvt.service.impl;
 
 import com.ktsnvt.ktsnvt.exception.*;
 import com.ktsnvt.ktsnvt.model.Employee;
+import com.ktsnvt.ktsnvt.model.InventoryItem;
+import com.ktsnvt.ktsnvt.model.MenuItem;
 import com.ktsnvt.ktsnvt.model.OrderItem;
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
 import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
@@ -125,6 +127,17 @@ public class OrderItemServiceImpl implements OrderItemService {
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public boolean hasActiveOrderItems(MenuItem menuItem) {
+        return orderItemRepository.streamActiveOrderItemsForMenuItem(menuItem.getId()).findAny().isPresent();
+    }
+
+    @Override
+    public boolean hasActiveOrderItems(InventoryItem inventoryItem) {
+        return orderItemRepository.streamActiveOrderItemsForInventoryItem(inventoryItem.getId()).findAny().isPresent();
+    }
+
+    @Override
     public OrderItem addOrderItem(Integer orderGroupId, Integer menuItemId, Integer amount, String pin) {
         var orderGroup = this.orderItemGroupRepository.findById(orderGroupId)
                 .orElseThrow(() ->
@@ -151,13 +164,13 @@ public class OrderItemServiceImpl implements OrderItemService {
     @Override
     public void updateOrderItem(Integer orderItemId, Integer amount, String pin) {
         var orderItem = this.orderItemRepository.findById(orderItemId)
-                .orElseThrow(()  -> new NotFoundException(String.format("Order item with id %d does not exist.", orderItemId)));
-        if(orderItem.getStatus() != OrderItemStatus.NEW)
+                .orElseThrow(() -> new NotFoundException(String.format("Order item with id %d does not exist.", orderItemId)));
+        if (orderItem.getStatus() != OrderItemStatus.NEW)
             throw new OrderItemInvalidStatusException(String.format("Status of order item with id %d is not NEW, and it cannot be updated.", orderItemId));
         if (amount <= 0)
             throw new IllegalAmountException(amount);
         var employee = this.employeeRepository.findEmployeeByPin(pin)
-                        .orElseThrow(()->new EmployeeNotFoundException(String.format("Employee with pin %s does not exist.", pin)));
+                .orElseThrow(() -> new EmployeeNotFoundException(String.format("Employee with pin %s does not exist.", pin)));
         if (!employee.getId().equals(orderItem.getOrderItemGroup().getOrder().getWaiter().getId()))
             throw new InvalidEmployeeTypeException(pin);
 
@@ -174,7 +187,7 @@ public class OrderItemServiceImpl implements OrderItemService {
 
         var employee = this.employeeRepository.findEmployeeByPin(pin)
                 .orElseThrow(() -> new EmployeeNotFoundException(String.format("Employee with pin %s does not exist.", pin)));
-        if(!employee.getId().equals(orderItem.getOrderItemGroup().getOrder().getWaiter().getId()))
+        if (!employee.getId().equals(orderItem.getOrderItemGroup().getOrder().getWaiter().getId()))
             throw new InvalidEmployeeTypeException(pin);
 
         orderItem.setIsActive(false);
