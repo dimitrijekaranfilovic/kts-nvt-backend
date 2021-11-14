@@ -1,4 +1,4 @@
-package com.ktsnvt.ktsnvt.dto.createinventoryitem;
+package com.ktsnvt.ktsnvt.dto.updateinventoryitem;
 
 import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
 import lombok.Data;
@@ -9,7 +9,7 @@ import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 
 @Data
-public class CreateInventoryItemRequest {
+public class UpdateInventoryItemRequest {
 
     @NotBlank(message = "Inventory item's name can't be blank.")
     private String name;
@@ -20,10 +20,11 @@ public class CreateInventoryItemRequest {
 
     private String description = "";
 
-    private String image = "";
-
     private String allergies = "";
+
+    private String image = "";
 
     @NotNull(message = "Inventory item's category is required.")
     private ItemCategory category;
+
 }
