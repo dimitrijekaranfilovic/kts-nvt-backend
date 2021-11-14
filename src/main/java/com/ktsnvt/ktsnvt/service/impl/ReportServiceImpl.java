@@ -3,6 +3,7 @@ package com.ktsnvt.ktsnvt.service.impl;
 import com.ktsnvt.ktsnvt.model.ReportStatistics;
 import com.ktsnvt.ktsnvt.repository.OrderRepository;
 import com.ktsnvt.ktsnvt.repository.SalaryRepository;
+import com.ktsnvt.ktsnvt.service.LocalDateTimeService;
 import com.ktsnvt.ktsnvt.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,10 +20,13 @@ public class ReportServiceImpl implements ReportService {
     private final SalaryRepository salaryRepository;
     private final OrderRepository orderRepository;
 
+    private final LocalDateTimeService localDateTimeService;
+
     @Autowired
-    public ReportServiceImpl(SalaryRepository salaryRepository, OrderRepository orderRepository) {
+    public ReportServiceImpl(SalaryRepository salaryRepository, OrderRepository orderRepository, LocalDateTimeService localDateTimeService) {
         this.salaryRepository = salaryRepository;
         this.orderRepository = orderRepository;
+        this.localDateTimeService = localDateTimeService;
     }
 
     protected interface StatisticsCollector<T> {
@@ -34,6 +38,9 @@ public class ReportServiceImpl implements ReportService {
     public ReportStatistics<LocalDate, BigDecimal> readSalaryExpenses(LocalDate from, LocalDate to) {
         return readReportTemplate(from, to, date -> {
             BigDecimal amount = salaryRepository.readExpensesForDate(date);
+            if (amount == null) {
+                return BigDecimal.ZERO;
+            }
             return amount.divide(BigDecimal.valueOf(date.lengthOfMonth()), RoundingMode.CEILING);
         });
     }
@@ -66,6 +73,8 @@ public class ReportServiceImpl implements ReportService {
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public <T> ReportStatistics<LocalDate, T> readReportTemplate(LocalDate from, LocalDate to, StatisticsCollector<T> collector) {
+        from = from == null ? localDateTimeService.currentDate().minusDays(30) : from;
+        to = to == null ? localDateTimeService.currentDate() : to;
         ReportStatistics<LocalDate, T> statistics = new ReportStatistics<>();
         while (from.isBefore(to)) {
             statistics.addSample(from, collector.collect(from));
