@@ -42,6 +42,7 @@ public class MenuItem extends BaseEntity {
 
     public void deactivateMenuItem(LocalDateTime endDate) {
         this.endDate = endDate;
+        this.setIsActive(Boolean.FALSE);
         if (this.item != null) {
             this.item.setIsInMenu(Boolean.FALSE);
         }
