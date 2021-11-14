@@ -3,13 +3,11 @@ package com.ktsnvt.ktsnvt.service.impl;
 import com.ktsnvt.ktsnvt.exception.InventoryItemNameAlreadyExistsException;
 import com.ktsnvt.ktsnvt.exception.InventoryItemNotFoundException;
 import com.ktsnvt.ktsnvt.exception.UsedInventoryItemDeletionException;
+import com.ktsnvt.ktsnvt.model.BasePrice;
 import com.ktsnvt.ktsnvt.model.InventoryItem;
 import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
 import com.ktsnvt.ktsnvt.repository.InventoryItemRepository;
-import com.ktsnvt.ktsnvt.service.BasePriceService;
-import com.ktsnvt.ktsnvt.service.InventoryItemService;
-import com.ktsnvt.ktsnvt.service.MenuItemService;
-import com.ktsnvt.ktsnvt.service.OrderItemService;
+import com.ktsnvt.ktsnvt.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
@@ -27,14 +25,17 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     private final OrderItemService orderItemService;
     private final BasePriceService basePriceService;
     private final MenuItemService menuItemService;
+    private final LocalDateTimeService localDateTimeService;
 
     @Autowired
     public InventoryItemServiceImpl(InventoryItemRepository inventoryItemRepository, OrderItemService orderItemService,
-                                    BasePriceService basePriceService, @Lazy MenuItemService menuItemService) {
+                                    BasePriceService basePriceService, @Lazy MenuItemService menuItemService,
+                                    LocalDateTimeService localDateTimeService) {
         this.inventoryItemRepository = inventoryItemRepository;
         this.orderItemService = orderItemService;
         this.basePriceService = basePriceService;
         this.menuItemService = menuItemService;
+        this.localDateTimeService = localDateTimeService;
     }
 
     @Override
@@ -84,6 +85,9 @@ public class InventoryItemServiceImpl implements InventoryItemService {
         if (sameInventoryItem.isPresent()) {
             throw new InventoryItemNameAlreadyExistsException(inventoryItem.getName());
         }
+
+        basePriceService.updateInventoryItemBasePrice(id,
+                new BasePrice(localDateTimeService.currentTime(), null, basePrice, inventoryItem));
 
         inventoryItem.setName(name);
         inventoryItem.setDescription(description);
