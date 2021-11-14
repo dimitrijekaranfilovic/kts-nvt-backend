@@ -16,21 +16,24 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, Integer> {
 
     @Query(value = "select mi from " +
             "MenuItem mi where " +
-            "(lower(mi.item.name) like concat('%', lower(:name), '%') or :name is null) and (mi.endDate is null)",
+            "(lower(mi.item.name) like concat('%', lower(:name), '%') or :name is null) and (mi.endDate is null)" +
+            " and mi.isActive = true",
             countQuery = "select count(mi) from " +
                     "MenuItem mi where " +
-                    "(lower(mi.item.name) like concat('%', lower(:name), '%') or :name is null) and (mi.endDate is null)"
+                    "(lower(mi.item.name) like concat('%', lower(:name), '%') or :name is null) and (mi.endDate is null)" +
+                    " and mi.isActive = true"
     )
     Page<MenuItem> getMenuItems(@Param("name") String name, Pageable pageable);
 
     @Lock(LockModeType.OPTIMISTIC)
     @Query(value = "select mi from MenuItem mi" +
             " where mi.item.id = :inventoryItemId" +
-            " and mi.endDate is null")
+            " and mi.endDate is null " +
+            " and mi.isActive = true")
     Optional<MenuItem> findActiveForInventoryItem(Integer inventoryItemId);
 
 
     @Lock(LockModeType.OPTIMISTIC)
-    @Query(value = "select mi from MenuItem mi where mi.id = :id")
+    @Query(value = "select mi from MenuItem mi where mi.id = :id and mi.isActive = true")
     Optional<MenuItem> findOneForUpdate(Integer id);
 }

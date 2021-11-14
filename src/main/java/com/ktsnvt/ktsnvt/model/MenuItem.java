@@ -2,7 +2,6 @@ package com.ktsnvt.ktsnvt.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -12,7 +11,6 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "menu_items")
-@Where(clause = "is_active = true")
 public class MenuItem extends BaseEntity {
 
     @Column(name = "price", nullable = false)
@@ -44,6 +42,7 @@ public class MenuItem extends BaseEntity {
 
     public void deactivateMenuItem(LocalDateTime endDate) {
         this.endDate = endDate;
+        this.setIsActive(Boolean.FALSE);
         if (this.item != null) {
             this.item.setIsInMenu(Boolean.FALSE);
         }

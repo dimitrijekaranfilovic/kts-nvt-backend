@@ -1,6 +1,7 @@
 package com.ktsnvt.ktsnvt.service;
 
 import com.ktsnvt.ktsnvt.model.Employee;
+import com.ktsnvt.ktsnvt.model.InventoryItem;
 import com.ktsnvt.ktsnvt.model.MenuItem;
 import com.ktsnvt.ktsnvt.model.OrderItem;
 import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
@@ -20,6 +21,8 @@ public interface OrderItemService {
     boolean hasActiveOrderItems(Employee employee);
 
     boolean hasActiveOrderItems(MenuItem menuItem);
+
+    boolean hasActiveOrderItems(InventoryItem inventoryItem);
 
     OrderItem addOrderItem(Integer orderGroupId, Integer menuItemId, Integer amount, String pin);
 

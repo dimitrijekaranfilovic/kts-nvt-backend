@@ -27,6 +27,9 @@ public class BasePrice extends BaseEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     private InventoryItem inventoryItem;
 
+    @Version
+    private Integer version;
+
     public BasePrice() {
         super();
     }

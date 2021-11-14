@@ -61,4 +61,11 @@ public class InventoryItemController {
         return page.map(inventoryItemToReadInventoryItemsResponse::convert);
     }
 
+    // PRE AUTHORIZE (ADMIN, MANAGER)
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteInventoryItem(@PathVariable Integer id) {
+        inventoryItemService.delete(id);
+    }
+
 }

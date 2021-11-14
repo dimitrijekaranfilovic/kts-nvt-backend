@@ -38,5 +38,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
     @Query("select oi from OrderItem oi where oi.item.id = :id and oi.status <> 2")
     Stream<OrderItem> streamActiveOrderItemsForMenuItem(Integer id);
 
-
+    // Order item status != DONE
+    @Query("select oi from OrderItem oi where oi.item.item.id = :id and oi.status <> 2")
+    Stream<OrderItem> streamActiveOrderItemsForInventoryItem(Integer id);
 }
