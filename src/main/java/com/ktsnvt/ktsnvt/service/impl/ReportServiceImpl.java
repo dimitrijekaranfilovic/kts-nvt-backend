@@ -1,5 +1,6 @@
 package com.ktsnvt.ktsnvt.service.impl;
 
+import com.ktsnvt.ktsnvt.model.Order;
 import com.ktsnvt.ktsnvt.model.ReportStatistics;
 import com.ktsnvt.ktsnvt.repository.OrderRepository;
 import com.ktsnvt.ktsnvt.repository.SalaryRepository;
@@ -81,11 +82,38 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public BigDecimal readTotalSalaryExpense(LocalDate from, LocalDate to) {
+        return this.readSalaryExpenses(from, to).getValues()
+                .parallelStream()
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public BigDecimal readTotalOrderIncome(LocalDate from, LocalDate to) {
+        return orderRepository.streamChargedOrdersInTimeRange(from.atStartOfDay(), to.plusDays(1).atStartOfDay())
+                .parallel()
+                .map(Order::getTotalIncome)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public BigDecimal readTotalOrderCost(LocalDate from, LocalDate to) {
+        return orderRepository.streamChargedOrdersInTimeRange(from.atStartOfDay(), to.plusDays(1).atStartOfDay())
+                .parallel()
+                .map(Order::getTotalCost)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    @Override
     @Async
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void generateMonthlyFinancialReport() {
+    public void generateMonthlyFinancialReport(LocalDate from, LocalDate to) {
         var superuser = superUserService.read(4);
-        emailService.sendMonthlyFinancialReport(superuser, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE);
+        emailService.sendMonthlyFinancialReport(superuser, readTotalSalaryExpense(from, to),
+                readTotalOrderIncome(from, to), readTotalOrderCost(from, to));
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)

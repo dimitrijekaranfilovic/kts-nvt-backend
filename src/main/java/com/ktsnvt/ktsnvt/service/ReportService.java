@@ -14,7 +14,13 @@ public interface ReportService {
 
     ReportStatistics<LocalDate, BigDecimal> readOrderCosts(LocalDate from, LocalDate to);
 
+    BigDecimal readTotalSalaryExpense(LocalDate from, LocalDate to);
+
+    BigDecimal readTotalOrderIncome(LocalDate from, LocalDate to);
+
+    BigDecimal readTotalOrderCost(LocalDate from, LocalDate to);
+
     @Async
-    void generateMonthlyFinancialReport();
+    void generateMonthlyFinancialReport(LocalDate from, LocalDate to);
 
 }
