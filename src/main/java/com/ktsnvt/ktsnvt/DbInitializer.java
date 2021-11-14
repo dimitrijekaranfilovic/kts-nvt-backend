@@ -127,6 +127,7 @@ public class DbInitializer implements ApplicationRunner {
         var menuItem3 = new MenuItem(BigDecimal.valueOf(100.00), LocalDateTime.parse("2021-01-01 12:12", formatter), null, item3);
         item3.addMenuItem(menuItem3);
         var menuItem4 = new MenuItem(BigDecimal.valueOf(322.00), LocalDateTime.parse("2021-01-01 12:12", formatter), null, item4);
+        item4.addMenuItem(menuItem4);
         menuItemRepo.save(menuItem1);
         menuItemRepo.save(menuItem2);
         menuItemRepo.save(menuItem3);
