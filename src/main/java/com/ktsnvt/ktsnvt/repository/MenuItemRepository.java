@@ -34,6 +34,6 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, Integer> {
 
 
     @Lock(LockModeType.OPTIMISTIC)
-    @Query(value = "select mi from MenuItem mi where mi.id = :id and mi.item.isActive = false and mi.isActive = true")
+    @Query(value = "select mi from MenuItem mi where mi.id = :id and mi.isActive = true")
     Optional<MenuItem> findOneForUpdate(Integer id);
 }
