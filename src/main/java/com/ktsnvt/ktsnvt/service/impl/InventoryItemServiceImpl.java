@@ -81,9 +81,11 @@ public class InventoryItemServiceImpl implements InventoryItemService {
                        BigDecimal basePrice) {
         var inventoryItem = readForUpdate(id);
 
-        var sameInventoryItem = inventoryItemRepository.findByName(inventoryItem.getName());
-        if (sameInventoryItem.isPresent()) {
-            throw new InventoryItemNameAlreadyExistsException(inventoryItem.getName());
+        if (!name.equals(inventoryItem.getName())) {
+            inventoryItemRepository.findByName(name)
+                    .ifPresent(item -> {
+                        throw new InventoryItemNameAlreadyExistsException(name);
+                    });
         }
 
         basePriceService.updateInventoryItemBasePrice(id,
