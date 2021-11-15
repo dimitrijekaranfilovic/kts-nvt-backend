@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
 
+    private final EmployeeQueryService employeeQueryService;
     private final AuthorityService authorityService;
     private final SalaryService salaryService;
     private final OrderService orderService;
@@ -25,11 +26,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     public EmployeeServiceImpl(EmployeeRepository employeeRepository,
+                               EmployeeQueryService employeeQueryService,
                                AuthorityService authorityService,
                                SalaryService salaryService,
                                OrderService orderService,
                                OrderItemService orderItemService) {
         this.employeeRepository = employeeRepository;
+        this.employeeQueryService = employeeQueryService;
         this.authorityService = authorityService;
         this.salaryService = salaryService;
         this.orderService = orderService;
@@ -39,7 +42,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public Employee create(Employee employee) {
-        var samePinEmployee = employeeRepository.findByPin(employee.getPin());
+        var samePinEmployee = employeeQueryService.findByPinUnchecked(employee.getPin());
         if (samePinEmployee.isPresent()) {
             throw new PinAlreadyExistsException(employee.getPin());
         }
@@ -60,7 +63,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public Employee read(Integer id) {
         return employeeRepository
-                .findById(id)
+                .findOneById(id)
                 .orElseThrow(() -> new EmployeeNotFoundException(String.format("Employee with id: %d not found.", id)));
     }
 
@@ -89,7 +92,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void update(Integer id, String name, String surname, String pin, EmployeeType type) {
         var employee = readForUpdate(id);
-        var samePinEmployee = employeeRepository.findByPin(pin);
+        var samePinEmployee = employeeQueryService.findByPinUnchecked(employee.getPin());
         samePinEmployee.ifPresent(same -> {
             if (!same.getId().equals(employee.getId())) {
                 throw new PinAlreadyExistsException(pin);

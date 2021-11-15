@@ -28,14 +28,14 @@ public class SectionServiceImpl implements SectionService {
 
     @Override
     public Collection<Section> getAllSections() {
-        return sectionRepository.findAll();
+        return sectionRepository.findAllActive();
     }
 
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public Section read(Integer id) {
         return sectionRepository
-                .findById(id)
+                .findOneById(id)
                 .orElseThrow(() -> new SectionNotFoundException("Cannot find section with id: " + id));
     }
 

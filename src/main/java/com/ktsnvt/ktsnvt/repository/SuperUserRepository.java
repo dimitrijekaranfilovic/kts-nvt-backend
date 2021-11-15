@@ -15,6 +15,10 @@ import java.util.stream.Stream;
 
 public interface SuperUserRepository extends JpaRepository<SuperUser, Integer> {
 
+    @Query("select u from SuperUser u where u.id = :id and u.isActive = true")
+    Optional<SuperUser> findOneById(Integer id);
+
+    @Query("select u from SuperUser u where u.email = :email and u.isActive = true")
     Optional<SuperUser> findByEmail(String email);
 
     @Query("select u from SuperUser u where ((lower(u.name) like concat('%', :query, '%')) or (lower(u.surname) like concat('%', :query, '%')))" +

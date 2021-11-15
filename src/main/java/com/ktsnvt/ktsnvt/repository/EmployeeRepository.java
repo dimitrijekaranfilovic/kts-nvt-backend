@@ -14,6 +14,9 @@ import java.util.Optional;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
 
+    @Query("select e from Employee e where e.id = :id and e.isActive = true")
+    Optional<Employee> findOneById(Integer id);
+
     @Query("select e from Employee e where e.pin = :pin and e.isActive = true")
     Optional<Employee> findByPin(String pin);
 

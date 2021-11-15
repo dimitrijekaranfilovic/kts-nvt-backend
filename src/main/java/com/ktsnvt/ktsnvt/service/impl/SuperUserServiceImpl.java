@@ -50,7 +50,7 @@ public class SuperUserServiceImpl implements SuperUserService {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public SuperUser read(Integer id) {
         return superUserRepository
-                .findById(id)
+                .findOneById(id)
                 .orElseThrow(() -> new SuperUserNotFoundException(String.format("Super user with id: %d not found.", id)));
     }
 
