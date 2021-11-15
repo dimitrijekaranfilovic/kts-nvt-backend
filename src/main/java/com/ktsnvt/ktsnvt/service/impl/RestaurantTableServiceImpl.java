@@ -16,6 +16,7 @@ import java.util.Objects;
 @Service
 public class RestaurantTableServiceImpl implements RestaurantTableService {
     private final RestaurantTableRepository restaurantTableRepository;
+
     private final SectionService sectionService;
 
     @Autowired
@@ -30,7 +31,7 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
     public RestaurantTable readForUpdate(Integer id) {
         return restaurantTableRepository
                 .findByIdForUpdate(id)
-                .orElseThrow(() -> new RestaurantTableNotFoundException("Restaurant table with id: " + id + " not found."));
+                .orElseThrow(() -> new RestaurantTableNotFoundException(String.format("Restaurant table with id: %d not found.", id)));
     }
 
     @Override
@@ -44,34 +45,25 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
     public RestaurantTable createRestaurantTable(RestaurantTable newTable, Integer sectionId) {
         var section = sectionService.readForUpdate(sectionId);
         var sectionTables = restaurantTableRepository.findAllForSection(sectionId);
-
         if(sectionTables.stream().anyMatch(t -> Objects.equals(t.getNumber(), newTable.getNumber()))){
-            throw new DuplicateTableNumberException("Table with number " + newTable.getNumber() + " already exists in this section.");
+            throw new DuplicateTableNumberException(String.format("Table with number: %d already exists in this section.", newTable.getNumber()));
         }
-
         if(sectionTables.stream().anyMatch(t -> intersects(t, newTable))) {
             throw new TableIntersectionException("Table is overlapping with another table.");
         }
-
         section.addTable(newTable);
         newTable.setAvailable(true);
         newTable.setReadyGroups(0);
         restaurantTableRepository.save(newTable);
-
-        return restaurantTableRepository.findByNumberInSection(sectionId, newTable.getNumber());
+        return newTable;
     }
 
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void deleteRestaurantTable(Integer id) {
         var table = readForUpdate(id);
-
-        if(Boolean.FALSE.equals(table.getAvailable())){
-            throw new OccupiedTableException("Table number " + table.getNumber() + " is occupied at the moment.");
-        }
-
+        throwIfNotAvailable(table);
         table.setIsActive(false);
-        restaurantTableRepository.save(table);
     }
 
     @Override
@@ -81,15 +73,19 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
         var table = readForUpdate(tableId);
         var sectionTables = restaurantTableRepository.findAllForSection(sectionId);
         if (!table.getSection().getId().equals(section.getId())) {
-            throw new TableSectionMismatchException("Table with id: " + tableId + " does not belong to section with id: " + sectionId);
+            throw new TableSectionMismatchException(String.format("Table with id: %d does not belong to section with id: %d", tableId, sectionId));
         }
-        if(Boolean.FALSE.equals(table.getAvailable())){
-            throw new OccupiedTableException("Table with id " + tableId + " is occupied at the moment.");
-        }
+        throwIfNotAvailable(table);
         table.setX(newX);
         table.setY(newY);
         if(sectionTables.stream().anyMatch(t -> intersects(t, table))) {
             throw new TableIntersectionException("Table is overlapping with another table.");
+        }
+    }
+
+    private void throwIfNotAvailable(RestaurantTable table) {
+        if(Boolean.FALSE.equals(table.getAvailable())){
+            throw new OccupiedTableException(String.format("Table number: %d is occupied at the moment.", table.getNumber()));
         }
     }
 

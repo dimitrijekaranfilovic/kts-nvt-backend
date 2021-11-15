@@ -11,9 +11,9 @@ import java.util.Optional;
 
 public interface SalaryRepository extends JpaRepository<Salary, Integer> {
 
-    @Query("select s from Salary s where s.user.id = :id and s.endDate is null")
+    @Query("select s from Salary s where s.user.id = :id and s.endDate is null and s.isActive = true")
     Optional<Salary> findActiveForUser(Integer id);
 
-    @Query("select sum(s.amount) from Salary s where s.startDate <= :date and (s.endDate is null or s.endDate > :date)")
-    BigDecimal readExpensesForDate(LocalDate date);
+    @Query("select sum(s.amount) from Salary s where s.startDate <= :date and (s.endDate is null or s.endDate > :date) and s.isActive = true")
+    Optional<BigDecimal> readExpensesForDate(LocalDate date);
 }

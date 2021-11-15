@@ -22,6 +22,6 @@ public interface RestaurantTableRepository extends JpaRepository<RestaurantTable
     RestaurantTable findByNumberInSection(Integer sectionId, Integer number);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select t from RestaurantTable t join fetch t.section where t.id = :id")
+    @Query("select t from RestaurantTable t join fetch t.section where t.id = :id and t.isActive = true")
     Optional<RestaurantTable> findByIdForUpdate(Integer id);
 }

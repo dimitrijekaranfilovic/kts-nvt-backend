@@ -17,6 +17,7 @@ import java.util.Collection;
 @Service
 public class SectionServiceImpl implements SectionService {
     private final SectionRepository sectionRepository;
+
     private final RestaurantTableRepository restaurantTableRepository;
 
     @Autowired

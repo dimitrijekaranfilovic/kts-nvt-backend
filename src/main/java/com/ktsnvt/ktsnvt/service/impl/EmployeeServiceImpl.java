@@ -17,13 +17,18 @@ import java.math.BigDecimal;
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
+
     private final AuthorityService authorityService;
     private final SalaryService salaryService;
     private final OrderService orderService;
     private final OrderItemService orderItemService;
 
     @Autowired
-    public EmployeeServiceImpl(EmployeeRepository employeeRepository, AuthorityService authorityService, SalaryService salaryService, OrderService orderService, OrderItemService orderItemService) {
+    public EmployeeServiceImpl(EmployeeRepository employeeRepository,
+                               AuthorityService authorityService,
+                               SalaryService salaryService,
+                               OrderService orderService,
+                               OrderItemService orderItemService) {
         this.employeeRepository = employeeRepository;
         this.authorityService = authorityService;
         this.salaryService = salaryService;
@@ -48,7 +53,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Employee readForUpdate(Integer id) {
         return employeeRepository
                 .findOneForUpdate(id)
-                .orElseThrow(() -> new EmployeeNotFoundException("Employee with id: " + id + " not found"));
+                .orElseThrow(() -> new EmployeeNotFoundException(String.format("Employee with id: %d not found.", id)));
     }
 
     @Override
@@ -56,7 +61,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Employee read(Integer id) {
         return employeeRepository
                 .findById(id)
-                .orElseThrow(() -> new EmployeeNotFoundException("Employee with id: " + id + " not found"));
+                .orElseThrow(() -> new EmployeeNotFoundException(String.format("Employee with id: %d not found.", id)));
     }
 
     @Override

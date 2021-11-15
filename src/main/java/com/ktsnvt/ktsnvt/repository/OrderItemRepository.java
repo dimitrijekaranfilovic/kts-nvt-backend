@@ -31,14 +31,14 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
     Collection<OrderItem> getAllFromOneGroup(Integer groupId);
 
     // Order item status != DONE
-    @Query("select oi from OrderItem oi where oi.preparedBy.id = :id and oi.status <> 2")
+    @Query("select oi from OrderItem oi where oi.preparedBy.id = :id and oi.status <> 2 and oi.isActive = true")
     Stream<OrderItem> streamActiveOrderItemsForEmployee(Integer id);
 
     // Order item status != DONE
-    @Query("select oi from OrderItem oi where oi.item.id = :id and oi.status <> 2")
+    @Query("select oi from OrderItem oi where oi.item.id = :id and oi.status <> 2 and oi.isActive = true")
     Stream<OrderItem> streamActiveOrderItemsForMenuItem(Integer id);
 
     // Order item status != DONE
-    @Query("select oi from OrderItem oi where oi.item.item.id = :id and oi.status <> 2")
+    @Query("select oi from OrderItem oi where oi.item.item.id = :id and oi.status <> 2 and oi.isActive = true")
     Stream<OrderItem> streamActiveOrderItemsForInventoryItem(Integer id);
 }

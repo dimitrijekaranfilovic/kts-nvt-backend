@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 @Service
 public class SuperUserServiceImpl implements SuperUserService {
     private final SuperUserRepository superUserRepository;
+
     private final AuthorityService authorityService;
     private final SalaryService salaryService;
 
@@ -50,7 +51,15 @@ public class SuperUserServiceImpl implements SuperUserService {
     public SuperUser read(Integer id) {
         return superUserRepository
                 .findById(id)
-                .orElseThrow(() -> new SuperUserNotFoundException("Cannot find superuser with id: " + id));
+                .orElseThrow(() -> new SuperUserNotFoundException(String.format("Super user with id: %d not found.", id)));
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public SuperUser readManagerForUpdate(Integer id) {
+        return superUserRepository
+                .getSuperUserForUpdate(id, SuperUserType.MANAGER)
+                .orElseThrow(() -> new ManagerNotFoundException(String.format("Manager with id: %d not found.", id)));
     }
 
     @Override
@@ -61,9 +70,7 @@ public class SuperUserServiceImpl implements SuperUserService {
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void deleteManager(Integer id) {
-        var manager = superUserRepository
-                .getSuperUserForUpdate(id, SuperUserType.MANAGER)
-                .orElseThrow(() -> new ManagerNotFoundException("Cannot find manager with id: " + id));
+        var manager = readManagerForUpdate(id);
         salaryService.endActiveSalaryForUser(manager);
         manager.setIsActive(false);
     }
