@@ -23,6 +23,6 @@ public class UserServiceImpl implements UserService {
     public User readForSalaryUpdate(Integer id) {
         return userRepository
                 .readForSalaryUpdate(id)
-                .orElseThrow(() -> new UserNotFoundException("User with id: " + id + " does not exist."));
+                .orElseThrow(() -> new UserNotFoundException(String.format("User with id: %d does not exist.", id)));
     }
 }

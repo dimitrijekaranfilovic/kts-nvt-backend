@@ -2,12 +2,7 @@ package com.ktsnvt.ktsnvt.service.impl;
 
 import com.ktsnvt.ktsnvt.model.Order;
 import com.ktsnvt.ktsnvt.model.ReportStatistics;
-import com.ktsnvt.ktsnvt.repository.OrderRepository;
-import com.ktsnvt.ktsnvt.repository.SalaryRepository;
-import com.ktsnvt.ktsnvt.service.EmailService;
-import com.ktsnvt.ktsnvt.service.LocalDateTimeService;
-import com.ktsnvt.ktsnvt.service.ReportService;
-import com.ktsnvt.ktsnvt.service.SuperUserService;
+import com.ktsnvt.ktsnvt.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -21,19 +16,20 @@ import java.util.HashMap;
 
 @Service
 public class ReportServiceImpl implements ReportService {
-    private final SalaryRepository salaryRepository;
-    private final OrderRepository orderRepository;
     private final EmailService emailService;
+    private final SalaryService salaryService;
+    private final OrderService orderService;
     private final SuperUserService superUserService;
-
     private final LocalDateTimeService localDateTimeService;
 
     @Autowired
-    public ReportServiceImpl(SalaryRepository salaryRepository, OrderRepository orderRepository,
-                             EmailService emailService, SuperUserService superUserService,
+    public ReportServiceImpl(EmailService emailService,
+                             SalaryService salaryService,
+                             OrderService orderService,
+                             SuperUserService superUserService,
                              LocalDateTimeService localDateTimeService) {
-        this.salaryRepository = salaryRepository;
-        this.orderRepository = orderRepository;
+        this.salaryService = salaryService;
+        this.orderService = orderService;
         this.emailService = emailService;
         this.superUserService = superUserService;
         this.localDateTimeService = localDateTimeService;
@@ -47,10 +43,7 @@ public class ReportServiceImpl implements ReportService {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public ReportStatistics<LocalDate, BigDecimal> readSalaryExpenses(LocalDate from, LocalDate to) {
         return readReportTemplate(from, to, date -> {
-            BigDecimal amount = salaryRepository.readExpensesForDate(date);
-            if (amount == null) {
-                return BigDecimal.ZERO;
-            }
+            BigDecimal amount = salaryService.readExpensesForDate(date);
             return amount.divide(BigDecimal.valueOf(date.lengthOfMonth()), RoundingMode.CEILING);
         });
     }
@@ -59,8 +52,8 @@ public class ReportServiceImpl implements ReportService {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public ReportStatistics<LocalDate, BigDecimal> readOrderIncomes(LocalDate from, LocalDate to) {
         var lookup = new HashMap<LocalDate, BigDecimal>();
-        orderRepository
-                .streamChargedOrdersInTimeRange(from.atStartOfDay(), to.plusDays(1).atStartOfDay())
+        orderService
+                .streamChargedOrdersInTimeRange(from, to)
                 .forEach(order -> {
                     var income = lookup.getOrDefault(order.getServedAt().toLocalDate(), BigDecimal.ZERO);
                     lookup.put(order.getServedAt().toLocalDate(), income.add(order.getTotalIncome()));
@@ -72,8 +65,8 @@ public class ReportServiceImpl implements ReportService {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public ReportStatistics<LocalDate, BigDecimal> readOrderCosts(LocalDate from, LocalDate to) {
         var lookup = new HashMap<LocalDate, BigDecimal>();
-        orderRepository
-                .streamChargedOrdersInTimeRange(from.atStartOfDay(), to.plusDays(1).atStartOfDay())
+        orderService
+                .streamChargedOrdersInTimeRange(from, to)
                 .forEach(order -> {
                     var cost = lookup.getOrDefault(order.getServedAt().toLocalDate(), BigDecimal.ZERO);
                     lookup.put(order.getServedAt().toLocalDate(), cost.add(order.getTotalCost()));
@@ -92,7 +85,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public BigDecimal readTotalOrderIncome(LocalDate from, LocalDate to) {
-        return orderRepository.streamChargedOrdersInTimeRange(from.atStartOfDay(), to.plusDays(1).atStartOfDay())
+        return orderService.streamChargedOrdersInTimeRange(from, to)
                 .parallel()
                 .map(Order::getTotalIncome)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -101,7 +94,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public BigDecimal readTotalOrderCost(LocalDate from, LocalDate to) {
-        return orderRepository.streamChargedOrdersInTimeRange(from.atStartOfDay(), to.plusDays(1).atStartOfDay())
+        return orderService.streamChargedOrdersInTimeRange(from, to)
                 .parallel()
                 .map(Order::getTotalCost)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

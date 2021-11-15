@@ -13,6 +13,8 @@ public interface SuperUserService {
 
     SuperUser read(Integer id);
 
+    SuperUser readManagerForUpdate(Integer id);
+
     Page<SuperUser> read(String query, BigDecimal salaryFrom, BigDecimal salaryTo, SuperUserType type, Pageable pageable);
 
     void deleteManager(Integer id);

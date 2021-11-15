@@ -1,9 +1,6 @@
 package com.ktsnvt.ktsnvt.service.impl;
 
-
 import com.ktsnvt.ktsnvt.exception.*;
-import com.ktsnvt.ktsnvt.exception.EmployeeNotFoundException;
-import com.ktsnvt.ktsnvt.exception.InvalidEmployeeTypeException;
 import com.ktsnvt.ktsnvt.exception.NotFoundException;
 import com.ktsnvt.ktsnvt.exception.OrderItemGroupInvalidStatusException;
 import com.ktsnvt.ktsnvt.model.*;
@@ -11,44 +8,48 @@ import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemGroupStatus;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemStatus;
 import com.ktsnvt.ktsnvt.model.enums.OrderStatus;
-import com.ktsnvt.ktsnvt.repository.EmployeeRepository;
 import com.ktsnvt.ktsnvt.repository.OrderItemGroupRepository;
 import com.ktsnvt.ktsnvt.repository.OrderRepository;
 
-import com.ktsnvt.ktsnvt.service.LocalDateTimeService;
-import com.ktsnvt.ktsnvt.service.OrderService;
-import com.ktsnvt.ktsnvt.service.RestaurantTableService;
+import com.ktsnvt.ktsnvt.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 
-import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 
 @Service
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemGroupRepository orderItemGroupRepository;
-    private final EmployeeRepository employeeRepository;
 
+    private final EmployeeQueryService employeeQueryService;
+    private final EmployeeOrderService employeeOrderService;
     private final RestaurantTableService restaurantTableService;
     private final LocalDateTimeService localDateTimeService;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, OrderItemGroupRepository orderItemGroupRepository, EmployeeRepository employeeRepository, RestaurantTableService restaurantTableService, LocalDateTimeService localDateTimeService) {
+    public OrderServiceImpl(OrderRepository orderRepository,
+                            OrderItemGroupRepository orderItemGroupRepository,
+                            EmployeeQueryService employeeQueryService,
+                            EmployeeOrderService employeeOrderService,
+                            RestaurantTableService restaurantTableService,
+                            LocalDateTimeService localDateTimeService) {
         this.orderRepository = orderRepository;
         this.orderItemGroupRepository = orderItemGroupRepository;
-        this.employeeRepository = employeeRepository;
+        this.employeeQueryService = employeeQueryService;
+        this.employeeOrderService = employeeOrderService;
         this.restaurantTableService = restaurantTableService;
         this.localDateTimeService = localDateTimeService;
     }
-
 
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
@@ -63,10 +64,8 @@ public class OrderServiceImpl implements OrderService {
         if (Boolean.FALSE.equals(table.getAvailable())) {
             throw new OccupiedTableException("Table with id: " + tableId + " is occupied at the moment.");
         }
-        var waiter = employeeRepository
-                .getEmployeeByPinForUpdate(waiterPin, EmployeeType.WAITER)
-                .orElseThrow(() -> new EmployeeNotFoundException("Cannot find waiter with pin: " + waiterPin));
-        Order order = new Order(OrderStatus.CREATED, localDateTimeService.currentTime(), null, table, waiter);
+        var waiter = employeeQueryService.findByPinForUpdate(waiterPin, EmployeeType.WAITER);
+        var order = new Order(OrderStatus.CREATED, localDateTimeService.currentTime(), null, table, waiter);
         table.setAvailable(false);
         return orderRepository.save(order);
     }
@@ -86,15 +85,11 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void sendOrderItemGroup(Integer orderId, Integer groupId, String pin) {
         var orderItemGroup = this.getOrderItemGroup(orderId, groupId);
-        if (orderItemGroup.getStatus() != OrderItemGroupStatus.NEW)
+        if (orderItemGroup.getStatus() != OrderItemGroupStatus.NEW) {
             throw new OrderItemGroupInvalidStatusException(String.format("Order group with id %d for order with id %d is not NEW, and cannot be sent.", orderId, groupId));
+        }
         //maybe we can put this check in a separate function
-        var employee = employeeRepository
-                .findByPin(pin)
-                .orElseThrow(() -> new EmployeeNotFoundException("Employee with PIN: " + pin + " not found."));
-        if(!orderItemGroup.getOrder().getWaiter().getId().equals(employee.getId()))
-            throw new InvalidEmployeeException("Employee with PIN: " + pin + " is not responsible for this order.");
-
+        employeeOrderService.throwIfWaiterNotResponsible(pin, orderItemGroup.getOrder().getWaiter().getId());
         orderItemGroup.setStatus(OrderItemGroupStatus.SENT);
         orderItemGroup.getOrderItems().forEach(orderItem -> {
             //send notification here
@@ -103,7 +98,6 @@ public class OrderServiceImpl implements OrderService {
         });
 
         this.orderItemGroupRepository.save(orderItemGroup);
-
     }
 
     @Override
@@ -114,20 +108,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void deleteOrderItemGroup(Integer orderId, Integer groupId, String pin) {
         var orderItemGroup = this.getOrderItemGroup(orderId, groupId);
-        if (orderItemGroup.getStatus() != OrderItemGroupStatus.NEW)
+        if (orderItemGroup.getStatus() != OrderItemGroupStatus.NEW) {
             throw new OrderItemGroupInvalidStatusException(String.format("Order group with id %d for order with id %d cannot be deleted, because its status is not NEW.", orderId, groupId));
-        var optionalEmployee = this.employeeRepository.findEmployeeByPin(pin);
-
-        if(optionalEmployee.isEmpty())
-            throw new EmployeeNotFoundException("Employee does not exist.");
-        var employee = optionalEmployee.get();
-        if(employee.getType() != EmployeeType.WAITER)
-            throw new InvalidEmployeeTypeException(pin);
-        if(!employee.getId().equals(orderItemGroup.getOrder().getWaiter().getId())){
-            throw new InvalidEmployeeTypeException(pin);
         }
-
-
+        employeeOrderService.throwIfWaiterNotResponsible(pin, orderItemGroup.getOrder().getWaiter().getId());
         orderItemGroup.setIsActive(false);
         orderItemGroup.getOrderItems().forEach(oig -> oig.setIsActive(false));
         this.orderItemGroupRepository.save(orderItemGroup);
@@ -135,14 +119,16 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
+    public Stream<Order> streamChargedOrdersInTimeRange(LocalDate from, LocalDate to) {
+        return orderRepository
+                .streamChargedOrdersInTimeRange(from.atStartOfDay(), to.plusDays(1).atStartOfDay());
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void chargeOrder(Integer id, String pin) {
-        var employee = employeeRepository
-                .findByPin(pin)
-                .orElseThrow(() -> new EmployeeNotFoundException("Employee with PIN: " + pin + " not found."));
         var order = getOrder(id);
-        if (!order.getWaiter().getId().equals(employee.getId())) {
-            throw new InvalidEmployeeException("Employee with PIN: " + pin + " is not responsible for this order.");
-        }
+        employeeOrderService.throwIfWaiterNotResponsible(pin, id);
         if (!order.getStatus().equals(OrderStatus.IN_PROGRESS)) {
             throw new IllegalOrderStateException("Order is not in IN PROGRESS state and thus cannot be charged.");
         }
@@ -152,15 +138,13 @@ public class OrderServiceImpl implements OrderService {
         order.getItemGroups()
                 .stream()
                 .filter(BaseEntity::getIsActive)
-                .forEach(ig -> {
-                    ig.getOrderItems()
-                            .stream()
-                            .filter(BaseEntity::getIsActive)
-                            .forEach(item -> {
-                                order.setTotalIncome(order.getTotalIncome().add(item.getCurrentMenuPrice()));
-                                order.setTotalCost(order.getTotalCost().add(item.getCurrentBasePrice()));
-                            });
-                });
+                .forEach(ig -> ig.getOrderItems()
+                        .stream()
+                        .filter(BaseEntity::getIsActive)
+                        .forEach(item -> {
+                            order.setTotalIncome(order.getTotalIncome().add(item.getCurrentMenuPrice()));
+                            order.setTotalCost(order.getTotalCost().add(item.getCurrentBasePrice()));
+                        }));
         order.setStatus(OrderStatus.CHARGED);
         order.setServedAt(localDateTimeService.currentTime());
         order.getRestaurantTable().freeTable();
@@ -169,13 +153,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void cancelOrder(Integer id, String pin) {
-        var employee = employeeRepository
-                .findByPin(pin)
-                .orElseThrow(() -> new EmployeeNotFoundException("Employee with PIN: " + pin + " not found."));
         var order = getOrder(id);
-        if (!order.getWaiter().getId().equals(employee.getId())) {
-            throw new InvalidEmployeeException("Employee with PIN: " + pin + " is not responsible for this order.");
-        }
+        employeeOrderService.throwIfWaiterNotResponsible(pin, order.getWaiter().getId());
         if (order.getStatus().equals(OrderStatus.CHARGED) || order.getStatus().equals(OrderStatus.CANCELLED)) {
             throw new IllegalOrderStateException("Order has already been processed and cannot be canceled.");
         }
@@ -193,13 +172,7 @@ public class OrderServiceImpl implements OrderService {
         var optionalOrderItemGroup = this.getOrderItemGroup(orderId, groupName);
         if (optionalOrderItemGroup.isPresent())
             throw new OrderItemGroupInvalidStatusException(String.format("Group with name %s already exists for order with id %d.", groupName, orderId));
-        var employee = employeeRepository
-                .findByPin(pin)
-                .orElseThrow(() -> new EmployeeNotFoundException("Employee with PIN: " + pin + " not found."));
-        if(!order.getWaiter().getId().equals(employee.getId()))
-            throw new InvalidEmployeeException("Employee with PIN: " + pin + " is not responsible for this order.");
-
-
+        employeeOrderService.throwIfWaiterNotResponsible(pin, order.getWaiter().getId());
         var orderItemGroup = new OrderItemGroup(groupName, OrderItemGroupStatus.NEW, order);
         return this.orderItemGroupRepository.save(orderItemGroup);
     }
@@ -210,7 +183,6 @@ public class OrderServiceImpl implements OrderService {
             throw new NotFoundException(String.format("Order group with id %d for order with id %d does not exist.", groupId, orderId));
         return optionalOrderItemGroup.get();
     }
-
 }
 
 

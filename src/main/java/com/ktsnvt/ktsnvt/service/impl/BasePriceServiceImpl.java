@@ -14,8 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class BasePriceServiceImpl implements BasePriceService {
-
     private final BasePriceRepository basePriceRepository;
+
     private final LocalDateTimeService localDateTimeService;
     private final InventoryItemService inventoryItemService;
 

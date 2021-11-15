@@ -11,9 +11,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 @Service
 public class SalaryServiceImpl implements SalaryService {
     private final SalaryRepository salaryRepository;
+
     private final UserService userService;
     private final LocalDateTimeService localDateTimeService;
 
@@ -37,5 +41,11 @@ public class SalaryServiceImpl implements SalaryService {
         var user = userService.readForSalaryUpdate(id);
         endActiveSalaryForUser(user);
         user.addSalary(salary);
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public BigDecimal readExpensesForDate(LocalDate date) {
+        return salaryRepository.readExpensesForDate(date).orElse(BigDecimal.ZERO);
     }
 }

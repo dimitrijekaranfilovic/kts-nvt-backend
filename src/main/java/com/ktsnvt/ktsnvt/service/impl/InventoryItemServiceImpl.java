@@ -20,8 +20,8 @@ import java.math.BigDecimal;
 
 @Service
 public class InventoryItemServiceImpl implements InventoryItemService {
-
     private final InventoryItemRepository inventoryItemRepository;
+
     private final OrderItemService orderItemService;
     private final BasePriceService basePriceService;
     private final MenuItemService menuItemService;

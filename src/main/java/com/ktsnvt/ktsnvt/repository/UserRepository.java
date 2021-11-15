@@ -11,6 +11,6 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select u from User u where u.id = :id")
+    @Query("select u from User u where u.id = :id and u.isActive = true")
     Optional<User> readForSalaryUpdate(Integer id);
 }

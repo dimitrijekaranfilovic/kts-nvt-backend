@@ -20,8 +20,8 @@ import java.math.BigDecimal;
 
 @Service
 public class MenuItemServiceImpl implements MenuItemService {
-
     private final MenuItemRepository menuItemRepository;
+
     private final InventoryItemService inventoryItemService;
     private final LocalDateTimeService localDateTimeService;
     private final OrderItemService orderItemService;
@@ -44,7 +44,8 @@ public class MenuItemServiceImpl implements MenuItemService {
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void removeActiveMenuItemForInventoryItem(Integer inventoryItemId) {
-        menuItemRepository.findActiveForInventoryItem(inventoryItemId)
+        menuItemRepository
+                .findActiveForInventoryItem(inventoryItemId)
                 .ifPresent(menuItem -> menuItem.deactivateMenuItem(localDateTimeService.currentTime()));
     }
 
@@ -81,7 +82,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     public MenuItem createMenuItem(BigDecimal price, Integer inventoryItemId) {
         var inventoryItem = inventoryItemService.readForUpdate(inventoryItemId);
         removeActiveMenuItemForInventoryItem(inventoryItemId);
-        MenuItem menuItem = new MenuItem(price, localDateTimeService.currentTime(), null, inventoryItem);
+        var menuItem = new MenuItem(price, localDateTimeService.currentTime(), null, inventoryItem);
         inventoryItem.addMenuItem(menuItem);
         return menuItemRepository.save(menuItem);
     }

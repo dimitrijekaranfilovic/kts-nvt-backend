@@ -1,6 +1,6 @@
 package com.ktsnvt.ktsnvt.service.impl;
 
-import com.ktsnvt.ktsnvt.exception.NotFoundException;
+import com.ktsnvt.ktsnvt.exception.AuthorityNotFoundException;
 import com.ktsnvt.ktsnvt.model.Authority;
 import com.ktsnvt.ktsnvt.repository.AuthorityRepository;
 import com.ktsnvt.ktsnvt.service.AuthorityService;
@@ -20,6 +20,6 @@ public class AuthorityServiceImpl implements AuthorityService {
     public Authority findByName(String name) {
         return authorityRepository
                 .findByName(name)
-                .orElseThrow(() -> new NotFoundException("Cannot find authority with name: " + name));
+                .orElseThrow(() -> new AuthorityNotFoundException("Cannot find authority with name: " + name));
     }
 }

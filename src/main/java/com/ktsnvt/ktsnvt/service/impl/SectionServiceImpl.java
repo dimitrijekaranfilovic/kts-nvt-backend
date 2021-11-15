@@ -17,6 +17,7 @@ import java.util.Collection;
 @Service
 public class SectionServiceImpl implements SectionService {
     private final SectionRepository sectionRepository;
+
     private final RestaurantTableRepository restaurantTableRepository;
 
     @Autowired
@@ -27,14 +28,14 @@ public class SectionServiceImpl implements SectionService {
 
     @Override
     public Collection<Section> getAllSections() {
-        return sectionRepository.findAll();
+        return sectionRepository.findAllActive();
     }
 
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public Section read(Integer id) {
         return sectionRepository
-                .findById(id)
+                .findOneById(id)
                 .orElseThrow(() -> new SectionNotFoundException("Cannot find section with id: " + id));
     }
 
