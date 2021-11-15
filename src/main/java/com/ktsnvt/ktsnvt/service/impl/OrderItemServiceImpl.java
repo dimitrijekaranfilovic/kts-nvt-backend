@@ -61,10 +61,12 @@ public class OrderItemServiceImpl implements OrderItemService {
         var item = orderItemRepository
                 .findOneByIdWithItemReference(itemId)
                 .orElseThrow(() -> new OrderItemNotFoundException(String.format("Order item with id: %d is not present.", itemId)));
+
         employeeOrderService.throwIfNotValidEmployeeType(employeeCurrent, item);
         item.setPreparedBy(employeeCurrent);
         item.setStatus(OrderItemStatus.PREPARING);
         item.setTakenAt(dateTimeService.currentTime());
+        orderItemRepository.save(item);
     }
 
     @Override
@@ -74,9 +76,11 @@ public class OrderItemServiceImpl implements OrderItemService {
         var item = orderItemRepository
                 .findOneInProgressByIdWithItemReference(itemId)
                 .orElseThrow(() -> new OrderItemNotFoundException(String.format("Order item with id: %d is not present.", itemId)));
+
         if (item.getPreparedBy() != null && !Objects.equals(item.getPreparedBy().getId(), employeeCurrent.getId())) {
             throw new InvalidEmployeeTypeException(employeePin);
         }
+
         employeeOrderService.throwIfNotValidEmployeeType(employeeCurrent, item);
         item.setStatus(OrderItemStatus.DONE);
         item.setPreparedAt(dateTimeService.currentTime());
@@ -85,10 +89,12 @@ public class OrderItemServiceImpl implements OrderItemService {
             item.setPreparedBy(employeeCurrent);
         }
         orderItemRepository.save(item);
+
         var allFromGroup = orderItemRepository.getAllFromOneGroup(item.getOrderItemGroup().getId());
         if (allFromGroup.stream().allMatch(oi -> oi.getStatus() == OrderItemStatus.DONE)) {
             item.getOrderItemGroup().setStatus(OrderItemGroupStatus.DONE);
-            // NOTIFIKACIJA
+            orderItemGroupRepository.save(item.getOrderItemGroup());
+            // NOTIFIKACIJA, ovo ovdje moze i sa fronta mozda
         }
     }
 
@@ -114,14 +120,17 @@ public class OrderItemServiceImpl implements OrderItemService {
         var orderGroup = this.orderItemGroupRepository.
                 findById(orderGroupId)
                 .orElseThrow(() -> new NotFoundException(String.format("Order item group with id %d does not exist.", orderGroupId)));
+
         if (orderGroup.getStatus() != OrderItemGroupStatus.NEW)
             throw new OrderItemGroupInvalidStatusException(String.format("Items cannot be added to order item group with id %d because its status is not NEW.", orderGroupId));
 
         var menuItem = this.menuItemRepository
                 .findById(menuItemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Menu item with id %d does not exist.", menuItemId)));
+
         if (amount <= 0)
             throw new IllegalAmountException(amount);
+
         employeeOrderService.throwIfWaiterNotResponsible(pin, orderGroup.getOrder().getWaiter().getId());
         var orderItem = new OrderItem(amount, orderGroup, menuItem, OrderItemStatus.NEW);
         return this.orderItemRepository.save(orderItem);
@@ -132,10 +141,13 @@ public class OrderItemServiceImpl implements OrderItemService {
         var orderItem = this.orderItemRepository
                 .findById(orderItemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Order item with id %d does not exist.", orderItemId)));
+
         if (orderItem.getStatus() != OrderItemStatus.NEW)
             throw new OrderItemInvalidStatusException(String.format("Status of order item with id %d is not NEW, and it cannot be updated.", orderItemId));
+
         if (amount <= 0)
             throw new IllegalAmountException(amount);
+
         employeeOrderService.throwIfWaiterNotResponsible(pin, orderItem.getOrderItemGroup().getOrder().getWaiter().getId());
         orderItem.setAmount(amount);
     }
@@ -145,9 +157,11 @@ public class OrderItemServiceImpl implements OrderItemService {
         var orderItem = this.orderItemRepository
                 .findById(orderItemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Order item with id %d does not exist.", orderItemId)));
+
         if (orderItem.getStatus() != OrderItemStatus.NEW) {
             throw new OrderItemInvalidStatusException(String.format("Status of order item with id %s is not NEW, and it cannot be deleted.", orderItemId));
         }
+
         employeeOrderService.throwIfWaiterNotResponsible(pin, orderItem.getOrderItemGroup().getOrder().getWaiter().getId());
         orderItem.setIsActive(false);
     }

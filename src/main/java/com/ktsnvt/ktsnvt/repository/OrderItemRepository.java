@@ -16,15 +16,15 @@ import java.util.stream.Stream;
 
 public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
 
-    @Query(value = "select oi from OrderItem oi where oi.status = :status and oi.item.item.category = :category")
+    @Query(value = "select oi from OrderItem oi where oi.status = :status and oi.item.item.category = :category and oi.isActive = true")
     Page<OrderItem> findAllItemRequests(Pageable pageable, OrderItemStatus status, ItemCategory category);
 
     @Lock(LockModeType.OPTIMISTIC)
-    @Query("select oi from OrderItem oi where oi.id = :id and oi.status = 0")
+    @Query("select oi from OrderItem oi where oi.id = :id and oi.status = 0 and oi.isActive = true")
     Optional<OrderItem> findOneByIdWithItemReference(Integer id);
 
     @Lock(LockModeType.OPTIMISTIC)
-    @Query("select oi from OrderItem oi where oi.id = :id and (oi.status = 1 or oi.status = 0)")
+    @Query("select oi from OrderItem oi where oi.id = :id and (oi.status = 1 or oi.status = 0) and oi.isActive = true")
     Optional<OrderItem> findOneInProgressByIdWithItemReference(Integer id);
 
     @Query("select oi from OrderItem oi where oi.orderItemGroup.id = :groupId")

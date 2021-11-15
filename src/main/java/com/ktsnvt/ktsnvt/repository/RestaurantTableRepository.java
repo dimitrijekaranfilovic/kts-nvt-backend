@@ -12,13 +12,13 @@ import java.util.Optional;
 
 public interface RestaurantTableRepository extends JpaRepository<RestaurantTable, Integer> {
 
-    @Query("select t from RestaurantTable t join t.section where t.section.id = :sectionId")
+    @Query("select t from RestaurantTable t join t.section where t.section.id = :sectionId and t.isActive = true")
     Collection<RestaurantTable> findAllForSection(Integer sectionId);
 
-    @Query("select t from RestaurantTable t where t.section.id = :sectionId and t.available = false")
+    @Query("select t from RestaurantTable t where t.section.id = :sectionId and t.available = false and t.isActive = true")
     Stream<RestaurantTable> streamOccupiedTablesForSection(Integer sectionId);
     
-    @Query("select t from RestaurantTable t join t.section where t.section.id = :sectionId and t.number = :number")
+    @Query("select t from RestaurantTable t join t.section where t.section.id = :sectionId and t.number = :number and t.isActive = true")
     RestaurantTable findByNumberInSection(Integer sectionId, Integer number);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
