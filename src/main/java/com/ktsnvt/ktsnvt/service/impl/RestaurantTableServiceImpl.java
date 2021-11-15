@@ -45,17 +45,21 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
     public RestaurantTable createRestaurantTable(RestaurantTable newTable, Integer sectionId) {
         var section = sectionService.readForUpdate(sectionId);
         var sectionTables = restaurantTableRepository.findAllForSection(sectionId);
+
         if(sectionTables.stream().anyMatch(t -> Objects.equals(t.getNumber(), newTable.getNumber()))){
             throw new DuplicateTableNumberException(String.format("Table with number: %d already exists in this section.", newTable.getNumber()));
         }
+
         if(sectionTables.stream().anyMatch(t -> intersects(t, newTable))) {
             throw new TableIntersectionException("Table is overlapping with another table.");
         }
+
         section.addTable(newTable);
         newTable.setAvailable(true);
         newTable.setReadyGroups(0);
         restaurantTableRepository.save(newTable);
-        return newTable;
+
+        return restaurantTableRepository.findByNumberInSection(sectionId, newTable.getNumber());
     }
 
     @Override
@@ -64,6 +68,8 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
         var table = readForUpdate(id);
         throwIfNotAvailable(table);
         table.setIsActive(false);
+
+        restaurantTableRepository.save(table);
     }
 
     @Override
@@ -72,12 +78,15 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
         var section = sectionService.readForUpdate(sectionId);
         var table = readForUpdate(tableId);
         var sectionTables = restaurantTableRepository.findAllForSection(sectionId);
+
         if (!table.getSection().getId().equals(section.getId())) {
             throw new TableSectionMismatchException(String.format("Table with id: %d does not belong to section with id: %d", tableId, sectionId));
         }
+
         throwIfNotAvailable(table);
         table.setX(newX);
         table.setY(newY);
+
         if(sectionTables.stream().anyMatch(t -> intersects(t, table))) {
             throw new TableIntersectionException("Table is overlapping with another table.");
         }
