@@ -2,7 +2,6 @@ package com.ktsnvt.ktsnvt.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
