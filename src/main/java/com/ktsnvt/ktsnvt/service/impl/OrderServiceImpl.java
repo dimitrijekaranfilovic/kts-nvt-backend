@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
@@ -88,10 +89,9 @@ public class OrderServiceImpl implements OrderService {
         if (orderItemGroup.getStatus() != OrderItemGroupStatus.NEW) {
             throw new OrderItemGroupInvalidStatusException(String.format("Order group with id %d for order with id %d is not NEW, and cannot be sent.", orderId, groupId));
         }
-        //maybe we can put this check in a separate function
         employeeOrderService.throwIfWaiterNotResponsible(pin, orderItemGroup.getOrder().getWaiter().getId());
         orderItemGroup.setStatus(OrderItemGroupStatus.SENT);
-        orderItemGroup.getOrderItems().forEach(orderItem -> {
+        orderItemGroup.getOrderItems().stream().filter(BaseEntity::getIsActive).forEach(orderItem -> {
             //send notification here
             orderItem.setStatus(OrderItemStatus.SENT);
             orderItem.setSentAt(localDateTimeService.currentTime());
@@ -102,7 +102,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderItemGroup> getOrderItemGroups(Integer orderId) {
-        return new ArrayList<>(this.orderItemGroupRepository.getOrderItemGroupsForOrder(orderId));
+        var orderItemGroups = this.orderItemGroupRepository.getOrderItemGroupsForOrder(orderId);
+        orderItemGroups.forEach(oig ->
+            oig.setOrderItems(oig.getOrderItems().stream().filter(BaseEntity::getIsActive).collect(Collectors.toSet())));
+        return new ArrayList<>(orderItemGroups);
     }
 
     @Override
