@@ -54,6 +54,13 @@ public class SuperUserServiceImpl extends TransactionalServiceBase implements Su
     }
 
     @Override
+    public SuperUser findByEmail(String email) {
+        return this.superUserRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new SuperUserNotFoundException(String.format("Superuser with email %s does not exist.", email)));
+    }
+
+    @Override
     public SuperUser readManagerForUpdate(Integer id) {
         return superUserRepository
                 .getSuperUserForUpdate(id, SuperUserType.MANAGER)
@@ -102,6 +109,8 @@ public class SuperUserServiceImpl extends TransactionalServiceBase implements Su
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        return null;
+        return this.superUserRepository.findByEmail(s)
+                .orElseThrow(() ->
+                        new SuperUserNotFoundException(String.format("Superuser with email %s does not exist.", s)));
     }
 }

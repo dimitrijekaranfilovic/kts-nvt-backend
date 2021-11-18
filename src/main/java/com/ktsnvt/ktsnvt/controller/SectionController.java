@@ -106,12 +106,14 @@ public class SectionController {
         return restaurantTableToCreateRestaurantTableResponse.convert(createdTable);
     }
 
+    //PRE AUTHORIZE (ADMIN)
     @DeleteMapping(value = "tables/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTable(@PathVariable Integer id) {
         restaurantTableService.deleteRestaurantTable(id);
     }
 
+    //PRE AUTHORIZE (ADMIN)
     @PutMapping("/{sectionId}/tables/{tableId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateTable(@PathVariable Integer sectionId, @PathVariable Integer tableId, @RequestBody @Valid MoveTableRequest request) {

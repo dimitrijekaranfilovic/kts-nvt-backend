@@ -1,5 +1,8 @@
 package com.ktsnvt.ktsnvt.controller;
 
+import com.ktsnvt.ktsnvt.config.jwt.JwtTokenUtil;
+import com.ktsnvt.ktsnvt.dto.auth.AuthRequest;
+import com.ktsnvt.ktsnvt.dto.auth.AuthResponse;
 import com.ktsnvt.ktsnvt.dto.createesuperuser.CreateSuperUserRequest;
 import com.ktsnvt.ktsnvt.dto.createesuperuser.CreateSuperUserResponse;
 import com.ktsnvt.ktsnvt.dto.readsuperusers.ReadSuperUsersRequest;
@@ -7,6 +10,8 @@ import com.ktsnvt.ktsnvt.dto.readsuperusers.ReadSuperUsersResponse;
 import com.ktsnvt.ktsnvt.dto.updatepassword.UpdatePasswordRequest;
 import com.ktsnvt.ktsnvt.dto.updatesalary.UpdateSalaryRequest;
 import com.ktsnvt.ktsnvt.dto.updatesuperuser.UpdateSuperUserRequest;
+import com.ktsnvt.ktsnvt.exception.NotFoundException;
+import com.ktsnvt.ktsnvt.model.Authority;
 import com.ktsnvt.ktsnvt.model.Salary;
 import com.ktsnvt.ktsnvt.model.SuperUser;
 import com.ktsnvt.ktsnvt.service.SalaryService;
@@ -17,15 +22,23 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "api/super-users")
 public class SuperUserController {
     private final SuperUserService superUserService;
     private final SalaryService salaryService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenUtil tokenUtil;
 
     private final EntityConverter<CreateSuperUserRequest, SuperUser> createSuperUserToSuperUser;
     private final EntityConverter<SuperUser, CreateSuperUserResponse> superUserToCreateSuperUserResponse;
@@ -37,12 +50,14 @@ public class SuperUserController {
     @Autowired
     public SuperUserController(SuperUserService superUserService,
                                SalaryService salaryService,
-                               EntityConverter<CreateSuperUserRequest, SuperUser> createSuperUserToSuperUser,
+                               AuthenticationManager authenticationManager, JwtTokenUtil tokenUtil, EntityConverter<CreateSuperUserRequest, SuperUser> createSuperUserToSuperUser,
                                EntityConverter<SuperUser, CreateSuperUserResponse> superUserToCreateSuperUserResponse,
                                EntityConverter<SuperUser, ReadSuperUsersResponse> superUserToReadSuperUserResponse,
                                EntityConverter<UpdateSalaryRequest, Salary> updateSalaryToSalary) {
         this.superUserService = superUserService;
         this.salaryService = salaryService;
+        this.authenticationManager = authenticationManager;
+        this.tokenUtil = tokenUtil;
         this.createSuperUserToSuperUser = createSuperUserToSuperUser;
         this.superUserToCreateSuperUserResponse = superUserToCreateSuperUserResponse;
         this.superUserToReadSuperUserResponse = superUserToReadSuperUserResponse;
@@ -96,5 +111,25 @@ public class SuperUserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteManager(@PathVariable Integer id) {
         superUserService.deleteManager(id);
+    }
+
+    @PostMapping(value = "/authenticate")
+    @ResponseStatus(HttpStatus.OK)
+    public AuthResponse authenticate(@RequestBody @Valid AuthRequest request){
+        var authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String token = tokenUtil.generateToken(authentication);
+        String username = tokenUtil.extractUsernameFromToken(token);
+        try {
+            var user = this.superUserService.findByEmail(username);
+            var authorities = user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
+            return new AuthResponse(user.getId(), user.getName(), user.getSurname(), token, authorities);
+        } catch (Exception ex) {
+            throw new NotFoundException(ex.getMessage());
+        }
     }
 }
