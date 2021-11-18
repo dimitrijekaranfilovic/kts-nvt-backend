@@ -2,7 +2,6 @@ package com.ktsnvt.ktsnvt.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -12,7 +11,6 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "base_prices")
-@Where(clause = "is_active = true")
 public class BasePrice extends BaseEntity {
 
     @Column(name = "start_date", nullable = false)

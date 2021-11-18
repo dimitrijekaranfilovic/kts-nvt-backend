@@ -1,6 +1,9 @@
 package com.ktsnvt.ktsnvt.service.impl;
 
-import com.ktsnvt.ktsnvt.exception.*;
+import com.ktsnvt.ktsnvt.exception.BusyEmployeeDeletionException;
+import com.ktsnvt.ktsnvt.exception.EmployeeNotFoundException;
+import com.ktsnvt.ktsnvt.exception.IllegalEmployeeTypeChangeException;
+import com.ktsnvt.ktsnvt.exception.PinAlreadyExistsException;
 import com.ktsnvt.ktsnvt.model.Employee;
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
 import com.ktsnvt.ktsnvt.repository.EmployeeRepository;
@@ -9,13 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
 @Service
-public class EmployeeServiceImpl implements EmployeeService {
+public class EmployeeServiceImpl extends TransactionalServiceBase implements EmployeeService {
     private final EmployeeRepository employeeRepository;
 
     private final EmployeeQueryService employeeQueryService;
@@ -40,7 +41,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Employee create(Employee employee) {
         var samePinEmployee = employeeQueryService.findByPinUnchecked(employee.getPin());
         if (samePinEmployee.isPresent()) {
@@ -52,7 +52,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Employee readForUpdate(Integer id) {
         return employeeRepository
                 .findOneForUpdate(id)
@@ -60,7 +59,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Employee read(Integer id) {
         return employeeRepository
                 .findOneById(id)
@@ -73,7 +71,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void delete(Integer id) {
         var employee = readForUpdate(id);
         // Check if the employee has some orders assigned
@@ -89,7 +86,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void update(Integer id, String name, String surname, String pin, EmployeeType type) {
         var employee = readForUpdate(id);
         var samePinEmployee = employeeQueryService.findByPinUnchecked(employee.getPin());

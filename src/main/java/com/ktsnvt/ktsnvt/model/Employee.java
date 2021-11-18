@@ -3,7 +3,6 @@ package com.ktsnvt.ktsnvt.model;
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,7 +12,6 @@ import javax.persistence.Table;
 @Setter
 @Entity
 @Table(name = "employees")
-@Where(clause = "is_active = true")
 public class Employee extends User {
 
     @Column(name = "pin", nullable = false)

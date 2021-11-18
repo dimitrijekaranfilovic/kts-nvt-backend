@@ -3,7 +3,6 @@ package com.ktsnvt.ktsnvt.model;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemStatus;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -13,7 +12,6 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "order_items")
-@Where(clause = "is_active = true")
 public class OrderItem extends BaseEntity {
 
     @Column(name = "amount", nullable = false)

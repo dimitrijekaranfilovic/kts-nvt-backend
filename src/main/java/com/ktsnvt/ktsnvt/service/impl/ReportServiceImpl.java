@@ -6,8 +6,6 @@ import com.ktsnvt.ktsnvt.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -15,7 +13,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 
 @Service
-public class ReportServiceImpl implements ReportService {
+public class ReportServiceImpl extends TransactionalServiceBase implements ReportService {
     private final EmailService emailService;
     private final SalaryService salaryService;
     private final OrderService orderService;
@@ -40,7 +38,6 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public ReportStatistics<LocalDate, BigDecimal> readSalaryExpenses(LocalDate from, LocalDate to) {
         return readReportTemplate(from, to, date -> {
             BigDecimal amount = salaryService.readExpensesForDate(date);
@@ -49,7 +46,6 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public ReportStatistics<LocalDate, BigDecimal> readOrderIncomes(LocalDate from, LocalDate to) {
         var lookup = new HashMap<LocalDate, BigDecimal>();
         orderService
@@ -62,7 +58,6 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public ReportStatistics<LocalDate, BigDecimal> readOrderCosts(LocalDate from, LocalDate to) {
         var lookup = new HashMap<LocalDate, BigDecimal>();
         orderService
@@ -75,7 +70,6 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public BigDecimal readTotalSalaryExpense(LocalDate from, LocalDate to) {
         return this.readSalaryExpenses(from, to).getValues()
                 .parallelStream()
@@ -83,7 +77,6 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public BigDecimal readTotalOrderIncome(LocalDate from, LocalDate to) {
         return orderService.streamChargedOrdersInTimeRange(from, to)
                 .parallel()
@@ -92,7 +85,6 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public BigDecimal readTotalOrderCost(LocalDate from, LocalDate to) {
         return orderService.streamChargedOrdersInTimeRange(from, to)
                 .parallel()
@@ -102,7 +94,6 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     @Async
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void generateMonthlyFinancialReport(LocalDate from, LocalDate to) {
         superUserService.readAll()
                 .forEach(superUser -> emailService.sendMonthlyFinancialReport(superUser,
@@ -112,7 +103,6 @@ public class ReportServiceImpl implements ReportService {
 
     }
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public <T> ReportStatistics<LocalDate, T> readReportTemplate(LocalDate from, LocalDate to, StatisticsCollector<T> collector) {
         from = from == null ? localDateTimeService.currentDate().minusDays(30) : from;
         to = to == null ? localDateTimeService.currentDate() : to;

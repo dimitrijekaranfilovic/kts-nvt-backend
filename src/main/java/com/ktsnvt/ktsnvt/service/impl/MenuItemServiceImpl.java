@@ -13,13 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
 @Service
-public class MenuItemServiceImpl implements MenuItemService {
+public class MenuItemServiceImpl extends TransactionalServiceBase implements MenuItemService {
     private final MenuItemRepository menuItemRepository;
 
     private final InventoryItemService inventoryItemService;
@@ -42,7 +40,6 @@ public class MenuItemServiceImpl implements MenuItemService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void removeActiveMenuItemForInventoryItem(Integer inventoryItemId) {
         menuItemRepository
                 .findActiveForInventoryItem(inventoryItemId)
@@ -50,7 +47,6 @@ public class MenuItemServiceImpl implements MenuItemService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void deactivateMenuItem(Integer id) {
         var menuItem = this.readForUpdate(id);
         if (menuItem.getEndDate() != null) {
@@ -71,14 +67,12 @@ public class MenuItemServiceImpl implements MenuItemService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public MenuItem updateMenuItemPrice(BigDecimal price, Integer menuItemId) {
         var menuItem = readForUpdate(menuItemId);
         return createMenuItem(price, menuItem.getItem().getId());
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public MenuItem createMenuItem(BigDecimal price, Integer inventoryItemId) {
         var inventoryItem = inventoryItemService.readForUpdate(inventoryItemId);
         removeActiveMenuItemForInventoryItem(inventoryItemId);

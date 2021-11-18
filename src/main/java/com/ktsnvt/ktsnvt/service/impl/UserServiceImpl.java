@@ -6,11 +6,9 @@ import com.ktsnvt.ktsnvt.repository.UserRepository;
 import com.ktsnvt.ktsnvt.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends TransactionalServiceBase implements UserService {
     private final UserRepository userRepository;
 
     @Autowired
@@ -19,7 +17,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public User readForSalaryUpdate(Integer id) {
         return userRepository
                 .readForSalaryUpdate(id)

@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class EmployeeOrderServiceImpl implements EmployeeOrderService {
+public class EmployeeOrderServiceImpl extends TransactionalServiceBase implements EmployeeOrderService {
     private final EmployeeQueryService employeeQueryService;
 
     @Autowired
@@ -22,7 +22,6 @@ public class EmployeeOrderServiceImpl implements EmployeeOrderService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void throwIfWaiterNotResponsible(String pin, Integer waiterId) {
         var employee = employeeQueryService.findByPin(pin);
         if(employee.getType() != EmployeeType.WAITER) {
@@ -34,7 +33,6 @@ public class EmployeeOrderServiceImpl implements EmployeeOrderService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void throwIfNotValidEmployeeType(Employee employee, OrderItem item) {
         var employeeType = employee.getType();
         var itemCategory = item.getItem().getItem().getCategory();

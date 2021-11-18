@@ -1,25 +1,24 @@
 package com.ktsnvt.ktsnvt.service.impl;
 
-import com.ktsnvt.ktsnvt.exception.*;
+import com.ktsnvt.ktsnvt.exception.IllegalOrderStateException;
 import com.ktsnvt.ktsnvt.exception.NotFoundException;
+import com.ktsnvt.ktsnvt.exception.OccupiedTableException;
 import com.ktsnvt.ktsnvt.exception.OrderItemGroupInvalidStatusException;
-import com.ktsnvt.ktsnvt.model.*;
+import com.ktsnvt.ktsnvt.model.BaseEntity;
+import com.ktsnvt.ktsnvt.model.Employee;
+import com.ktsnvt.ktsnvt.model.Order;
+import com.ktsnvt.ktsnvt.model.OrderItemGroup;
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemGroupStatus;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemStatus;
 import com.ktsnvt.ktsnvt.model.enums.OrderStatus;
 import com.ktsnvt.ktsnvt.repository.OrderItemGroupRepository;
 import com.ktsnvt.ktsnvt.repository.OrderRepository;
-
 import com.ktsnvt.ktsnvt.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
-
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +27,7 @@ import java.util.stream.Stream;
 
 
 @Service
-public class OrderServiceImpl implements OrderService {
+public class OrderServiceImpl extends TransactionalServiceBase implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemGroupRepository orderItemGroupRepository;
 
@@ -53,13 +52,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Order getOrder(Integer id) {
         return this.orderRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Order with id %d not found.", id)));
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Order createOrder(Integer tableId, String waiterPin) {
         var table = restaurantTableService.readForUpdate(tableId);
         if (Boolean.FALSE.equals(table.getAvailable())) {
@@ -77,13 +74,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public boolean hasAssignedActiveOrders(Employee employee) {
         return orderRepository.streamAssignedActiveOrdersForEmployee(employee.getId()).findAny().isPresent();
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void sendOrderItemGroup(Integer orderId, Integer groupId, String pin) {
         var orderItemGroup = this.getOrderItemGroup(orderId, groupId);
         if (orderItemGroup.getStatus() != OrderItemGroupStatus.NEW) {
@@ -121,14 +116,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Stream<Order> streamChargedOrdersInTimeRange(LocalDate from, LocalDate to) {
         return orderRepository
                 .streamChargedOrdersInTimeRange(from.atStartOfDay(), to.plusDays(1).atStartOfDay());
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void chargeOrder(Integer id, String pin) {
         var order = getOrder(id);
         employeeOrderService.throwIfWaiterNotResponsible(pin, id);
@@ -154,7 +147,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void cancelOrder(Integer id, String pin) {
         var order = getOrder(id);
         employeeOrderService.throwIfWaiterNotResponsible(pin, order.getWaiter().getId());
@@ -169,7 +161,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public OrderItemGroup createGroupForOrder(Integer orderId, String groupName, String pin) {
         var order = this.getOrder(orderId);
         var optionalOrderItemGroup = this.getOrderItemGroup(orderId, groupName);
