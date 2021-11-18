@@ -7,14 +7,12 @@ import com.ktsnvt.ktsnvt.service.RestaurantTableService;
 import com.ktsnvt.ktsnvt.service.SectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.Objects;
 
 @Service
-public class RestaurantTableServiceImpl implements RestaurantTableService {
+public class RestaurantTableServiceImpl extends TransactionalServiceBase implements RestaurantTableService {
     private final RestaurantTableRepository restaurantTableRepository;
 
     private final SectionService sectionService;
@@ -27,7 +25,6 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public RestaurantTable readForUpdate(Integer id) {
         return restaurantTableRepository
                 .findByIdForUpdate(id)
@@ -41,7 +38,6 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public RestaurantTable createRestaurantTable(RestaurantTable newTable, Integer sectionId) {
         var section = sectionService.readForUpdate(sectionId);
         var sectionTables = restaurantTableRepository.findAllForSection(sectionId);
@@ -63,7 +59,6 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void deleteRestaurantTable(Integer id) {
         var table = readForUpdate(id);
         throwIfNotAvailable(table);
@@ -73,7 +68,6 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void updateTablePosition(Integer sectionId, Integer tableId, Integer newX, Integer newY) {
         var section = sectionService.readForUpdate(sectionId);
         var table = readForUpdate(tableId);

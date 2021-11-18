@@ -9,13 +9,11 @@ import com.ktsnvt.ktsnvt.repository.SectionRepository;
 import com.ktsnvt.ktsnvt.service.SectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 
 @Service
-public class SectionServiceImpl implements SectionService {
+public class SectionServiceImpl extends TransactionalServiceBase implements SectionService {
     private final SectionRepository sectionRepository;
 
     private final RestaurantTableRepository restaurantTableRepository;
@@ -32,7 +30,6 @@ public class SectionServiceImpl implements SectionService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Section read(Integer id) {
         return sectionRepository
                 .findOneById(id)
@@ -40,7 +37,6 @@ public class SectionServiceImpl implements SectionService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Section readForUpdate(Integer id) {
         return sectionRepository
                 .findByIdWithTablesForUpdate(id)
@@ -48,7 +44,6 @@ public class SectionServiceImpl implements SectionService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Section create(Section section) {
         var sectionWithSameName = sectionRepository.findByName(section.getName());
         if (sectionWithSameName.isPresent()) {
@@ -58,7 +53,6 @@ public class SectionServiceImpl implements SectionService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void update(Integer id, String name) {
         var section = readForUpdate(id);
         var sectionWithSameName = sectionRepository.findByName(name);
@@ -71,7 +65,6 @@ public class SectionServiceImpl implements SectionService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void delete(Integer id) {
         var section = readForUpdate(id);
         restaurantTableRepository.streamOccupiedTablesForSection(section.getId()).findAny().ifPresent(table -> {

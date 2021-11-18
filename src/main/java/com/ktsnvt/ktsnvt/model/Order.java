@@ -3,7 +3,6 @@ package com.ktsnvt.ktsnvt.model;
 import com.ktsnvt.ktsnvt.model.enums.OrderStatus;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -15,7 +14,6 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "orders")
-@Where(clause = "is_active = true")
 public class Order extends BaseEntity {
 
     @Column(name = "status", nullable = false)

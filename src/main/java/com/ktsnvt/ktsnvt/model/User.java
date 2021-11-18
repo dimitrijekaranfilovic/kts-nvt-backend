@@ -2,9 +2,7 @@ package com.ktsnvt.ktsnvt.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Where;
 
-import javax.persistence.Table;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -15,7 +13,6 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
-@Where(clause = "is_active = true")
 public abstract class User extends BaseEntity {
 
     @Column(name = "name", nullable = false)

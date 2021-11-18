@@ -2,7 +2,6 @@ package com.ktsnvt.ktsnvt.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -12,7 +11,6 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "tables")
-@Where(clause = "is_active = true")
 public class RestaurantTable extends BaseEntity {
 
     @Column(name = "number", nullable = false)

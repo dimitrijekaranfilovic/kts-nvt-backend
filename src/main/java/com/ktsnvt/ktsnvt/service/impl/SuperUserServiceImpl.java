@@ -14,14 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.stream.Stream;
 
 @Service
-public class SuperUserServiceImpl implements SuperUserService {
+public class SuperUserServiceImpl extends TransactionalServiceBase implements SuperUserService {
     private final SuperUserRepository superUserRepository;
 
     private final AuthorityService authorityService;
@@ -35,7 +33,6 @@ public class SuperUserServiceImpl implements SuperUserService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public SuperUser create(SuperUser superUser) {
         var superUserWithSameEmail = superUserRepository.findByEmail(superUser.getEmail());
         if (superUserWithSameEmail.isPresent()) {
@@ -47,7 +44,6 @@ public class SuperUserServiceImpl implements SuperUserService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public SuperUser read(Integer id) {
         return superUserRepository
                 .findOneById(id)
@@ -55,7 +51,6 @@ public class SuperUserServiceImpl implements SuperUserService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public SuperUser readManagerForUpdate(Integer id) {
         return superUserRepository
                 .getSuperUserForUpdate(id, SuperUserType.MANAGER)
@@ -68,7 +63,6 @@ public class SuperUserServiceImpl implements SuperUserService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void deleteManager(Integer id) {
         var manager = readManagerForUpdate(id);
         salaryService.endActiveSalaryForUser(manager);
@@ -76,7 +70,6 @@ public class SuperUserServiceImpl implements SuperUserService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void updatePassword(Integer id, String oldPassword, String newPassword) {
         var user = read(id);
         if (!user.getPassword().equals(oldPassword)) {
@@ -86,7 +79,6 @@ public class SuperUserServiceImpl implements SuperUserService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void update(Integer id, String name, String surname, String email) {
         var user = read(id);
         var superUserWithSameEmail = superUserRepository.findByEmail(email);
@@ -101,7 +93,6 @@ public class SuperUserServiceImpl implements SuperUserService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Stream<SuperUser> readAll() {
         return superUserRepository.findAllByIsActiveTrue();
     }

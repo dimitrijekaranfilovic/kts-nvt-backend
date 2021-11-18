@@ -7,14 +7,11 @@ import com.ktsnvt.ktsnvt.repository.EmployeeRepository;
 import com.ktsnvt.ktsnvt.service.EmployeeQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
-@Transactional(isolation = Isolation.READ_COMMITTED)
-public class EmployeeQueryServiceImpl implements EmployeeQueryService {
+public class EmployeeQueryServiceImpl extends TransactionalServiceBase implements EmployeeQueryService {
     private final EmployeeRepository employeeRepository;
 
     @Autowired

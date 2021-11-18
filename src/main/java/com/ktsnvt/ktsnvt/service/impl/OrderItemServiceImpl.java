@@ -19,13 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
 @Service
-public class OrderItemServiceImpl implements OrderItemService {
+public class OrderItemServiceImpl extends TransactionalServiceBase implements OrderItemService {
     private final OrderItemRepository orderItemRepository;
     private final OrderItemGroupRepository orderItemGroupRepository;
     private final MenuItemRepository menuItemRepository;
@@ -55,7 +53,6 @@ public class OrderItemServiceImpl implements OrderItemService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void takeItemRequest(Integer itemId, String employeePin) {
         var employeeCurrent = employeeQueryService.findByPin(employeePin);
         var item = orderItemRepository
@@ -70,7 +67,6 @@ public class OrderItemServiceImpl implements OrderItemService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void finishItemRequest(Integer itemId, String employeePin) {
         var employeeCurrent = employeeQueryService.findByPin(employeePin);
         var item = orderItemRepository
@@ -99,13 +95,11 @@ public class OrderItemServiceImpl implements OrderItemService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public boolean hasActiveOrderItems(Employee employee) {
         return orderItemRepository.streamActiveOrderItemsForEmployee(employee.getId()).findAny().isPresent();
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public boolean hasActiveOrderItems(MenuItem menuItem) {
         return orderItemRepository.streamActiveOrderItemsForMenuItem(menuItem.getId()).findAny().isPresent();
     }
