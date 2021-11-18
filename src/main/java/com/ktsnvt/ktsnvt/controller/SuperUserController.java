@@ -1,5 +1,6 @@
 package com.ktsnvt.ktsnvt.controller;
 
+import com.ktsnvt.ktsnvt.annotations.IsAdmin;
 import com.ktsnvt.ktsnvt.config.jwt.JwtTokenUtil;
 import com.ktsnvt.ktsnvt.dto.auth.AuthRequest;
 import com.ktsnvt.ktsnvt.dto.auth.AuthResponse;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -29,7 +31,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RestController
@@ -64,23 +65,21 @@ public class SuperUserController {
         this.updateSalaryToSalary = updateSalaryToSalary;
     }
 
-    // PRE AUTHORIZE (ADMIN, MANAGER)
-    // OWNING USER
+    @PreAuthorize("hasRole({'ROLE_ADMIN', 'ROLE_MANAGER'}) and #id = authentication.principal.id")
     @PutMapping("/{id}/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updatePassword(@PathVariable Integer id, @RequestBody @Valid UpdatePasswordRequest request) {
         superUserService.updatePassword(id, request.getOldPassword(), request.getNewPassword());
     }
 
-    // PRE AUTHORIZE (ADMIN, MANAGER)
-    // OWNING USER
+    @PreAuthorize("hasRole({'ROLE_ADMIN', 'ROLE_MANAGER'}) and #id = authentication.principal.id")
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateSuperUser(@PathVariable Integer id, @RequestBody @Valid UpdateSuperUserRequest request) {
         superUserService.update(id, request.getName(), request.getSurname(), request.getEmail());
     }
 
-    // PRE AUTHORIZE (ADMIN)
+    @IsAdmin
     @PutMapping("/{id}/salary")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateSalary(@PathVariable Integer id, @RequestBody @Valid UpdateSalaryRequest request) {
@@ -89,7 +88,7 @@ public class SuperUserController {
         salaryService.updateUserSalary(id, updateSalaryToSalary.convert(request));
     }
 
-    // PRE AUTHORIZE (ADMIN)
+    @IsAdmin
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CreateSuperUserResponse createSuperUser(@RequestBody @Valid CreateSuperUserRequest request) {
@@ -98,7 +97,7 @@ public class SuperUserController {
         return superUserToCreateSuperUserResponse.convert(result);
     }
 
-    // PRE AUTHORIZE (ADMIN)
+    @IsAdmin
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Page<ReadSuperUsersResponse> readSuperUsers(ReadSuperUsersRequest request, @PageableDefault Pageable pageable) {
@@ -106,7 +105,7 @@ public class SuperUserController {
         return page.map(superUserToReadSuperUserResponse::convert);
     }
 
-    // PRE AUTHORIZE (ADMIN)
+    @IsAdmin
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteManager(@PathVariable Integer id) {

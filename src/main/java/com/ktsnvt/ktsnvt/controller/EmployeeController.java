@@ -1,5 +1,6 @@
 package com.ktsnvt.ktsnvt.controller;
 
+import com.ktsnvt.ktsnvt.annotations.IsSuperUser;
 import com.ktsnvt.ktsnvt.dto.createemployee.CreateEmployeeRequest;
 import com.ktsnvt.ktsnvt.dto.createemployee.CreateEmployeeResponse;
 import com.ktsnvt.ktsnvt.dto.reademployees.ReadEmployeesRequest;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -48,7 +50,7 @@ public class EmployeeController {
         this.updateSalaryToSalary = updateSalaryToSalary;
     }
 
-    // PRE AUTHORIZE (ADMIN, MANAGER)
+    @IsSuperUser
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CreateEmployeeResponse createEmployee(@RequestBody @Valid CreateEmployeeRequest request) {
@@ -57,7 +59,7 @@ public class EmployeeController {
         return employeeToCreateEmployee.convert(result);
     }
 
-    // PRE AUTHORIZE (ADMIN, MANAGER)
+    @IsSuperUser
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Page<ReadEmployeesResponse> readEmployees(ReadEmployeesRequest request, @PageableDefault Pageable pageable) {
@@ -65,14 +67,14 @@ public class EmployeeController {
         return page.map(employeeToReadEmployee::convert);
     }
 
-    // PRE AUTHORIZE (ADMIN, MANAGER)
+    @IsSuperUser
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(@PathVariable Integer id, @RequestBody @Valid UpdateEmployeeRequest request) {
         employeeService.update(id, request.getName(), request.getSurname(), request.getPin(), request.getType());
     }
 
-    // PRE AUTHORIZE (ADMIN, MANAGER)
+    @IsSuperUser
     @PutMapping("/{id}/salary")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateSalary(@PathVariable Integer id, @RequestBody @Valid UpdateSalaryRequest request) {
@@ -81,7 +83,7 @@ public class EmployeeController {
         salaryService.updateUserSalary(id, updateSalaryToSalary.convert(request));
     }
 
-    // PRE AUTHORIZE (ADMIN, MANAGER)
+    @IsSuperUser
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteEmployee(@PathVariable Integer id) {

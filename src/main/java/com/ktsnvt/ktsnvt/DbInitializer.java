@@ -29,7 +29,6 @@ public class DbInitializer implements ApplicationRunner {
     private final SalaryRepository salaryRepo;
     private final SectionRepository sectionRepo;
     private final SuperUserRepository superUserRepo;
-    private final UserRepository userRepo;
     private final RestaurantTableRepository tableRepo;
     private final BasePriceRepository basePriceRepo;
     private final PasswordEncoder passwordEncoder;
@@ -41,7 +40,7 @@ public class DbInitializer implements ApplicationRunner {
                          InventoryItemRepository inventoryItemRepo, MenuItemRepository menuItemRepo,
                          OrderItemGroupRepository orderItemGroupRepo,
                          OrderItemRepository orderItemRepo, OrderRepository orderRepo, SalaryRepository salaryRepo,
-                         SectionRepository sectionRepo, SuperUserRepository superUserRepo, UserRepository userRepo,
+                         SectionRepository sectionRepo, SuperUserRepository superUserRepo,
                          RestaurantTableRepository tableRepo, BasePriceRepository basePriceRepo, PasswordEncoder passwordEncoder) {
         this.authorityRepo = authorityRepo;
         this.employeeRepo = employeeRepo;
@@ -53,7 +52,6 @@ public class DbInitializer implements ApplicationRunner {
         this.salaryRepo = salaryRepo;
         this.sectionRepo = sectionRepo;
         this.superUserRepo = superUserRepo;
-        this.userRepo = userRepo;
         this.tableRepo = tableRepo;
         this.basePriceRepo = basePriceRepo;
         this.passwordEncoder = passwordEncoder;
@@ -62,11 +60,11 @@ public class DbInitializer implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) throws Exception {
-        var chef = new Authority("CHEF");
-        var bartender = new Authority("BARTENDER");
-        var waiter = new Authority("WAITER");
-        var manager = new Authority("MANAGER");
-        var admin = new Authority("ADMIN");
+        var chef = new Authority("ROLE_CHEF");
+        var bartender = new Authority("ROLE_BARTENDER");
+        var waiter = new Authority("ROLE_WAITER");
+        var manager = new Authority("ROLE_MANAGER");
+        var admin = new Authority("ROLE_ADMIN");
         authorityRepo.save(chef);
         authorityRepo.save(bartender);
         authorityRepo.save(waiter);

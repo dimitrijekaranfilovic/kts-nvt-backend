@@ -67,6 +67,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/api/order-items").permitAll()
                 .antMatchers(HttpMethod.PUT, "/api/order-items/{orderItemId}").permitAll()
                 .antMatchers(HttpMethod.DELETE, "/api/order-items/{orderItemId}").permitAll()
+
+                .antMatchers(HttpMethod.GET, "/api/sections/{sectionId}/tables").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/sections").permitAll()
                 .anyRequest().authenticated();
 
         http.addFilterBefore(jwtTokenFilter,

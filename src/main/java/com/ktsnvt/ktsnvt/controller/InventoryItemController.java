@@ -1,5 +1,6 @@
 package com.ktsnvt.ktsnvt.controller;
 
+import com.ktsnvt.ktsnvt.annotations.IsSuperUser;
 import com.ktsnvt.ktsnvt.dto.createinventoryitem.CreateInventoryItemRequest;
 import com.ktsnvt.ktsnvt.dto.createinventoryitem.CreateInventoryItemResponse;
 import com.ktsnvt.ktsnvt.dto.readinventoryitems.ReadInventoryItemsRequest;
@@ -43,7 +44,7 @@ public class InventoryItemController {
         this.inventoryItemToReadInventoryItemsResponse = inventoryItemToReadInventoryItemsResponse;
     }
 
-    // PRE AUTHORIZE (ADMIN, MANAGER)
+    @IsSuperUser
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CreateInventoryItemResponse createInventoryItem(@RequestBody @Valid CreateInventoryItemRequest request) {
@@ -52,7 +53,7 @@ public class InventoryItemController {
         return inventoryItemToCreateInventoryItemResponse.convert(result);
     }
 
-    // PRE AUTHORIZE (ADMIN, MANAGER)
+    @IsSuperUser
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Page<ReadInventoryItemsResponse> readInventoryItems(@Valid ReadInventoryItemsRequest request,
@@ -62,14 +63,14 @@ public class InventoryItemController {
         return page.map(inventoryItemToReadInventoryItemsResponse::convert);
     }
 
-    // PRE AUTHORIZE (ADMIN, MANAGER)
+    @IsSuperUser
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteInventoryItem(@PathVariable Integer id) {
         inventoryItemService.delete(id);
     }
 
-    // PRE AUTHORIZE (ADMIN, MANAGER)
+    @IsSuperUser
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(@PathVariable Integer id, @RequestBody @Valid UpdateInventoryItemRequest request) {
