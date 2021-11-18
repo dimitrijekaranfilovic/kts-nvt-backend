@@ -13,13 +13,16 @@ import com.ktsnvt.ktsnvt.service.SuperUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.stream.Stream;
 
 @Service
-public class SuperUserServiceImpl extends TransactionalServiceBase implements SuperUserService {
+public class SuperUserServiceImpl extends TransactionalServiceBase implements SuperUserService, UserDetailsService {
     private final SuperUserRepository superUserRepository;
 
     private final AuthorityService authorityService;
@@ -95,5 +98,10 @@ public class SuperUserServiceImpl extends TransactionalServiceBase implements Su
     @Override
     public Stream<SuperUser> readAll() {
         return superUserRepository.findAllByIsActiveTrue();
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+        return null;
     }
 }
