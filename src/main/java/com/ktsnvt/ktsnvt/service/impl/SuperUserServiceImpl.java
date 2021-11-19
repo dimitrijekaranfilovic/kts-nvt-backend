@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -27,12 +28,17 @@ public class SuperUserServiceImpl extends TransactionalServiceBase implements Su
 
     private final AuthorityService authorityService;
     private final SalaryService salaryService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public SuperUserServiceImpl(SuperUserRepository superUserRepository, AuthorityService authorityService, SalaryService salaryService) {
+    public SuperUserServiceImpl(SuperUserRepository superUserRepository,
+                                AuthorityService authorityService,
+                                SalaryService salaryService,
+                                PasswordEncoder passwordEncoder) {
         this.superUserRepository = superUserRepository;
         this.authorityService = authorityService;
         this.salaryService = salaryService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -41,6 +47,7 @@ public class SuperUserServiceImpl extends TransactionalServiceBase implements Su
         if (superUserWithSameEmail.isPresent()) {
             throw new EmailAlreadyExistsException(superUser.getEmail());
         }
+        superUser.setPassword(passwordEncoder.encode(superUser.getPassword()));
         var authority = authorityService.findByName(superUser.getType().toString());
         superUser.setAuthority(authority);
         return superUserRepository.save(superUser);
@@ -82,10 +89,10 @@ public class SuperUserServiceImpl extends TransactionalServiceBase implements Su
     @Override
     public void updatePassword(Integer id, String oldPassword, String newPassword) {
         var user = read(id);
-        if (!user.getPassword().equals(oldPassword)) {
+        if (!user.getPassword().equals(passwordEncoder.encode(oldPassword))) {
             throw new InvalidPasswordException("Incorrect old password provided.");
         }
-        user.setPassword(newPassword);
+        user.setPassword(passwordEncoder.encode(newPassword));
     }
 
     @Override
