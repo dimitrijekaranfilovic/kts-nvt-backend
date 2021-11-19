@@ -1,6 +1,7 @@
 package com.ktsnvt.ktsnvt.controller;
 
 
+import com.ktsnvt.ktsnvt.annotations.IsSuperUser;
 import com.ktsnvt.ktsnvt.dto.createmenuitem.CreateMenuItemRequest;
 import com.ktsnvt.ktsnvt.dto.createmenuitem.CreateMenuItemResponse;
 import com.ktsnvt.ktsnvt.dto.displaypaginatedmenuitems.DisplayMenuItemResponse;
@@ -45,7 +46,7 @@ public class MenuItemController {
         return this.menuItemService.getMenuItems(name, pageable).map(menuItemToDisplayMenuItemResponse::convert);
     }
 
-    // PRE AUTHORIZE (ADMIN, MANAGER)
+    @IsSuperUser
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CreateMenuItemResponse createMenuItem(@RequestBody @Valid CreateMenuItemRequest request) {
@@ -53,7 +54,7 @@ public class MenuItemController {
                 .convert(this.menuItemService.createMenuItem(request.getPrice(), request.getInventoryItemId()));
     }
 
-    // PRE AUTHORIZE (ADMIN, MANAGER)
+    @IsSuperUser
     @PostMapping("/{id}/price")
     @ResponseStatus(HttpStatus.CREATED)
     public UpdateMenuItemPriceResponse updatePrice(@PathVariable Integer id, @RequestBody @Valid UpdateMenuItemPriceRequest request) {
@@ -61,7 +62,7 @@ public class MenuItemController {
                 .convert(this.menuItemService.updateMenuItemPrice(request.getPrice(), id));
     }
 
-    // PRE AUTHORIZE (ADMIN, MANAGER)
+    @IsSuperUser
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deactivateMenuItem(@PathVariable Integer id) {

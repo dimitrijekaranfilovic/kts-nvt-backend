@@ -1,6 +1,7 @@
 package com.ktsnvt.ktsnvt.controller;
 
 
+import com.ktsnvt.ktsnvt.annotations.IsAdmin;
 import com.ktsnvt.ktsnvt.dto.createrestauranttable.CreateRestaurantTableRequest;
 import com.ktsnvt.ktsnvt.dto.createrestauranttable.CreateRestaurantTableResponse;
 import com.ktsnvt.ktsnvt.dto.createsection.CreateSectionRequest;
@@ -60,7 +61,7 @@ public class SectionController {
     }
 
 
-    // PRE AUTHORIZE (ADMIN)
+    @IsAdmin
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CreateSectionResponse createSection(@RequestBody @Valid CreateSectionRequest request) {
@@ -69,14 +70,14 @@ public class SectionController {
         return sectionToCreateSection.convert(result);
     }
 
-    // PRE AUTHORIZE (ADMIN)
+    @IsAdmin
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateSection(@PathVariable Integer id, @RequestBody @Valid UpdateSectionRequest request) {
         sectionService.update(id, request.getName());
     }
 
-    // PRE AUTHORIZE (ADMIN)
+    @IsAdmin
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteSection(@PathVariable Integer id) {
@@ -95,6 +96,7 @@ public class SectionController {
         return restaurantTableService.getAllTablesForSection(sectionId).stream().map(restaurantTableToReadSectionTablesResponse::convert).collect(Collectors.toList());
     }
 
+    @IsAdmin
     @PostMapping(value = "{sectionId}/tables")
     @ResponseStatus(HttpStatus.CREATED)
     public CreateRestaurantTableResponse createTable(@RequestBody @Valid CreateRestaurantTableRequest
@@ -106,12 +108,14 @@ public class SectionController {
         return restaurantTableToCreateRestaurantTableResponse.convert(createdTable);
     }
 
+    @IsAdmin
     @DeleteMapping(value = "tables/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTable(@PathVariable Integer id) {
         restaurantTableService.deleteRestaurantTable(id);
     }
 
+    @IsAdmin
     @PutMapping("/{sectionId}/tables/{tableId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateTable(@PathVariable Integer sectionId, @PathVariable Integer tableId, @RequestBody @Valid MoveTableRequest request) {

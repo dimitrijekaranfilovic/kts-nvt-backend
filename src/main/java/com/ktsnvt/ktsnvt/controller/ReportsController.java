@@ -1,5 +1,6 @@
 package com.ktsnvt.ktsnvt.controller;
 
+import com.ktsnvt.ktsnvt.annotations.IsAdmin;
 import com.ktsnvt.ktsnvt.dto.readreports.ReadReportsRequest;
 import com.ktsnvt.ktsnvt.dto.readreports.ReadReportsResponse;
 import com.ktsnvt.ktsnvt.model.ReportStatistics;
@@ -30,7 +31,7 @@ public class ReportsController {
         this.toReportResponse = toReportResponse;
     }
 
-    // PRE AUTHORIZE (ADMIN)
+    @IsAdmin
     @GetMapping("/salary-costs")
     @ResponseStatus(HttpStatus.OK)
     public ReadReportsResponse readSalaryExpenses(ReadReportsRequest request) {
@@ -38,7 +39,7 @@ public class ReportsController {
         return toReportResponse.convert(result);
     }
 
-    // PRE AUTHORIZE (ADMIN)
+    @IsAdmin
     @GetMapping("/order-costs")
     @ResponseStatus(HttpStatus.OK)
     public ReadReportsResponse readOrderCosts(ReadReportsRequest request) {
@@ -46,7 +47,7 @@ public class ReportsController {
         return toReportResponse.convert(result);
     }
 
-    // PRE AUTHORIZE (ADMIN)
+    @IsAdmin
     @GetMapping("/order-incomes")
     @ResponseStatus(HttpStatus.OK)
     public ReadReportsResponse readOrderIncomes(ReadReportsRequest request) {

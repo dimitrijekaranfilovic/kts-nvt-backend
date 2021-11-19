@@ -6,6 +6,7 @@ import com.ktsnvt.ktsnvt.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
@@ -28,9 +29,9 @@ public class DbInitializer implements ApplicationRunner {
     private final SalaryRepository salaryRepo;
     private final SectionRepository sectionRepo;
     private final SuperUserRepository superUserRepo;
-    private final UserRepository userRepo;
     private final RestaurantTableRepository tableRepo;
     private final BasePriceRepository basePriceRepo;
+    private final PasswordEncoder passwordEncoder;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
@@ -39,8 +40,8 @@ public class DbInitializer implements ApplicationRunner {
                          InventoryItemRepository inventoryItemRepo, MenuItemRepository menuItemRepo,
                          OrderItemGroupRepository orderItemGroupRepo,
                          OrderItemRepository orderItemRepo, OrderRepository orderRepo, SalaryRepository salaryRepo,
-                         SectionRepository sectionRepo, SuperUserRepository superUserRepo, UserRepository userRepo,
-                         RestaurantTableRepository tableRepo, BasePriceRepository basePriceRepo) {
+                         SectionRepository sectionRepo, SuperUserRepository superUserRepo,
+                         RestaurantTableRepository tableRepo, BasePriceRepository basePriceRepo, PasswordEncoder passwordEncoder) {
         this.authorityRepo = authorityRepo;
         this.employeeRepo = employeeRepo;
         this.inventoryItemRepo = inventoryItemRepo;
@@ -51,9 +52,9 @@ public class DbInitializer implements ApplicationRunner {
         this.salaryRepo = salaryRepo;
         this.sectionRepo = sectionRepo;
         this.superUserRepo = superUserRepo;
-        this.userRepo = userRepo;
         this.tableRepo = tableRepo;
         this.basePriceRepo = basePriceRepo;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -91,9 +92,9 @@ public class DbInitializer implements ApplicationRunner {
         employeeRepo.save(employee2);
         employeeRepo.save(employee3);
 
-        var manager1 = new SuperUser("Jasna", "Perovic", manager, "email1@email.com", "password", SuperUserType.MANAGER);
+        var manager1 = new SuperUser("Jasna", "Perovic", manager, "email1@email.com", passwordEncoder.encode("password"), SuperUserType.MANAGER);
         manager1.addSalary(salary4);
-        var admin1 = new SuperUser("Nikola", "Stankovic", admin, "email2@email.com", "password", SuperUserType.ADMIN);
+        var admin1 = new SuperUser("Nikola", "Stankovic", admin, "email2@email.com", passwordEncoder.encode("password"), SuperUserType.ADMIN);
         admin1.addSalary(salary5);
         superUserRepo.save(manager1);
         superUserRepo.save(admin1);

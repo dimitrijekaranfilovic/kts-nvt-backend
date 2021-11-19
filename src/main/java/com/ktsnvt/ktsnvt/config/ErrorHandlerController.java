@@ -11,6 +11,7 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -90,6 +91,13 @@ public class ErrorHandlerController {
 
         return new ErrorInfo(request.getRequestURI(), ex.getLocalizedMessage(), LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST, errors);
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseBody
+    public ErrorInfo handleAccessDeniedException(HttpServletRequest request, AccessDeniedException ex){
+        return new ErrorInfo(request.getRequestURI(), "You are not authorized to access this resource.", LocalDateTime.now(), HttpStatus.FORBIDDEN);
     }
 
 
