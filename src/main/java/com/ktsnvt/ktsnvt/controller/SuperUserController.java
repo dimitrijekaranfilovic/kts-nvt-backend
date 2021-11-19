@@ -65,14 +65,14 @@ public class SuperUserController {
         this.updateSalaryToSalary = updateSalaryToSalary;
     }
 
-    @PreAuthorize("hasRole({'ROLE_ADMIN', 'ROLE_MANAGER'}) and #id = authentication.principal.id")
+    @PreAuthorize("hasAnyAuthority({'ADMIN', 'MANAGER'}) and #id = authentication.principal.id")
     @PutMapping("/{id}/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updatePassword(@PathVariable Integer id, @RequestBody @Valid UpdatePasswordRequest request) {
         superUserService.updatePassword(id, request.getOldPassword(), request.getNewPassword());
     }
 
-    @PreAuthorize("hasRole({'ROLE_ADMIN', 'ROLE_MANAGER'}) and #id = authentication.principal.id")
+    @PreAuthorize("hasAnyAuthority({'ADMIN', 'MANAGER'}) and #id = authentication.principal.id")
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateSuperUser(@PathVariable Integer id, @RequestBody @Valid UpdateSuperUserRequest request) {
