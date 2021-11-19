@@ -60,11 +60,11 @@ public class DbInitializer implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) throws Exception {
-        var chef = new Authority("ROLE_CHEF");
-        var bartender = new Authority("ROLE_BARTENDER");
-        var waiter = new Authority("ROLE_WAITER");
-        var manager = new Authority("ROLE_MANAGER");
-        var admin = new Authority("ROLE_ADMIN");
+        var chef = new Authority("CHEF");
+        var bartender = new Authority("BARTENDER");
+        var waiter = new Authority("WAITER");
+        var manager = new Authority("MANAGER");
+        var admin = new Authority("ADMIN");
         authorityRepo.save(chef);
         authorityRepo.save(bartender);
         authorityRepo.save(waiter);
