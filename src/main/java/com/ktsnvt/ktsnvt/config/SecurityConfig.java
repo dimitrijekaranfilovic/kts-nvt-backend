@@ -44,7 +44,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        //mora se provjeriti web socket controller
+        //valjda radi za sokete, trebalo bi se dalje provjeriti
         http = http.cors().and().csrf().disable();
 
         http = http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and();
@@ -70,6 +70,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .antMatchers(HttpMethod.GET, "/api/sections/{sectionId}/tables").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/sections").permitAll()
+
+                .antMatchers("/socket").permitAll()
+                .antMatchers("/socket-publisher").permitAll()
+                .antMatchers("/socket-subscriber").permitAll()
+                .antMatchers("/send/message").permitAll()
                 .anyRequest().authenticated();
 
         http.addFilterBefore(jwtTokenFilter,
