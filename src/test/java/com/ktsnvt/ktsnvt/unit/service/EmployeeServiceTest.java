@@ -1,5 +1,6 @@
 package com.ktsnvt.ktsnvt.unit.service;
 
+import com.ktsnvt.ktsnvt.exception.BusyEmployeeDeletionException;
 import com.ktsnvt.ktsnvt.exception.PinAlreadyExistsException;
 import com.ktsnvt.ktsnvt.model.Authority;
 import com.ktsnvt.ktsnvt.model.Employee;
@@ -75,21 +76,65 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void delete_whenCalledWithValidId_isSuccess() {
-        Employee retEmp = new Employee();
-        retEmp.setId(1);
-
-        doNothing().when(salaryService).endActiveSalaryForUser(retEmp);
-
+    void delete_whenCalledWithEmployeeWithNoPendingItems_isSuccess() {
+        // GIVEN
+        Employee deletedEmployee = new Employee();
+        deletedEmployee.setId(999);
+        doNothing().when(salaryService).endActiveSalaryForUser(deletedEmployee);
         EmployeeService employeeServiceSpy = spy(employeeService);
+        doReturn(deletedEmployee).when(employeeServiceSpy).readForUpdate(deletedEmployee.getId());
+        doReturn(false).when(orderService).hasAssignedActiveOrders(deletedEmployee);
+        doReturn(false).when(orderItemService).hasActiveOrderItems(deletedEmployee);
 
-        doReturn(retEmp).when(employeeServiceSpy).readForUpdate(retEmp.getId());
+        // WHEN
+        employeeServiceSpy.delete(deletedEmployee.getId());
 
-        doReturn(false).when(orderService).hasAssignedActiveOrders(retEmp);
-        doReturn(false).when(orderItemService).hasActiveOrderItems(retEmp);
+        // THEN
+        assertFalse(deletedEmployee.getIsActive());
+        verify(salaryService, times(1)).endActiveSalaryForUser(deletedEmployee);
+        verify(orderService, times(1)).hasAssignedActiveOrders(deletedEmployee);
+        verify(orderItemService, times(1)).hasActiveOrderItems(deletedEmployee);
+    }
 
-        employeeServiceSpy.delete(1);
+    @Test
+    void delete_whenCalledWithEmployeeWithAssignedActiveOrders_throwsException() {
+        // GIVEN
+        Employee deletedEmployee = new Employee();
+        deletedEmployee.setId(999);
+        doNothing().when(salaryService).endActiveSalaryForUser(deletedEmployee);
+        EmployeeService employeeServiceSpy = spy(employeeService);
+        doReturn(deletedEmployee).when(employeeServiceSpy).readForUpdate(deletedEmployee.getId());
+        doReturn(true).when(orderService).hasAssignedActiveOrders(deletedEmployee);
+        doReturn(false).when(orderItemService).hasActiveOrderItems(deletedEmployee);
 
-        assertFalse(retEmp.getIsActive());
+        // WHEN
+        assertThrows(BusyEmployeeDeletionException.class, () -> employeeServiceSpy.delete(deletedEmployee.getId()));
+
+        // THEN
+        assertTrue(deletedEmployee.getIsActive());
+        verify(orderService, times(1)).hasAssignedActiveOrders(deletedEmployee);
+        verifyNoMoreInteractions(salaryService);
+        verifyNoMoreInteractions(orderItemService);
+    }
+
+    @Test
+    void delete_whenCalledWithEmployeeWithAssignedActiveOrderItems_throwsException() {
+        // GIVEN
+        Employee deletedEmployee = new Employee();
+        deletedEmployee.setId(999);
+        doNothing().when(salaryService).endActiveSalaryForUser(deletedEmployee);
+        EmployeeService employeeServiceSpy = spy(employeeService);
+        doReturn(deletedEmployee).when(employeeServiceSpy).readForUpdate(deletedEmployee.getId());
+        doReturn(false).when(orderService).hasAssignedActiveOrders(deletedEmployee);
+        doReturn(true).when(orderItemService).hasActiveOrderItems(deletedEmployee);
+
+        // WHEN
+        assertThrows(BusyEmployeeDeletionException.class, () -> employeeServiceSpy.delete(deletedEmployee.getId()));
+
+        // THEN
+        assertTrue(deletedEmployee.getIsActive());
+        verify(orderService, times(1)).hasAssignedActiveOrders(deletedEmployee);
+        verify(orderItemService, times(1)).hasActiveOrderItems(deletedEmployee);
+        verifyNoMoreInteractions(salaryService);
     }
 }
