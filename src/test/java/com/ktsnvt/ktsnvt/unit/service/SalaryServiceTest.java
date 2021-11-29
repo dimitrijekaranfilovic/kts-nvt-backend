@@ -2,9 +2,9 @@ package com.ktsnvt.ktsnvt.unit.service;
 
 import com.ktsnvt.ktsnvt.model.Employee;
 import com.ktsnvt.ktsnvt.model.Salary;
-import com.ktsnvt.ktsnvt.model.User;
 import com.ktsnvt.ktsnvt.repository.SalaryRepository;
 import com.ktsnvt.ktsnvt.service.LocalDateTimeService;
+import com.ktsnvt.ktsnvt.service.SalaryService;
 import com.ktsnvt.ktsnvt.service.UserService;
 import com.ktsnvt.ktsnvt.service.impl.SalaryServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -16,8 +16,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class SalaryServiceTest {
@@ -61,6 +61,28 @@ class SalaryServiceTest {
 
         // THEN
         verify(salaryRepository, times(1)).findActiveForUser(user.getId());
+    }
+
+    @Test
+    void updateUserSalary_calledWithValidData_isSuccess() {
+        // GIVEN
+        var userForSalaryUpdate = new Employee();
+        userForSalaryUpdate.setId(999);
+        var currentSalary = new Salary(LocalDate.of(2021, 11, 14), null, BigDecimal.valueOf(123), userForSalaryUpdate);
+        userForSalaryUpdate.addSalary(currentSalary);
+        var newSalary = new Salary(LocalDate.of(2021, 11, 29), null, BigDecimal.valueOf(456), userForSalaryUpdate);
+        SalaryService salaryServiceSpy = spy(salaryService);
+        doReturn(userForSalaryUpdate).when(userService).readForSalaryUpdate(userForSalaryUpdate.getId());
+        doNothing().when(salaryServiceSpy).endActiveSalaryForUser(userForSalaryUpdate);
+
+        // WHEN
+        salaryServiceSpy.updateUserSalary(userForSalaryUpdate.getId(), newSalary);
+
+        // THEN
+        assertEquals(2, userForSalaryUpdate.getSalaries().size());
+        assertEquals(newSalary.getAmount(), userForSalaryUpdate.getCurrentSalary());
+        verify(salaryServiceSpy, times(1)).endActiveSalaryForUser(userForSalaryUpdate);
+        verify(userService, times(1)).readForSalaryUpdate(userForSalaryUpdate.getId());
     }
 
 }
