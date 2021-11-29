@@ -88,7 +88,7 @@ public class EmployeeServiceImpl extends TransactionalServiceBase implements Emp
     @Override
     public void update(Integer id, String name, String surname, String pin, EmployeeType type) {
         var employee = readForUpdate(id);
-        var samePinEmployee = employeeQueryService.findByPinUnchecked(employee.getPin());
+        var samePinEmployee = employeeQueryService.findByPinUnchecked(pin);
         samePinEmployee.ifPresent(same -> {
             if (!same.getId().equals(employee.getId())) {
                 throw new PinAlreadyExistsException(pin);
@@ -99,7 +99,7 @@ public class EmployeeServiceImpl extends TransactionalServiceBase implements Emp
         if (!employee.getType().equals(type)) {
             if (employee.getType().equals(EmployeeType.WAITER) && orderService.hasAssignedActiveOrders(employee)) {
                 throw new IllegalEmployeeTypeChangeException("Employee has order which it has to process.");
-            } else if (orderItemService.hasActiveOrderItems(employee)) {
+            } else if (!employee.getType().equals(EmployeeType.WAITER) && orderItemService.hasActiveOrderItems(employee)) {
                 throw new IllegalEmployeeTypeChangeException("Employee has order items which it has to prepare.");
             }
         }
