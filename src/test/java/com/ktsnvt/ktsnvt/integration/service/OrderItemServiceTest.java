@@ -1,7 +1,6 @@
 package com.ktsnvt.ktsnvt.integration.service;
 
-import com.ktsnvt.ktsnvt.exception.InvalidEmployeeTypeException;
-import com.ktsnvt.ktsnvt.exception.OrderItemNotFoundException;
+import com.ktsnvt.ktsnvt.exception.*;
 import com.ktsnvt.ktsnvt.model.Employee;
 import com.ktsnvt.ktsnvt.model.InventoryItem;
 import com.ktsnvt.ktsnvt.model.MenuItem;
@@ -111,4 +110,84 @@ public class OrderItemServiceTest {
         assertTrue(orderItemService.hasActiveOrderItems(inventoryItem1));
         assertFalse(orderItemService.hasActiveOrderItems(inventoryItem2));
     }
+
+    @Test
+    void addOrderItem_withValidData_isSuccess(){
+        assertDoesNotThrow(() -> orderItemService.addOrderItem(2, 1, 2, "4321"));
+    }
+
+    @Test
+    void addOrderItem_whenGroupDoesNotExist_throwsException(){
+        assertThrows(NotFoundException.class, () -> orderItemService.addOrderItem(2222, 1, 2, "4321"));
+    }
+
+    @Test
+    void addOrderItem_whenMenuItemDoesNotExist_throwsException(){
+        assertThrows(NotFoundException.class, () -> orderItemService.addOrderItem(2, 2222, 2, "4321"));
+    }
+
+    @Test
+    void addOrderItem_whenGroupStatusIsNotNew_throwsException(){
+        assertThrows(OrderItemGroupInvalidStatusException.class, () -> orderItemService.addOrderItem(1, 1, 2, "4321"));
+    }
+
+    @Test
+    void addOrderItem_whenAmountIsNotPositive_throwsException(){
+        assertThrows(IllegalAmountException.class, () -> orderItemService.addOrderItem(2, 1, -2, "4321"));
+    }
+
+    @Test
+    void addOrderItem_whenNotResponsibleEmployeeTriesToAdd_throwsException(){
+        assertThrows(InvalidEmployeeTypeException.class, () -> orderItemService.addOrderItem(2, 1, 2, "1234"));
+    }
+
+    @Test
+    void updateOrderItem_withValidData_isSuccess(){
+        assertDoesNotThrow(() -> orderItemService.updateOrderItem(12, 2, "4321"));
+    }
+
+    @Test
+    void updateOrderItem_whenItemDoesNotExist_throwsException(){
+        assertThrows(NotFoundException.class, () -> orderItemService.updateOrderItem(222, 2, "4321"));
+    }
+
+    @Test
+    void updateOrderItem_whenItemStatusIsNotNew_throwsException(){
+        assertThrows(OrderItemInvalidStatusException.class , () -> orderItemService.updateOrderItem(10, 2, "4321"));
+    }
+
+    @Test
+    void updateOrderItem_whenAmountIsNotPositive_throwsException(){
+        assertThrows(IllegalAmountException.class , () -> orderItemService.updateOrderItem(12, -2, "4321"));
+    }
+
+    @Test
+    void updateOrderItem_whenNotResponsibleEmployeeTriesToUpdate_throwsException(){
+        assertThrows(InvalidEmployeeTypeException.class , () -> orderItemService.updateOrderItem(12, 2, "1234"));
+
+    }
+
+    @Test
+    void deleteOrderItem_withValidData_isSuccess(){
+        assertDoesNotThrow(() -> orderItemService.deleteOrderItem(12,  "4321"));
+    }
+
+    @Test
+    void delete_whenItemDoesNotExist_throwsException(){
+        assertThrows(NotFoundException.class, () -> orderItemService.deleteOrderItem(222, "4321"));
+    }
+
+    @Test
+    void deleteOrderItem_whenItemStatusIsNotNew_throwsException(){
+        assertThrows(OrderItemInvalidStatusException.class , () -> orderItemService.deleteOrderItem(10, "4321"));
+    }
+
+    @Test
+    void deleteOrderItem_whenNotResponsibleEmployeeTriesToDelete_throwsException(){
+        assertThrows(InvalidEmployeeTypeException.class , () -> orderItemService.deleteOrderItem(12,  "1234"));
+
+    }
+
+
+
 }
