@@ -4,6 +4,7 @@ import com.ktsnvt.ktsnvt.exception.SectionNameAlreadyExistsException;
 import com.ktsnvt.ktsnvt.model.Section;
 import com.ktsnvt.ktsnvt.repository.RestaurantTableRepository;
 import com.ktsnvt.ktsnvt.repository.SectionRepository;
+import com.ktsnvt.ktsnvt.service.SectionService;
 import com.ktsnvt.ktsnvt.service.impl.SectionServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -49,6 +50,66 @@ class SectionServiceTest {
         assertThrows(SectionNameAlreadyExistsException.class, () -> sectionService.create(section));
 
         // THEN
+        verify(sectionRepository, times(0)).save(section);
+    }
+
+    @Test
+    void update_whenCalledWithValidNameChange_isSuccess() {
+        // GIVEN
+        var newName = "somethingNew";
+        var section = new Section("something");
+        var sectionId = 999;
+        section.setId(sectionId);
+        SectionService sectionServiceSpy = spy(sectionService);
+        doReturn(section).when(sectionServiceSpy).readForUpdate(sectionId);
+        doReturn(Optional.empty()).when(sectionRepository).findByName(newName);
+        doReturn(section).when(sectionRepository).save(section);
+
+        // WHEN
+        sectionServiceSpy.update(sectionId, newName);
+
+        // THEN
+        assertEquals(newName, section.getName());
+        verify(sectionRepository, times(0)).save(section);
+    }
+
+    @Test
+    void update_whenCalledWithNoNameChange_isSuccess() {
+        // GIVEN
+        var section = new Section("something");
+        var sectionId = 999;
+        section.setId(sectionId);
+        SectionService sectionServiceSpy = spy(sectionService);
+        doReturn(section).when(sectionServiceSpy).readForUpdate(sectionId);
+        doReturn(Optional.of(section)).when(sectionRepository).findByName(section.getName());
+        doReturn(section).when(sectionRepository).save(section);
+
+        // WHEN
+        sectionServiceSpy.update(sectionId, section.getName());
+
+        // THEN
+        verify(sectionRepository, times(0)).save(section);
+    }
+
+    @Test
+    void update_whenCalledWithDuplicateNameChange_isSuccess() {
+        // GIVEN
+        var newName = "somethingNew";
+        var section = new Section("something");
+        var sectionId = 999;
+        section.setId(sectionId);
+        var sectionWithSameName = new Section(newName);
+        sectionWithSameName.setId(888);
+        SectionService sectionServiceSpy = spy(sectionService);
+        doReturn(section).when(sectionServiceSpy).readForUpdate(sectionId);
+        doReturn(Optional.of(sectionWithSameName)).when(sectionRepository).findByName(newName);
+        doReturn(section).when(sectionRepository).save(section);
+
+        // WHEN
+        assertThrows(SectionNameAlreadyExistsException.class, () -> sectionServiceSpy.update(sectionId, newName));
+
+        // THEN
+        assertNotEquals(newName, section.getName());
         verify(sectionRepository, times(0)).save(section);
     }
 }
