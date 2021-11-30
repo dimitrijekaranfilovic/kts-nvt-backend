@@ -18,6 +18,7 @@ import com.ktsnvt.ktsnvt.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -139,8 +140,8 @@ public class OrderServiceImpl extends TransactionalServiceBase implements OrderS
                         .stream()
                         .filter(BaseEntity::getIsActive)
                         .forEach(item -> {
-                            order.setTotalIncome(order.getTotalIncome().add(item.getCurrentMenuPrice()));
-                            order.setTotalCost(order.getTotalCost().add(item.getCurrentBasePrice()));
+                            order.setTotalIncome(order.getTotalIncome().add(item.getCurrentMenuPrice().multiply(BigDecimal.valueOf(item.getAmount()))));
+                            order.setTotalCost(order.getTotalCost().add(item.getCurrentBasePrice().multiply(BigDecimal.valueOf(item.getAmount()))));
                         }));
         order.setStatus(OrderStatus.CHARGED);
         order.setServedAt(localDateTimeService.currentTime());

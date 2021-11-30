@@ -8,6 +8,7 @@ import com.ktsnvt.ktsnvt.exception.OrderItemGroupInvalidStatusException;
 import com.ktsnvt.ktsnvt.model.*;
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemGroupStatus;
+import com.ktsnvt.ktsnvt.model.enums.OrderItemStatus;
 import com.ktsnvt.ktsnvt.model.enums.OrderStatus;
 import com.ktsnvt.ktsnvt.repository.OrderItemGroupRepository;
 import com.ktsnvt.ktsnvt.repository.OrderRepository;
@@ -25,6 +26,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -200,6 +202,102 @@ class OrderServiceTest {
 
         // THEN
         assertEquals(OrderStatus.CHARGED, order.getStatus());
+        verifyNoInteractions(orderRepository);
+    }
+
+    @Test
+    void chargeOrder_calledWithValidData_isSuccess() {
+        // GIVEN
+        var order = new Order();
+        var orderId = 999;
+        order.setId(orderId); order.setStatus(OrderStatus.IN_PROGRESS);
+        var waiterPin = "1234";
+        var waiterId = 999;
+        var waiter = new Employee("name", "surname", new Authority("WAITER"), waiterPin, EmployeeType.WAITER);
+        waiter.setId(waiterId);
+        order.setWaiter(waiter);
+        var table = new RestaurantTable(123, 10, 10, 10, new Section("something"));
+        var tableId = 999;
+        table.setId(tableId); table.setAvailable(false);
+        order.setRestaurantTable(table);
+        var og1 = new OrderItemGroup("first", OrderItemGroupStatus.DONE);
+        makeOrderItem(og1, 2, 30, 15);
+        makeOrderItem(og1, 1, 40, 12);
+        var og2 = new OrderItemGroup("second", OrderItemGroupStatus.DONE);
+        makeOrderItem(og2, 1, 20, 8);
+        makeOrderItem(og2, 3, 50, 25);
+        order.getItemGroups().add(og1); order.getItemGroups().add(og2);
+        OrderService orderServiceSpy = spy(orderService);
+        doReturn(order).when(orderServiceSpy).getOrder(orderId);
+        doNothing().when(employeeOrderService).throwIfWaiterNotResponsible(waiterPin, waiterId);
+
+        // WHEN
+        orderServiceSpy.chargeOrder(orderId, waiterPin);
+
+        // THEN
+        assertTrue(table.getAvailable());
+        assertEquals(BigDecimal.valueOf(270), order.getTotalIncome());
+        assertEquals(BigDecimal.valueOf(125), order.getTotalCost());
+        assertEquals(OrderStatus.CHARGED, order.getStatus());
+        verifyNoInteractions(orderRepository);
+    }
+
+    @Test
+    void chargeOrder_calledWithNotInProgress_throwsException() {
+        // GIVEN
+        var order = new Order();
+        var orderId = 999;
+        order.setId(orderId); order.setStatus(OrderStatus.CANCELLED);
+        var waiterPin = "1234";
+        var waiterId = 999;
+        var waiter = new Employee("name", "surname", new Authority("WAITER"), waiterPin, EmployeeType.WAITER);
+        waiter.setId(waiterId);
+        order.setWaiter(waiter);
+        var table = new RestaurantTable(123, 10, 10, 10, new Section("something"));
+        var tableId = 999;
+        table.setId(tableId); table.setAvailable(false);
+        order.setRestaurantTable(table);
+        OrderService orderServiceSpy = spy(orderService);
+        doReturn(order).when(orderServiceSpy).getOrder(orderId);
+        doNothing().when(employeeOrderService).throwIfWaiterNotResponsible(waiterPin, waiterId);
+
+        // WHEN
+        assertThrows(IllegalOrderStateException.class, () -> orderServiceSpy.chargeOrder(orderId, waiterPin));
+
+        // THEN
+        assertFalse(table.getAvailable());
+        assertNotEquals(OrderStatus.CHARGED, order.getStatus());
+        verifyNoInteractions(orderRepository);
+    }
+
+    @Test
+    void chargeOrder_calledWithNoDoneItems_throwsException() {
+        // GIVEN
+        var order = new Order();
+        var orderId = 999;
+        order.setId(orderId); order.setStatus(OrderStatus.IN_PROGRESS);
+        var waiterPin = "1234";
+        var waiterId = 999;
+        var waiter = new Employee("name", "surname", new Authority("WAITER"), waiterPin, EmployeeType.WAITER);
+        waiter.setId(waiterId);
+        order.setWaiter(waiter);
+        var table = new RestaurantTable(123, 10, 10, 10, new Section("something"));
+        var tableId = 999;
+        table.setId(tableId); table.setAvailable(false);
+        order.setRestaurantTable(table);
+        var og1 = new OrderItemGroup("first", OrderItemGroupStatus.SENT);
+        var og2 = new OrderItemGroup("second", OrderItemGroupStatus.DONE);
+        order.getItemGroups().add(og1); order.getItemGroups().add(og2);
+        OrderService orderServiceSpy = spy(orderService);
+        doReturn(order).when(orderServiceSpy).getOrder(orderId);
+        doNothing().when(employeeOrderService).throwIfWaiterNotResponsible(waiterPin, waiterId);
+
+        // WHEN
+        assertThrows(IllegalOrderStateException.class, () -> orderServiceSpy.chargeOrder(orderId, waiterPin));
+
+        // THEN
+        assertFalse(table.getAvailable());
+        assertNotEquals(OrderStatus.CHARGED, order.getStatus());
         verifyNoInteractions(orderRepository);
     }
 
@@ -491,9 +589,9 @@ class OrderServiceTest {
 
     }
 
-
-
-
-
-
+    private void makeOrderItem(OrderItemGroup group, int amount, long price, long cost) {
+        OrderItem item = new OrderItem();
+        item.setAmount(amount); item.setCurrentMenuPrice(BigDecimal.valueOf(price)); item.setCurrentBasePrice(BigDecimal.valueOf(cost));
+        group.addItem(item);
+    }
 }
