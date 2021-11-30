@@ -140,4 +140,64 @@ class SuperUserServiceTest {
         verify(passwordEncoder, times(1)).encode(oldPasswordMistake);
         verifyNoInteractions(superUserRepository);
     }
+
+    @Test
+    void update_whenCalledWithValidEmailChange_isSuccess() {
+        // GIVEN
+        var newEMail = "test@gmail.com";
+        var superUser = new SuperUser("name", "surname", new Authority("MANAGER"), "name.surname@gmail.com", "test123", SuperUserType.MANAGER);
+        var superUserId = 999;
+        superUser.setId(superUserId);
+        SuperUserService superUserServiceSpy = spy(superUserService);
+        doReturn(superUser).when(superUserServiceSpy).read(superUser.getId());
+        doReturn(Optional.empty()).when(superUserRepository).findByEmail(newEMail);
+
+        // WHEN
+        superUserServiceSpy.update(superUserId, "pera", "peric", newEMail);
+
+        // THEN
+        assertEquals(newEMail, superUser.getEmail());
+        assertEquals("pera", superUser.getName());
+        assertEquals("peric", superUser.getSurname());
+    }
+
+    @Test
+    void update_whenCalledWithNoEmailChange_isSuccess() {
+        // GIVEN
+        var superUser = new SuperUser("name", "surname", new Authority("MANAGER"), "name.surname@gmail.com", "test123", SuperUserType.MANAGER);
+        var superUserId = 999;
+        superUser.setId(superUserId);
+        SuperUserService superUserServiceSpy = spy(superUserService);
+        doReturn(superUser).when(superUserServiceSpy).read(superUser.getId());
+        doReturn(Optional.of(superUser)).when(superUserRepository).findByEmail(superUser.getEmail());
+
+        // WHEN
+        superUserServiceSpy.update(superUserId, "pera", "peric", superUser.getEmail());
+
+        // THEN
+        assertEquals("pera", superUser.getName());
+        assertEquals("peric", superUser.getSurname());
+    }
+
+    @Test
+    void update_whenCalledWithDuplicateEmail_throwsException() {
+        // GIVEN
+        var newEmail = "pera@gmail.com";
+        var superUser = new SuperUser("name", "surname", new Authority("MANAGER"), "name.surname@gmail.com", "test123", SuperUserType.MANAGER);
+        var superUserId = 999;
+        superUser.setId(superUserId);
+        var userWithSameEmail = new SuperUser();
+        userWithSameEmail.setId(888);
+        SuperUserService superUserServiceSpy = spy(superUserService);
+        doReturn(superUser).when(superUserServiceSpy).read(superUser.getId());
+        doReturn(Optional.of(userWithSameEmail)).when(superUserRepository).findByEmail(newEmail);
+
+        // WHEN
+        assertThrows(EmailAlreadyExistsException.class, () -> superUserServiceSpy.update(superUserId, "pera", "peric", newEmail));
+
+        // THEN
+        assertNotEquals(newEmail, superUser.getEmail());
+        assertNotEquals("pera", superUser.getName());
+        assertNotEquals("peric", superUser.getSurname());
+    }
 }
