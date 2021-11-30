@@ -1,5 +1,7 @@
 package com.ktsnvt.ktsnvt.unit.service;
 
+import com.ktsnvt.ktsnvt.model.Order;
+import com.ktsnvt.ktsnvt.model.ReportStatistics;
 import com.ktsnvt.ktsnvt.service.*;
 import com.ktsnvt.ktsnvt.service.impl.ReportServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,9 +12,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.stream.Stream;
 
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doReturn;
 
 @SpringBootTest
 class ReportServiceTest {
@@ -50,10 +53,19 @@ class ReportServiceTest {
         var statistics = reportService.readSalaryExpenses(first, third);
 
         // THEN
-        assertEquals(3, statistics.getLabels().size());
-        assertEquals(BigDecimal.valueOf(10L), statistics.getValues().get(0));
-        assertEquals(BigDecimal.valueOf(20L), statistics.getValues().get(1));
-        assertEquals(BigDecimal.valueOf(0L), statistics.getValues().get(2));
+        assertReportTestCase(statistics, BigDecimal.valueOf(10L), BigDecimal.valueOf(20L), BigDecimal.valueOf(0L));
+    }
+
+    @Test
+    void readOrderCosts_whenCalledWithValidDate_isSuccess() {
+        // GIVEN
+        doReturn(buildTestDataForStreamingOrders()).when(orderService).streamChargedOrdersInTimeRange(first, third);
+
+        // WHEN
+        var statistics = reportService.readOrderIncomes(first, third);
+
+        // THEN
+        assertReportTestCase(statistics, BigDecimal.valueOf(330L), BigDecimal.valueOf(400L), BigDecimal.valueOf(500L));
     }
 
     @Test
@@ -88,5 +100,34 @@ class ReportServiceTest {
         assertEquals(startDate, statistics.getLabels().get(0));
         assertEquals(endDate, statistics.getLabels().get(30));
         assertEquals(999, statistics.getValues().get(2));
+    }
+
+    private <T> void assertReportTestCase(ReportStatistics<LocalDate, T> statistics, T one, T two, T three) {
+        assertEquals(3, statistics.getLabels().size());
+        assertEquals(first, statistics.getLabels().get(0));
+        assertEquals(second, statistics.getLabels().get(1));
+        assertEquals(third, statistics.getLabels().get(2));
+        assertEquals(one, statistics.getValues().get(0));
+        assertEquals(two, statistics.getValues().get(1));
+        assertEquals(three, statistics.getValues().get(2));
+    }
+
+    private Stream<Order> buildTestDataForStreamingOrders() {
+        return Stream.of(
+                makeOrder(first, 150L, 70L),
+                makeOrder(second, 200L, 140L),
+                makeOrder(first, 180L, 160L),
+                makeOrder(third, 100L, 20L),
+                makeOrder(third, 400L, 120L),
+                makeOrder(second, 200L, 100L)
+        );
+    }
+
+    private Order makeOrder(LocalDate servedAt, long income, long cost) {
+        var order = new Order();
+        order.setServedAt(servedAt.atStartOfDay());
+        order.setTotalIncome(BigDecimal.valueOf(income));
+        order.setTotalCost(BigDecimal.valueOf(cost));
+        return order;
     }
 }
