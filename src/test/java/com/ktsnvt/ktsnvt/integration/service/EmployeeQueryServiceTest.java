@@ -45,6 +45,21 @@ class EmployeeQueryServiceTest {
         assertThrows(EmployeeNotFoundException.class, () -> employeeQueryService.findByPinForUpdate(pin, employeeType));
     }
 
+    @ParameterizedTest
+    @MethodSource("provideExistingPinsWithEmployeeType")
+    void findByPinUnchecked_whenCalledWithExistingPin_isSuccess(String pin) {
+        var employeeOptional = employeeQueryService.findByPinUnchecked(pin);
+        assertTrue(employeeOptional.isPresent());
+        assertEquals(pin, employeeOptional.get().getPin());
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideNonExistentPins")
+    void findByPinUnchecked_whenCalledWithExistingPin_isEmpty(String pin) {
+        var employeeOptional = employeeQueryService.findByPinUnchecked(pin);
+        assertTrue(employeeOptional.isEmpty());
+    }
+
     @SuppressWarnings("unused")
     private static Stream<Arguments> provideExistingPins() {
         return Stream.of(
