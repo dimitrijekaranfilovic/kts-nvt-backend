@@ -79,7 +79,6 @@ public class OrderServiceImpl extends TransactionalServiceBase implements OrderS
     }
 
     @Override
-    //TODO: test
     public void sendOrderItemGroup(Integer orderId, Integer groupId, String pin) {
         var orderItemGroup = this.getOrderItemGroup(orderId, groupId);
         if (orderItemGroup.getStatus() != OrderItemGroupStatus.NEW) {
@@ -106,7 +105,6 @@ public class OrderServiceImpl extends TransactionalServiceBase implements OrderS
 
 
     @Override
-    //TODO: test
     public void deleteOrderItemGroup(Integer orderId, Integer groupId, String pin) {
         var orderItemGroup = this.getOrderItemGroup(orderId, groupId);
         if (orderItemGroup.getStatus() != OrderItemGroupStatus.NEW) {
