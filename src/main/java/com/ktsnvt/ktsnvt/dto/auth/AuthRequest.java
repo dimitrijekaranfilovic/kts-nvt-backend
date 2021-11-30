@@ -1,9 +1,10 @@
 package com.ktsnvt.ktsnvt.dto.auth;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
-@Data
+@Data @AllArgsConstructor
 public class AuthRequest {
 
     private String email;
