@@ -1,40 +1,305 @@
 package com.ktsnvt.ktsnvt.unit.service;
 
 
+import com.ktsnvt.ktsnvt.exception.IllegalOrderStateException;
 import com.ktsnvt.ktsnvt.exception.InvalidEmployeeTypeException;
+import com.ktsnvt.ktsnvt.exception.OccupiedTableException;
 import com.ktsnvt.ktsnvt.exception.OrderItemGroupInvalidStatusException;
-import com.ktsnvt.ktsnvt.model.Employee;
-import com.ktsnvt.ktsnvt.model.Order;
-import com.ktsnvt.ktsnvt.model.OrderItemGroup;
+import com.ktsnvt.ktsnvt.model.*;
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemGroupStatus;
+import com.ktsnvt.ktsnvt.model.enums.OrderItemStatus;
 import com.ktsnvt.ktsnvt.model.enums.OrderStatus;
 import com.ktsnvt.ktsnvt.repository.OrderItemGroupRepository;
-import com.ktsnvt.ktsnvt.service.EmployeeOrderService;
+import com.ktsnvt.ktsnvt.repository.OrderRepository;
+import com.ktsnvt.ktsnvt.service.*;
 import com.ktsnvt.ktsnvt.service.impl.OrderServiceImpl;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.swing.text.html.Option;
+import static org.mockito.Mockito.*;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Optional;
 
 @SpringBootTest
-public class OrderServiceTest {
-
+class OrderServiceTest {
+    @Mock
+    private OrderRepository orderRepository;
     @Mock
     private OrderItemGroupRepository orderItemGroupRepository;
-
+    @Mock
+    private EmployeeQueryService employeeQueryService;
     @Mock
     private EmployeeOrderService employeeOrderService;
-
+    @Mock
+    private RestaurantTableService restaurantTableService;
+    @Mock
+    private LocalDateTimeService localDateTimeService;
     @InjectMocks
     private OrderServiceImpl orderService;
 
+    private final LocalDate currentDate = LocalDate.of(2021, 11, 30);
+    private final LocalDateTime currentDateTime = LocalDateTime.of(currentDate, LocalTime.of(12, 0));
 
+    @BeforeEach
+    void setupLocalDateTimeService() {
+        doReturn(currentDate).when(localDateTimeService).currentDate();
+        doReturn(currentDateTime).when(localDateTimeService).currentTime();
+    }
+
+    @Test
+    void createOrder_whenCalledWithValidData_isSuccess() {
+        // GIVEN
+        var table = new RestaurantTable(123, 10, 10, 10, new Section("something"));
+        var tableId = 999;
+        table.setId(tableId);
+        var waiterPin = "1234";
+        var waiter = new Employee("name", "surname", new Authority("WAITER"), waiterPin, EmployeeType.WAITER);
+        doReturn(table).when(restaurantTableService).readForUpdate(tableId);
+        doReturn(waiter).when(employeeQueryService).findByPinForUpdate(waiterPin, EmployeeType.WAITER);
+        doAnswer(returnsFirstArg()).when(orderRepository).save(any());
+
+        // WHEN
+        var createdOrder = orderService.createOrder(tableId, waiterPin);
+
+        // THEN
+        assertFalse(table.getAvailable());
+        assertEquals(table, createdOrder.getRestaurantTable());
+        assertEquals(waiter, createdOrder.getWaiter());
+        assertEquals(currentDateTime, createdOrder.getCreatedAt());
+        assertEquals(OrderStatus.CREATED, createdOrder.getStatus());
+        verify(orderRepository, times(1)).save(createdOrder);
+    }
+
+    @Test
+    void createOrder_whenCalledWithTableWhichIsAlreadyOccupied_throwsException() {
+        // GIVEN
+        var table = new RestaurantTable(123, 10, 10, 10, new Section("something"));
+        var tableId = 999;
+        table.setId(tableId);
+        table.setAvailable(false);
+        var waiterPin = "1234";
+        var waiter = new Employee("name", "surname", new Authority("WAITER"), waiterPin, EmployeeType.WAITER);
+        doReturn(table).when(restaurantTableService).readForUpdate(tableId);
+        doReturn(waiter).when(employeeQueryService).findByPinForUpdate(waiterPin, EmployeeType.WAITER);
+        doAnswer(returnsFirstArg()).when(orderRepository).save(any());
+
+        // WHEN
+        assertThrows(OccupiedTableException.class, () -> orderService.createOrder(tableId, waiterPin));
+
+        // THEN
+        assertFalse(table.getAvailable());
+        verify(orderRepository, times(0)).save(any());
+    }
+
+    @Test
+    void cancelOrder_whenCalledWithGivenData_isSuccess() {
+        // GIVEN
+        var order = new Order();
+        var orderId = 999;
+        order.setId(orderId); order.setStatus(OrderStatus.CREATED);
+        var waiterPin = "1234";
+        var waiterId = 999;
+        var waiter = new Employee("name", "surname", new Authority("WAITER"), waiterPin, EmployeeType.WAITER);
+        waiter.setId(waiterId);
+        order.setWaiter(waiter);
+        var og1 = new OrderItemGroup("first", OrderItemGroupStatus.NEW);
+        var og2 = new OrderItemGroup("second", OrderItemGroupStatus.NEW);
+        order.getItemGroups().add(og1); order.getItemGroups().add(og2);
+        OrderService orderServiceSpy = spy(orderService);
+        doNothing().when(employeeOrderService).throwIfWaiterNotResponsible(waiterPin, waiterId);
+        doReturn(order).when(orderServiceSpy).getOrder(orderId);
+
+        // WHEN
+        orderServiceSpy.cancelOrder(orderId, waiterPin);
+
+        // THEN
+        assertEquals(OrderStatus.CANCELLED, order.getStatus());
+        assertFalse(og1.getIsActive());
+        assertFalse(og2.getIsActive());
+        verifyNoInteractions(orderRepository);
+    }
+
+    @Test
+    void cancelOrder_whenCalledWithNoItems_isSuccess() {
+        // GIVEN
+        var order = new Order();
+        var orderId = 999;
+        order.setId(orderId); order.setStatus(OrderStatus.CREATED);
+        var waiterPin = "1234";
+        var waiterId = 999;
+        var waiter = new Employee("name", "surname", new Authority("WAITER"), waiterPin, EmployeeType.WAITER);
+        waiter.setId(waiterId);
+        order.setWaiter(waiter);
+        OrderService orderServiceSpy = spy(orderService);
+        doNothing().when(employeeOrderService).throwIfWaiterNotResponsible(waiterPin, waiterId);
+        doReturn(order).when(orderServiceSpy).getOrder(orderId);
+
+        // WHEN
+        orderServiceSpy.cancelOrder(orderId, waiterPin);
+
+        // THEN
+        assertEquals(OrderStatus.CANCELLED, order.getStatus());
+        verifyNoInteractions(orderRepository);
+    }
+
+    @Test
+    void cancelOrder_whenCalledWithInProgressItems_throwsException() {
+        // GIVEN
+        var order = new Order();
+        var orderId = 999;
+        order.setId(orderId); order.setStatus(OrderStatus.IN_PROGRESS);
+        var waiterPin = "1234";
+        var waiterId = 999;
+        var waiter = new Employee("name", "surname", new Authority("WAITER"), waiterPin, EmployeeType.WAITER);
+        waiter.setId(waiterId);
+        order.setWaiter(waiter);
+        var og1 = new OrderItemGroup("first", OrderItemGroupStatus.SENT);
+        var og2 = new OrderItemGroup("second", OrderItemGroupStatus.DONE);
+        order.getItemGroups().add(og1); order.getItemGroups().add(og2);
+        OrderService orderServiceSpy = spy(orderService);
+        doNothing().when(employeeOrderService).throwIfWaiterNotResponsible(waiterPin, waiterId);
+        doReturn(order).when(orderServiceSpy).getOrder(orderId);
+
+        // WHEN
+        assertThrows(IllegalOrderStateException.class, () -> orderServiceSpy.cancelOrder(orderId, waiterPin));
+
+        // THEN
+        assertEquals(OrderStatus.IN_PROGRESS, order.getStatus());
+        assertEquals(OrderItemGroupStatus.SENT, og1.getStatus());
+        assertEquals(OrderItemGroupStatus.DONE, og2.getStatus());
+        verifyNoInteractions(orderRepository);
+    }
+
+    @Test
+    void cancelOrder_whenCalledNonNewOrCreatedOrder_throwsException() {
+        // GIVEN
+        var order = new Order();
+        var orderId = 999;
+        order.setId(orderId); order.setStatus(OrderStatus.CHARGED);
+        var waiterPin = "1234";
+        var waiterId = 999;
+        var waiter = new Employee("name", "surname", new Authority("WAITER"), waiterPin, EmployeeType.WAITER);
+        waiter.setId(waiterId);
+        order.setWaiter(waiter);
+        OrderService orderServiceSpy = spy(orderService);
+        doNothing().when(employeeOrderService).throwIfWaiterNotResponsible(waiterPin, waiterId);
+        doReturn(order).when(orderServiceSpy).getOrder(orderId);
+
+        // WHEN
+        assertThrows(IllegalOrderStateException.class, () -> orderServiceSpy.cancelOrder(orderId, waiterPin));
+
+        // THEN
+        assertEquals(OrderStatus.CHARGED, order.getStatus());
+        verifyNoInteractions(orderRepository);
+    }
+
+    @Test
+    void chargeOrder_calledWithValidData_isSuccess() {
+        // GIVEN
+        var order = new Order();
+        var orderId = 999;
+        order.setId(orderId); order.setStatus(OrderStatus.IN_PROGRESS);
+        var waiterPin = "1234";
+        var waiterId = 999;
+        var waiter = new Employee("name", "surname", new Authority("WAITER"), waiterPin, EmployeeType.WAITER);
+        waiter.setId(waiterId);
+        order.setWaiter(waiter);
+        var table = new RestaurantTable(123, 10, 10, 10, new Section("something"));
+        var tableId = 999;
+        table.setId(tableId); table.setAvailable(false);
+        order.setRestaurantTable(table);
+        var og1 = new OrderItemGroup("first", OrderItemGroupStatus.DONE);
+        makeOrderItem(og1, 2, 30, 15);
+        makeOrderItem(og1, 1, 40, 12);
+        var og2 = new OrderItemGroup("second", OrderItemGroupStatus.DONE);
+        makeOrderItem(og2, 1, 20, 8);
+        makeOrderItem(og2, 3, 50, 25);
+        order.getItemGroups().add(og1); order.getItemGroups().add(og2);
+        OrderService orderServiceSpy = spy(orderService);
+        doReturn(order).when(orderServiceSpy).getOrder(orderId);
+        doNothing().when(employeeOrderService).throwIfWaiterNotResponsible(waiterPin, waiterId);
+
+        // WHEN
+        orderServiceSpy.chargeOrder(orderId, waiterPin);
+
+        // THEN
+        assertTrue(table.getAvailable());
+        assertEquals(BigDecimal.valueOf(270), order.getTotalIncome());
+        assertEquals(BigDecimal.valueOf(125), order.getTotalCost());
+        assertEquals(OrderStatus.CHARGED, order.getStatus());
+        verifyNoInteractions(orderRepository);
+    }
+
+    @Test
+    void chargeOrder_calledWithNotInProgress_throwsException() {
+        // GIVEN
+        var order = new Order();
+        var orderId = 999;
+        order.setId(orderId); order.setStatus(OrderStatus.CANCELLED);
+        var waiterPin = "1234";
+        var waiterId = 999;
+        var waiter = new Employee("name", "surname", new Authority("WAITER"), waiterPin, EmployeeType.WAITER);
+        waiter.setId(waiterId);
+        order.setWaiter(waiter);
+        var table = new RestaurantTable(123, 10, 10, 10, new Section("something"));
+        var tableId = 999;
+        table.setId(tableId); table.setAvailable(false);
+        order.setRestaurantTable(table);
+        OrderService orderServiceSpy = spy(orderService);
+        doReturn(order).when(orderServiceSpy).getOrder(orderId);
+        doNothing().when(employeeOrderService).throwIfWaiterNotResponsible(waiterPin, waiterId);
+
+        // WHEN
+        assertThrows(IllegalOrderStateException.class, () -> orderServiceSpy.chargeOrder(orderId, waiterPin));
+
+        // THEN
+        assertFalse(table.getAvailable());
+        assertNotEquals(OrderStatus.CHARGED, order.getStatus());
+        verifyNoInteractions(orderRepository);
+    }
+
+    @Test
+    void chargeOrder_calledWithNoDoneItems_throwsException() {
+        // GIVEN
+        var order = new Order();
+        var orderId = 999;
+        order.setId(orderId); order.setStatus(OrderStatus.IN_PROGRESS);
+        var waiterPin = "1234";
+        var waiterId = 999;
+        var waiter = new Employee("name", "surname", new Authority("WAITER"), waiterPin, EmployeeType.WAITER);
+        waiter.setId(waiterId);
+        order.setWaiter(waiter);
+        var table = new RestaurantTable(123, 10, 10, 10, new Section("something"));
+        var tableId = 999;
+        table.setId(tableId); table.setAvailable(false);
+        order.setRestaurantTable(table);
+        var og1 = new OrderItemGroup("first", OrderItemGroupStatus.SENT);
+        var og2 = new OrderItemGroup("second", OrderItemGroupStatus.DONE);
+        order.getItemGroups().add(og1); order.getItemGroups().add(og2);
+        OrderService orderServiceSpy = spy(orderService);
+        doReturn(order).when(orderServiceSpy).getOrder(orderId);
+        doNothing().when(employeeOrderService).throwIfWaiterNotResponsible(waiterPin, waiterId);
+
+        // WHEN
+        assertThrows(IllegalOrderStateException.class, () -> orderServiceSpy.chargeOrder(orderId, waiterPin));
+
+        // THEN
+        assertFalse(table.getAvailable());
+        assertNotEquals(OrderStatus.CHARGED, order.getStatus());
+        verifyNoInteractions(orderRepository);
+    }
 
     @Test
     void sendOrderItemGroup_withValidData_isSuccess(){
@@ -324,9 +589,9 @@ public class OrderServiceTest {
 
     }
 
-
-
-
-
-
+    private void makeOrderItem(OrderItemGroup group, int amount, long price, long cost) {
+        OrderItem item = new OrderItem();
+        item.setAmount(amount); item.setCurrentMenuPrice(BigDecimal.valueOf(price)); item.setCurrentBasePrice(BigDecimal.valueOf(cost));
+        group.addItem(item);
+    }
 }
