@@ -27,8 +27,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -500,6 +499,39 @@ public class OrderItemServiceTest {
         assertThrows(OrderItemInvalidStatusException.class, () -> orderItemService.updateOrderItem(orderItem.getId(), 2, waiter.getPin()));
     }
 
+    @Test
+    void updateOrderItem_whenNotResponsibleEmployeeTriesToUpdate_throwsException(){
+        //data setup
+        var waiter = new Employee();
+        waiter.setPin("1234");
+        waiter.setType(EmployeeType.WAITER);
+
+        var order = new Order();
+        order.setId(1);
+        order.setWaiter(waiter);
+
+        var orderItemGroup = new OrderItemGroup();
+        orderItemGroup.setOrder(order);
+        orderItemGroup.setId(1);
+
+        var orderItem = new OrderItem();
+        orderItem.setId(1);
+        orderItem.setStatus(OrderItemStatus.NEW);
+        orderItem.setAmount(1);
+        orderItem.setOrderItemGroup(orderItemGroup);
+
+        var invalidPin = "1111";
+
+        //mock and spy
+        Mockito.doReturn(Optional.of(orderItem)).when(orderItemRepository).findById(1);
+        Mockito.doThrow(new InvalidEmployeeTypeException(invalidPin)).when(employeeOrderService).throwIfWaiterNotResponsible(invalidPin, waiter.getId());
+
+        //method call and assertion
+        assertThrows(InvalidEmployeeTypeException.class, () -> orderItemService.updateOrderItem(orderItem.getId(), 2,invalidPin));
+
+    }
+
+
 
     @Test
     void updateOrderItem_whenAmountIsNotPositive_throwsException(){
@@ -529,6 +561,131 @@ public class OrderItemServiceTest {
         assertThrows(IllegalAmountException.class, () -> orderItemService.updateOrderItem(orderItem.getId(), -2, waiter.getPin()));
 
     }
+
+
+    @Test
+    void deleteOrderItem_withValidData_isSuccess(){
+        //data setup
+        var waiter = new Employee();
+        waiter.setPin("1234");
+        waiter.setType(EmployeeType.WAITER);
+
+        var order = new Order();
+        order.setId(1);
+        order.setWaiter(waiter);
+
+        var orderItemGroup = new OrderItemGroup();
+        orderItemGroup.setOrder(order);
+        orderItemGroup.setId(1);
+
+        var orderItem = new OrderItem();
+        orderItem.setId(1);
+        orderItem.setStatus(OrderItemStatus.NEW);
+        orderItem.setAmount(1);
+        orderItem.setOrderItemGroup(orderItemGroup);
+
+        //mock and spy
+        Mockito.doReturn(Optional.of(orderItem)).when(orderItemRepository).findById(1);
+
+        //method call and assertion
+        orderItemService.deleteOrderItem(orderItem.getId(), waiter.getPin());
+        assertFalse(orderItem.getIsActive());
+    }
+
+    @Test
+    void deleteOrderItem_whenItemStatusIsNotNew_throwsException(){
+        //data setup
+        var waiter = new Employee();
+        waiter.setPin("1234");
+        waiter.setType(EmployeeType.WAITER);
+
+        var order = new Order();
+        order.setId(1);
+        order.setWaiter(waiter);
+
+        var orderItemGroup = new OrderItemGroup();
+        orderItemGroup.setOrder(order);
+        orderItemGroup.setId(1);
+
+        var orderItem = new OrderItem();
+        orderItem.setId(1);
+        orderItem.setStatus(OrderItemStatus.SENT);
+        orderItem.setAmount(1);
+        orderItem.setOrderItemGroup(orderItemGroup);
+
+        //mock and spy
+        Mockito.doReturn(Optional.of(orderItem)).when(orderItemRepository).findById(1);
+
+        //method call and assertion
+        assertThrows(OrderItemInvalidStatusException.class, () -> orderItemService.deleteOrderItem(orderItem.getId(), waiter.getPin()));
+
+    }
+
+
+    @Test
+    void deleteOrderItem_whenItemDoesNotExist_throwsException(){
+        //data setup
+        var waiter = new Employee();
+        waiter.setPin("1234");
+        waiter.setType(EmployeeType.WAITER);
+
+        var order = new Order();
+        order.setId(1);
+        order.setWaiter(waiter);
+
+        var orderItemGroup = new OrderItemGroup();
+        orderItemGroup.setOrder(order);
+        orderItemGroup.setId(1);
+
+        var orderItem = new OrderItem();
+        orderItem.setId(1);
+        orderItem.setStatus(OrderItemStatus.SENT);
+        orderItem.setAmount(1);
+        orderItem.setOrderItemGroup(orderItemGroup);
+
+        //mock and spy
+        Mockito.doReturn(Optional.empty()).when(orderItemRepository).findById(1);
+
+        //method call and assertion
+        assertThrows(NotFoundException.class, () -> orderItemService.deleteOrderItem(orderItem.getId(), waiter.getPin()));
+
+    }
+
+
+    @Test
+    void deleteOrderItem_whenNotResponsibleEmployeeTriesToDelete_throwsException(){
+        //data setup
+        var waiter = new Employee();
+        waiter.setPin("1234");
+        waiter.setType(EmployeeType.WAITER);
+
+        var order = new Order();
+        order.setId(1);
+        order.setWaiter(waiter);
+
+        var orderItemGroup = new OrderItemGroup();
+        orderItemGroup.setOrder(order);
+        orderItemGroup.setId(1);
+
+        var orderItem = new OrderItem();
+        orderItem.setId(1);
+        orderItem.setStatus(OrderItemStatus.NEW);
+        orderItem.setAmount(1);
+        orderItem.setOrderItemGroup(orderItemGroup);
+
+        var invalidPin = "1111";
+
+        //mock and spy
+        Mockito.doReturn(Optional.of(orderItem)).when(orderItemRepository).findById(1);
+        Mockito.doThrow(new InvalidEmployeeTypeException(invalidPin)).when(employeeOrderService).throwIfWaiterNotResponsible(invalidPin, waiter.getId());
+
+        //method call and assertion
+        assertThrows(InvalidEmployeeTypeException.class, () -> orderItemService.deleteOrderItem(orderItem.getId(), invalidPin));
+
+    }
+
+
+
 
 
 
