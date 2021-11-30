@@ -2,39 +2,106 @@ package com.ktsnvt.ktsnvt.unit.service;
 
 
 import com.ktsnvt.ktsnvt.exception.InvalidEmployeeTypeException;
+import com.ktsnvt.ktsnvt.exception.OccupiedTableException;
 import com.ktsnvt.ktsnvt.exception.OrderItemGroupInvalidStatusException;
-import com.ktsnvt.ktsnvt.model.Employee;
-import com.ktsnvt.ktsnvt.model.Order;
-import com.ktsnvt.ktsnvt.model.OrderItemGroup;
+import com.ktsnvt.ktsnvt.model.*;
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemGroupStatus;
 import com.ktsnvt.ktsnvt.model.enums.OrderStatus;
 import com.ktsnvt.ktsnvt.repository.OrderItemGroupRepository;
+import com.ktsnvt.ktsnvt.repository.OrderRepository;
 import com.ktsnvt.ktsnvt.service.EmployeeOrderService;
+import com.ktsnvt.ktsnvt.service.EmployeeQueryService;
+import com.ktsnvt.ktsnvt.service.LocalDateTimeService;
+import com.ktsnvt.ktsnvt.service.RestaurantTableService;
 import com.ktsnvt.ktsnvt.service.impl.OrderServiceImpl;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.swing.text.html.Option;
+import static org.mockito.Mockito.*;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Optional;
 
 @SpringBootTest
-public class OrderServiceTest {
-
+class OrderServiceTest {
+    @Mock
+    private OrderRepository orderRepository;
     @Mock
     private OrderItemGroupRepository orderItemGroupRepository;
-
+    @Mock
+    private EmployeeQueryService employeeQueryService;
     @Mock
     private EmployeeOrderService employeeOrderService;
-
+    @Mock
+    private RestaurantTableService restaurantTableService;
+    @Mock
+    private LocalDateTimeService localDateTimeService;
     @InjectMocks
     private OrderServiceImpl orderService;
 
+    private final LocalDate currentDate = LocalDate.of(2021, 11, 30);
+    private final LocalDateTime currentDateTime = LocalDateTime.of(currentDate, LocalTime.of(12, 0));
 
+    @BeforeEach
+    void setupLocalDateTimeService() {
+        doReturn(currentDate).when(localDateTimeService).currentDate();
+        doReturn(currentDateTime).when(localDateTimeService).currentTime();
+    }
+
+    @Test
+    void createOrder_whenCalledWithValidData_isSuccess() {
+        // GIVEN
+        var table = new RestaurantTable(123, 10, 10, 10, new Section("something"));
+        var tableId = 999;
+        table.setId(tableId);
+        var waiterPin = "1234";
+        var waiter = new Employee("name", "surname", new Authority("WAITER"), waiterPin, EmployeeType.WAITER);
+        doReturn(table).when(restaurantTableService).readForUpdate(tableId);
+        doReturn(waiter).when(employeeQueryService).findByPinForUpdate(waiterPin, EmployeeType.WAITER);
+        doAnswer(returnsFirstArg()).when(orderRepository).save(any());
+
+        // WHEN
+        var createdOrder = orderService.createOrder(tableId, waiterPin);
+
+        // THEN
+        assertFalse(table.getAvailable());
+        assertEquals(table, createdOrder.getRestaurantTable());
+        assertEquals(waiter, createdOrder.getWaiter());
+        assertEquals(currentDateTime, createdOrder.getCreatedAt());
+        assertEquals(OrderStatus.CREATED, createdOrder.getStatus());
+        verify(orderRepository, times(1)).save(createdOrder);
+    }
+
+    @Test
+    void createOrder_whenCalledWithTableWhichIsAlreadyOccupied_throwsException() {
+        // GIVEN
+        var table = new RestaurantTable(123, 10, 10, 10, new Section("something"));
+        var tableId = 999;
+        table.setId(tableId);
+        table.setAvailable(false);
+        var waiterPin = "1234";
+        var waiter = new Employee("name", "surname", new Authority("WAITER"), waiterPin, EmployeeType.WAITER);
+        doReturn(table).when(restaurantTableService).readForUpdate(tableId);
+        doReturn(waiter).when(employeeQueryService).findByPinForUpdate(waiterPin, EmployeeType.WAITER);
+        doAnswer(returnsFirstArg()).when(orderRepository).save(any());
+
+        // WHEN
+        assertThrows(OccupiedTableException.class, () -> orderService.createOrder(tableId, waiterPin));
+
+        // THEN
+        assertFalse(table.getAvailable());
+        verify(orderRepository, times(0)).save(any());
+    }
 
     @Test
     void sendOrderItemGroup_withValidData_isSuccess(){
