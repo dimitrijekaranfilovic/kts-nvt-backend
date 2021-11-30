@@ -210,13 +210,13 @@ public class DbInitializer implements ApplicationRunner {
 
         // orderItem1.setPreparedBy(employee2);
         orderGroup1.addItem(orderItem1);
-        orderItem1.setSentAt(LocalDateTime.now());
+        orderItem1.setSentAt(LocalDateTime.of(2021, 01, 15, 12, 12));
         orderGroup1.addItem(orderItem2);
-        orderItem2.setSentAt(LocalDateTime.now());
+        orderItem2.setSentAt(LocalDateTime.of(2021, 01, 15, 12, 12));
         orderGroup1.addItem(orderItem3);
-        orderItem3.setSentAt(LocalDateTime.now());
+        orderItem3.setSentAt(LocalDateTime.of(2021, 01, 15, 12, 12));
         orderGroup1.addItem(orderItem4);
-        orderItem4.setSentAt(LocalDateTime.now());
+        orderItem4.setSentAt(LocalDateTime.of(2021, 01, 15, 12, 12));
 
         orderGroup1.addItem(orderItem10);
         orderItem10.setSentAt(LocalDateTime.now());
