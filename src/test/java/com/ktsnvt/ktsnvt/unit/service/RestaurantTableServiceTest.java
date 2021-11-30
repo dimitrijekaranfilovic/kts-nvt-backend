@@ -47,69 +47,82 @@ public class RestaurantTableServiceTest {
 
     @Test
     public void delete_whenCalledWithValidId_isSuccess() {
+        // GIVEN
         RestaurantTableService restaurantTableServiceSpy = spy(restaurantTableService);
-
         RestaurantTable table = new RestaurantTable();
         table.setAvailable(true);
 
+        // WHEN
         doReturn(table).when(restaurantTableServiceSpy).readForUpdate(anyInt());
 
         restaurantTableServiceSpy.deleteRestaurantTable(1);
 
+        // THEN
         assertEquals(false, table.getIsActive());
     }
 
     @Test
     public void delete_whenTableIsUnavailable_ThrowsOccupiedTableException() {
+        // GIVEN
         RestaurantTableService restaurantTableServiceSpy = spy(restaurantTableService);
-
         RestaurantTable table = new RestaurantTable();
         table.setAvailable(false);
 
+        // WHEN
         doReturn(table).when(restaurantTableServiceSpy).readForUpdate(anyInt());
 
+        // THEN
         assertThrows(OccupiedTableException.class, () -> restaurantTableServiceSpy.deleteRestaurantTable(1));
     }
 
     @Test
     public void create_whenCalledWithValidData_IsSuccess() {
+        // GIVEN
         Section section = new Section();
         section.setId(1);
         RestaurantTable newTable = new RestaurantTable(2, 1, 1, 0, section);
         newTable.setId(2);
 
+        // WHEN
         doReturn(section).when(sectionService).readForUpdate(section.getId());
         doReturn(newTable).when(restaurantTableRepository).findByNumberInSection(section.getId(), newTable.getNumber());
 
         RestaurantTable ret = restaurantTableService.createRestaurantTable(newTable, section.getId());
 
+        // THEN
         assertEquals(newTable.getNumber(), ret.getNumber());
         verify(restaurantTableRepository, times(1)).save(newTable);
     }
 
     @Test
     public void create_whenIntersectsWithOtherTable_throwsTableIntersectionException() {
+        // GIVEN
         Section section = new Section();
         section.setId(1);
         RestaurantTable newTable = new RestaurantTable(2, 1, 1, 1, section);
         newTable.setId(2);
 
+        // WHEN
         doReturn(section).when(sectionService).readForUpdate(section.getId());
         doReturn(newTable).when(restaurantTableRepository).findByNumberInSection(section.getId(), newTable.getNumber());
 
+        // THEN
         assertThrows(TableIntersectionException.class, () ->restaurantTableService.createRestaurantTable(newTable, section.getId()));
     }
 
     @Test
     public void create_whenHasNumberAsOtherTable_throwsDuplicateTableNumberException() {
+        // GIVEN
         Section section = new Section();
         section.setId(1);
         RestaurantTable newTable = new RestaurantTable(1, 1, 1, 0, section);
         newTable.setId(2);
 
+        // WHEN
         doReturn(section).when(sectionService).readForUpdate(section.getId());
         doReturn(newTable).when(restaurantTableRepository).findByNumberInSection(section.getId(), newTable.getNumber());
 
+        // THEN
         assertThrows(DuplicateTableNumberException.class, () ->restaurantTableService.createRestaurantTable(newTable, section.getId()));
     }
 }

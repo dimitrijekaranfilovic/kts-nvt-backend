@@ -9,7 +9,6 @@ import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
 import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
 import com.ktsnvt.ktsnvt.service.EmployeeQueryService;
 import com.ktsnvt.ktsnvt.service.impl.EmployeeOrderServiceImpl;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -66,6 +65,7 @@ public class EmployeeOrderServiceTest {
     @ParameterizedTest
     @MethodSource("provideParamsForThrowIfNotResponsible")
     public void throwIfWaiterNotResponsible_waiterNotResponsible_throwsInvalidEmployeeTypeException(String pin, Integer waiterId) {
+        // GIVEN
         Employee employee1 = new Employee();
         employee1.setType(EmployeeType.CHEF);
         employee1.setPin("0000");
@@ -75,9 +75,11 @@ public class EmployeeOrderServiceTest {
         employee2.setPin("1111");
         employee2.setId(1);
 
+        // WHEN
         doReturn(employee1).when(employeeQueryService).findByPin(employee1.getPin());
         doReturn(employee2).when(employeeQueryService).findByPin(employee2.getPin());
 
+        // THEN
         assertThrows(InvalidEmployeeTypeException.class, () -> employeeOrderService.throwIfWaiterNotResponsible(pin, waiterId));
     }
 

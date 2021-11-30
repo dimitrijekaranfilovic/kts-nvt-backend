@@ -13,17 +13,18 @@ import com.ktsnvt.ktsnvt.service.EmployeeOrderService;
 import com.ktsnvt.ktsnvt.service.EmployeeQueryService;
 import com.ktsnvt.ktsnvt.service.LocalDateTimeService;
 import com.ktsnvt.ktsnvt.service.impl.OrderItemServiceImpl;
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.*;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 public class OrderItemServiceTest {
@@ -51,6 +52,7 @@ public class OrderItemServiceTest {
 
     @Test
     public void takeItemRequest_calledWithValidParams_isSuccess() {
+        // GIVEN
         Employee employee = new Employee();
         employee.setId(1);
         OrderItem orderItem = new OrderItem();
@@ -58,6 +60,7 @@ public class OrderItemServiceTest {
 
         LocalDateTime takenAt = LocalDateTime.of(2021, 1, 1, 1, 1);
 
+        // WHEN
         doReturn(employee).when(employeeQueryService).findByPin(anyString());
         doReturn(Optional.of(orderItem)).when(orderItemRepository).findOneByIdWithItemReference(orderItem.getId());
         doNothing().when(employeeOrderService).throwIfNotValidEmployeeType(employee, orderItem);
@@ -65,6 +68,7 @@ public class OrderItemServiceTest {
 
         orderItemService.takeItemRequest(orderItem.getId(), "");
 
+        //THEN
         assertEquals(employee, orderItem.getPreparedBy());
         assertEquals(OrderItemStatus.PREPARING, orderItem.getStatus());
         assertEquals(takenAt, orderItem.getTakenAt());
@@ -73,6 +77,7 @@ public class OrderItemServiceTest {
 
     @Test
     public void finishItemRequest_calledOnSentItem_IsSuccess() {
+        //GIVEN
         LocalDateTime takenAt = LocalDateTime.of(2021, 1, 1, 1, 1);
         Employee employee = new Employee();
         employee.setId(1);
@@ -82,6 +87,7 @@ public class OrderItemServiceTest {
         OrderItemGroup group = new OrderItemGroup();
         group.addItem(orderItem);
 
+        // WHEN
         doReturn(employee).when(employeeQueryService).findByPin(employee.getPin());
         doReturn(Optional.of(orderItem)).when(orderItemRepository).findOneInProgressByIdWithItemReference(orderItem.getId());
         doNothing().when(employeeOrderService).throwIfNotValidEmployeeType(employee, orderItem);
@@ -90,6 +96,7 @@ public class OrderItemServiceTest {
 
         orderItemService.finishItemRequest(orderItem.getId(), employee.getPin());
 
+        // THEN
         assertEquals(OrderItemStatus.DONE, orderItem.getStatus());
         assertEquals(takenAt, orderItem.getTakenAt());
         assertEquals(takenAt, orderItem.getPreparedAt());
@@ -101,6 +108,7 @@ public class OrderItemServiceTest {
 
     @Test
     public void finishItemRequest_calledOnTakenItem_IsSuccess() {
+        // GIVEN
         LocalDateTime takenAt = LocalDateTime.of(2021, 1, 1, 1, 1);
         Employee employee = new Employee();
         employee.setId(1);
@@ -111,6 +119,7 @@ public class OrderItemServiceTest {
         OrderItemGroup group = new OrderItemGroup();
         group.addItem(orderItem);
 
+        // WHEN
         doReturn(employee).when(employeeQueryService).findByPin(employee.getPin());
         doReturn(Optional.of(orderItem)).when(orderItemRepository).findOneInProgressByIdWithItemReference(orderItem.getId());
         doNothing().when(employeeOrderService).throwIfNotValidEmployeeType(employee, orderItem);
@@ -119,6 +128,7 @@ public class OrderItemServiceTest {
 
         orderItemService.finishItemRequest(orderItem.getId(), employee.getPin());
 
+        // THEN
         assertEquals(OrderItemStatus.DONE, orderItem.getStatus());
         assertEquals(takenAt, orderItem.getPreparedAt());
         assertEquals(employee, orderItem.getPreparedBy());
@@ -129,6 +139,7 @@ public class OrderItemServiceTest {
 
     @Test
     public void finishItemRequest_calledAsNotLastInGroup_DoesNotUpdateGroup() {
+        // GIVEN
         LocalDateTime takenAt = LocalDateTime.of(2021, 1, 1, 1, 1);
         Employee employee = new Employee();
         employee.setId(1);
@@ -140,6 +151,7 @@ public class OrderItemServiceTest {
         group.setStatus(OrderItemGroupStatus.SENT);
         group.addItem(orderItem);
 
+        // WHEN
         doReturn(employee).when(employeeQueryService).findByPin(employee.getPin());
         doReturn(Optional.of(orderItem)).when(orderItemRepository).findOneInProgressByIdWithItemReference(orderItem.getId());
         doNothing().when(employeeOrderService).throwIfNotValidEmployeeType(employee, orderItem);
@@ -148,12 +160,14 @@ public class OrderItemServiceTest {
 
         orderItemService.finishItemRequest(orderItem.getId(), employee.getPin());
 
+        // THEN
         assertEquals(OrderItemGroupStatus.SENT, group.getStatus());
         verify(orderItemGroupRepository, times(0)).save(group);
     }
 
     @Test
     public void finishItemRequest_takenByOtherEmployee_throwsInvalidEmployeeTypeException() {
+        // GIVEN
         Employee employee1 = new Employee();
         employee1.setId(1);
         employee1.setPin("0000");
@@ -163,9 +177,11 @@ public class OrderItemServiceTest {
         orderItem.setId(1);
         orderItem.setPreparedBy(employee2);
 
+        // WHEN
         doReturn(employee1).when(employeeQueryService).findByPin(employee1.getPin());
         doReturn(Optional.of(orderItem)).when(orderItemRepository).findOneInProgressByIdWithItemReference(orderItem.getId());
 
+        // THEN
         assertThrows(InvalidEmployeeTypeException.class, () -> orderItemService.finishItemRequest(orderItem.getId(), employee1.getPin()));
 
     }
