@@ -132,4 +132,98 @@ public class OrderServiceTest {
 
     }
 
+
+
+    @Test
+    void deleteOrderItemGroup_withValidData_isSuccess(){
+        //data setup
+        var waiter = new Employee();
+        waiter.setType(EmployeeType.WAITER);
+        waiter.setId(1);
+        waiter.setPin("1234");
+
+        var order = new Order();
+        order.setId(1);
+        order.setWaiter(waiter);
+        order.setStatus(OrderStatus.IN_PROGRESS);
+
+        var orderItemGroup = new OrderItemGroup();
+        orderItemGroup.setId(1);
+        orderItemGroup.setName("group 1");
+        orderItemGroup.setOrder(order);
+        orderItemGroup.setStatus(OrderItemGroupStatus.NEW);
+
+
+        //set up mock and spy objects behaviour
+        var orderServiceSpy = Mockito.spy(orderService);
+        Mockito.doReturn(orderItemGroup).when(orderServiceSpy).getOrderItemGroup(1, 1);
+
+        orderServiceSpy.deleteOrderItemGroup(order.getId(), orderItemGroup.getId(), waiter.getPin());
+
+        Assertions.assertFalse(orderItemGroup.getIsActive());
+
+        Mockito.verify(employeeOrderService, Mockito.times(1)).throwIfWaiterNotResponsible(waiter.getPin(), orderItemGroup.getOrder().getWaiter().getId());
+        Mockito.verify(orderItemGroupRepository, Mockito.times(1)).save(orderItemGroup);
+    }
+
+
+    @Test
+    void deleteOrderItemGroup_whenGroupStatusIsNotNew_throwsException(){
+        //data setup
+        var waiter = new Employee();
+        waiter.setType(EmployeeType.WAITER);
+        waiter.setId(1);
+        waiter.setPin("1234");
+
+        var order = new Order();
+        order.setId(1);
+        order.setWaiter(waiter);
+        order.setStatus(OrderStatus.IN_PROGRESS);
+
+        var orderItemGroup = new OrderItemGroup();
+        orderItemGroup.setId(1);
+        orderItemGroup.setName("group 1");
+        orderItemGroup.setOrder(order);
+        orderItemGroup.setStatus(OrderItemGroupStatus.SENT);
+
+
+        //set up mock and spy objects behaviour
+        var orderServiceSpy = Mockito.spy(orderService);
+        Mockito.doReturn(orderItemGroup).when(orderServiceSpy).getOrderItemGroup(1, 1);
+
+        Assertions.assertThrows(OrderItemGroupInvalidStatusException.class, ()->orderServiceSpy.deleteOrderItemGroup(order.getId(), orderItemGroup.getId(), waiter.getPin()));
+    }
+
+
+    @Test
+    void deleteOrderItemGroup_whenNotResponsibleEmployeeTriesToDelete_throwsException(){
+        //data setup
+        var waiter = new Employee();
+        waiter.setType(EmployeeType.WAITER);
+        waiter.setId(1);
+        waiter.setPin("1234");
+
+        var order = new Order();
+        order.setId(1);
+        order.setWaiter(waiter);
+        order.setStatus(OrderStatus.IN_PROGRESS);
+
+        var orderItemGroup = new OrderItemGroup();
+        orderItemGroup.setId(1);
+        orderItemGroup.setName("group 1");
+        orderItemGroup.setOrder(order);
+        orderItemGroup.setStatus(OrderItemGroupStatus.NEW);
+
+        var invalidEmployeePin = "1111";
+
+        //set up mock and spy objects behaviour
+        var orderServiceSpy = Mockito.spy(orderService);
+        Mockito.doReturn(orderItemGroup).when(orderServiceSpy).getOrderItemGroup(1, 1);
+        Mockito.doThrow(new InvalidEmployeeTypeException(invalidEmployeePin)).when(employeeOrderService).throwIfWaiterNotResponsible(invalidEmployeePin, waiter.getId());
+
+        Assertions.assertThrows(InvalidEmployeeTypeException.class, ()->orderServiceSpy.deleteOrderItemGroup(order.getId(), orderItemGroup.getId(), invalidEmployeePin));
+
+
+    }
+
 }
