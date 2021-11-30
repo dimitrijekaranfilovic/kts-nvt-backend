@@ -57,7 +57,7 @@ class ReportServiceTest {
     }
 
     @Test
-    void readOrderCosts_whenCalledWithValidDate_isSuccess() {
+    void readOrderIncomes_whenCalledWithValidDate_isSuccess() {
         // GIVEN
         doReturn(buildTestDataForStreamingOrders()).when(orderService).streamChargedOrdersInTimeRange(first, third);
 
@@ -66,6 +66,18 @@ class ReportServiceTest {
 
         // THEN
         assertReportTestCase(statistics, BigDecimal.valueOf(330L), BigDecimal.valueOf(400L), BigDecimal.valueOf(500L));
+    }
+
+    @Test
+    void readOrderCosts_whenCalledWithValidDate_isSuccess() {
+        // GIVEN
+        doReturn(buildTestDataForStreamingOrders()).when(orderService).streamChargedOrdersInTimeRange(first, third);
+
+        // WHEN
+        var statistics = reportService.readOrderCosts(first, third);
+
+        // THEN
+        assertReportTestCase(statistics, BigDecimal.valueOf(230L), BigDecimal.valueOf(240L), BigDecimal.valueOf(140L));
     }
 
     @Test
