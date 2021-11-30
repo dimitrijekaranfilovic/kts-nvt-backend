@@ -33,7 +33,7 @@ public class ReportServiceImpl extends TransactionalServiceBase implements Repor
         this.localDateTimeService = localDateTimeService;
     }
 
-    protected interface StatisticsCollector<T> {
+    public interface StatisticsCollector<T> {
         T collect(LocalDate date);
     }
 
