@@ -19,6 +19,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import javax.swing.text.html.Option;
+import java.util.Optional;
+
 @SpringBootTest
 public class OrderServiceTest {
 
@@ -225,5 +228,105 @@ public class OrderServiceTest {
 
 
     }
+
+
+    @Test
+    void createGroupForOrder_withValidData_isSuccess(){
+        //data setup
+        var waiter = new Employee();
+        waiter.setType(EmployeeType.WAITER);
+        waiter.setId(1);
+        waiter.setPin("1234");
+
+        var order = new Order();
+        order.setId(1);
+        order.setWaiter(waiter);
+        order.setStatus(OrderStatus.IN_PROGRESS);
+
+        var orderItemGroup = new OrderItemGroup();
+        orderItemGroup.setId(1);
+        orderItemGroup.setName("group 1");
+        orderItemGroup.setStatus(OrderItemGroupStatus.NEW);
+
+
+        //set up mock and spy objects behaviour
+        var orderServiceSpy = Mockito.spy(orderService);
+        Mockito.doReturn(order).when(orderServiceSpy).getOrder(1);
+        Mockito.doReturn(Optional.empty()).when(orderServiceSpy).getOrderItemGroup(1, "group 1");
+
+        orderServiceSpy.createGroupForOrder(order.getId(), "group 1", waiter.getPin());
+
+        Assertions.assertEquals("group 1", orderItemGroup.getName());
+
+        Mockito.verify(orderServiceSpy, Mockito.times(1)).getOrder(1);
+        Mockito.verify(orderServiceSpy, Mockito.times(1)).getOrderItemGroup(1, "group 1");
+
+    }
+
+
+    @Test
+    void createGroupForOrder_whenGroupNameExists_throwsException(){
+        //data setup
+        var waiter = new Employee();
+        waiter.setType(EmployeeType.WAITER);
+        waiter.setId(1);
+        waiter.setPin("1234");
+
+        var order = new Order();
+        order.setId(1);
+        order.setWaiter(waiter);
+        order.setStatus(OrderStatus.IN_PROGRESS);
+
+        var orderItemGroup = new OrderItemGroup();
+        orderItemGroup.setId(1);
+        orderItemGroup.setName("group 1");
+        orderItemGroup.setStatus(OrderItemGroupStatus.NEW);
+
+        //set up mock and spy objects behaviour
+        var orderServiceSpy = Mockito.spy(orderService);
+        Mockito.doReturn(order).when(orderServiceSpy).getOrder(1);
+        Mockito.doReturn(Optional.of(orderItemGroup)).when(orderServiceSpy).getOrderItemGroup(1, "group 1");
+
+        Assertions.assertThrows(OrderItemGroupInvalidStatusException.class, ()->orderServiceSpy.createGroupForOrder(order.getId(), "group 1", waiter.getPin()));
+
+    }
+
+
+    @Test
+    void createGroupForOrder_whenNotResponsibleEmployeeTriesToCreate_throwsException(){
+        //data setup
+        var waiter = new Employee();
+        waiter.setType(EmployeeType.WAITER);
+        waiter.setId(1);
+        waiter.setPin("1234");
+
+        var order = new Order();
+        order.setId(1);
+        order.setWaiter(waiter);
+        order.setStatus(OrderStatus.IN_PROGRESS);
+
+        var orderItemGroup = new OrderItemGroup();
+        orderItemGroup.setId(1);
+        orderItemGroup.setName("group 1");
+        orderItemGroup.setStatus(OrderItemGroupStatus.NEW);
+
+        var invalidPin = "1111";
+
+
+        //set up mock and spy objects behaviour
+        var orderServiceSpy = Mockito.spy(orderService);
+        Mockito.doReturn(order).when(orderServiceSpy).getOrder(1);
+        Mockito.doReturn(Optional.empty()).when(orderServiceSpy).getOrderItemGroup(1, "group 1");
+        Mockito.doThrow(new InvalidEmployeeTypeException(invalidPin)).when(employeeOrderService).throwIfWaiterNotResponsible(invalidPin, waiter.getId());
+
+        Assertions.assertThrows(InvalidEmployeeTypeException.class, ()->orderServiceSpy.createGroupForOrder(order.getId(), "group 1", invalidPin));
+
+
+    }
+
+
+
+
+
 
 }

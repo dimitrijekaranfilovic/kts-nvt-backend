@@ -104,7 +104,6 @@ public class OrderServiceImpl extends TransactionalServiceBase implements OrderS
     }
 
 
-    //TODO: test
     @Override
     public void deleteOrderItemGroup(Integer orderId, Integer groupId, String pin) {
         var orderItemGroup = this.getOrderItemGroup(orderId, groupId);
@@ -162,7 +161,6 @@ public class OrderServiceImpl extends TransactionalServiceBase implements OrderS
         order.setStatus(OrderStatus.CANCELLED);
     }
 
-    //TODO: test
     @Override
     public OrderItemGroup createGroupForOrder(Integer orderId, String groupName, String pin) {
         var order = this.getOrder(orderId);
