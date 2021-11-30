@@ -208,6 +208,7 @@ public class DbInitializer implements ApplicationRunner {
         var orderItem10 = new OrderItem(1, orderGroup1, employee1, menuItem1, OrderItemStatus.PREPARING);
         var orderItem11 = new OrderItem(1, orderGroup1, employee2, menuItem3, OrderItemStatus.PREPARING);
 
+        var orderItem12 = new OrderItem(1, orderGroup2, null, menuItem1, OrderItemStatus.NEW);
 
         // orderItem1.setPreparedBy(employee2);
         orderGroup1.addItem(orderItem1);
@@ -225,6 +226,8 @@ public class DbInitializer implements ApplicationRunner {
         orderGroup1.addItem(orderItem11);
         orderItem11.setSentAt(LocalDateTime.now());
         orderItem11.setTakenAt(LocalDateTime.now());
+
+        orderGroup2.addItem(orderItem12);
 
         orderGroup3.addItem(orderItem5);
         orderGroup3.addItem(orderItem6);
@@ -251,6 +254,7 @@ public class DbInitializer implements ApplicationRunner {
         orderItemRepo.save(orderItem9);
         orderItemRepo.save(orderItem10);
         orderItemRepo.save(orderItem11);
+        orderItemRepo.save(orderItem12);
 
         System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     }
