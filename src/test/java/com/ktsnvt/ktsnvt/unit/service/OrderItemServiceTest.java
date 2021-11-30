@@ -3,6 +3,7 @@ package com.ktsnvt.ktsnvt.unit.service;
 import com.ktsnvt.ktsnvt.exception.IllegalAmountException;
 import com.ktsnvt.ktsnvt.exception.InvalidEmployeeTypeException;
 import com.ktsnvt.ktsnvt.exception.NotFoundException;
+import com.ktsnvt.ktsnvt.exception.OrderItemInvalidStatusException;
 import com.ktsnvt.ktsnvt.model.*;
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemGroupStatus;
@@ -406,6 +407,129 @@ public class OrderItemServiceTest {
 
         Assertions.assertThrows(InvalidEmployeeTypeException.class, () -> orderItemService.addOrderItem(order.getId(), menuItem.getId(), 1, invalidPin));
     }
+
+
+    @Test
+    void updateOrderItem_withValidData_isSuccess(){
+        //data setup
+        var waiter = new Employee();
+        waiter.setPin("1234");
+        waiter.setType(EmployeeType.WAITER);
+
+        var order = new Order();
+        order.setId(1);
+        order.setWaiter(waiter);
+
+        var orderItemGroup = new OrderItemGroup();
+        orderItemGroup.setOrder(order);
+        orderItemGroup.setId(1);
+
+
+
+        var orderItem = new OrderItem();
+        orderItem.setId(1);
+        orderItem.setStatus(OrderItemStatus.NEW);
+        orderItem.setAmount(1);
+        orderItem.setOrderItemGroup(orderItemGroup);
+
+        //mock and spy
+        Mockito.doReturn(Optional.of(orderItem)).when(orderItemRepository).findById(1);
+
+        //method call and assertion
+        orderItemService.updateOrderItem(orderItem.getId(), 2, waiter.getPin());
+        assertEquals(2, orderItem.getAmount());
+
+    }
+
+
+    @Test
+    void updateOrderItem_whenOrderItemDoesNotExist_throwsException(){
+        //data setup
+        var waiter = new Employee();
+        waiter.setPin("1234");
+        waiter.setType(EmployeeType.WAITER);
+
+        var order = new Order();
+        order.setId(1);
+        order.setWaiter(waiter);
+
+        var orderItemGroup = new OrderItemGroup();
+        orderItemGroup.setOrder(order);
+        orderItemGroup.setId(1);
+
+
+
+        var orderItem = new OrderItem();
+        orderItem.setId(1);
+        orderItem.setStatus(OrderItemStatus.NEW);
+        orderItem.setAmount(1);
+        orderItem.setOrderItemGroup(orderItemGroup);
+
+        //mock and spy
+        Mockito.doReturn(Optional.empty()).when(orderItemRepository).findById(1);
+
+        //method call and assertion
+        assertThrows(NotFoundException.class, () -> orderItemService.updateOrderItem(orderItem.getId(), 2, waiter.getPin()));
+    }
+
+    @Test
+    void updateOrderItem_whenItemStatusIsNotNew_throwsException(){
+        //data setup
+        var waiter = new Employee();
+        waiter.setPin("1234");
+        waiter.setType(EmployeeType.WAITER);
+
+        var order = new Order();
+        order.setId(1);
+        order.setWaiter(waiter);
+
+        var orderItemGroup = new OrderItemGroup();
+        orderItemGroup.setOrder(order);
+        orderItemGroup.setId(1);
+
+        var orderItem = new OrderItem();
+        orderItem.setId(1);
+        orderItem.setStatus(OrderItemStatus.SENT);
+        orderItem.setAmount(1);
+        orderItem.setOrderItemGroup(orderItemGroup);
+
+        //mock and spy
+        Mockito.doReturn(Optional.of(orderItem)).when(orderItemRepository).findById(1);
+
+        //method call and assertion
+        assertThrows(OrderItemInvalidStatusException.class, () -> orderItemService.updateOrderItem(orderItem.getId(), 2, waiter.getPin()));
+    }
+
+
+    @Test
+    void updateOrderItem_whenAmountIsNotPositive_throwsException(){
+        //data setup
+        var waiter = new Employee();
+        waiter.setPin("1234");
+        waiter.setType(EmployeeType.WAITER);
+
+        var order = new Order();
+        order.setId(1);
+        order.setWaiter(waiter);
+
+        var orderItemGroup = new OrderItemGroup();
+        orderItemGroup.setOrder(order);
+        orderItemGroup.setId(1);
+
+        var orderItem = new OrderItem();
+        orderItem.setId(1);
+        orderItem.setStatus(OrderItemStatus.NEW);
+        orderItem.setAmount(1);
+        orderItem.setOrderItemGroup(orderItemGroup);
+
+        //mock and spy
+        Mockito.doReturn(Optional.of(orderItem)).when(orderItemRepository).findById(1);
+
+        //method call and assertion
+        assertThrows(IllegalAmountException.class, () -> orderItemService.updateOrderItem(orderItem.getId(), -2, waiter.getPin()));
+
+    }
+
 
 
 }

@@ -131,7 +131,6 @@ public class OrderItemServiceImpl extends TransactionalServiceBase implements Or
     }
 
     @Override
-    //TODO: test
     public void updateOrderItem(Integer orderItemId, Integer amount, String pin) {
         var orderItem = this.orderItemRepository
                 .findById(orderItemId)
