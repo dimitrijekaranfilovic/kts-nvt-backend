@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.mockito.Mockito.*;
@@ -28,10 +29,31 @@ class ReportServiceTest {
     @InjectMocks
     private ReportServiceImpl reportService;
 
+    private final LocalDate first = LocalDate.of(2021, 11, 28);
+    private final LocalDate second = LocalDate.of(2021, 11, 29);
+    private final LocalDate third = LocalDate.of(2021, 11, 30);
+
     @BeforeEach
     public void setupLocalDateTimeService() {
         var currentDate = LocalDate.of(2021, 11, 30);
         doReturn(currentDate).when(localDateTimeService).currentDate();
+    }
+
+    @Test
+    void readSalaryExpenses_whenCalledWithValidDate_isSuccess() {
+        // GIVEN
+        doReturn(BigDecimal.valueOf(300L)).when(salaryService).readExpensesForDate(first);
+        doReturn(BigDecimal.valueOf(600L)).when(salaryService).readExpensesForDate(second);
+        doReturn(BigDecimal.valueOf(0L)).when(salaryService).readExpensesForDate(third);
+
+        // WHEN
+        var statistics = reportService.readSalaryExpenses(first, third);
+
+        // THEN
+        assertEquals(3, statistics.getLabels().size());
+        assertEquals(BigDecimal.valueOf(10L), statistics.getValues().get(0));
+        assertEquals(BigDecimal.valueOf(20L), statistics.getValues().get(1));
+        assertEquals(BigDecimal.valueOf(0L), statistics.getValues().get(2));
     }
 
     @Test
