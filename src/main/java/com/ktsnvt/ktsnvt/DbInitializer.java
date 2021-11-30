@@ -65,11 +65,14 @@ public class DbInitializer implements ApplicationRunner {
         var waiter = new Authority("WAITER");
         var manager = new Authority("MANAGER");
         var admin = new Authority("ADMIN");
+        var deleted = new Authority("DELETED");
+        deleted.setIsActive(false);
         authorityRepo.save(chef);
         authorityRepo.save(bartender);
         authorityRepo.save(waiter);
         authorityRepo.save(manager);
         authorityRepo.save(admin);
+        authorityRepo.save(deleted);
 
         var salary1 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
         var salary2 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("512.00"), null);
