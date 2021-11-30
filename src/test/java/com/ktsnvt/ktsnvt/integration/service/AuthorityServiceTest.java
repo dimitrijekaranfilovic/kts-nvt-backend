@@ -21,6 +21,11 @@ class AuthorityServiceTest {
     }
 
     @Test
+    void findByName_whenCalledWithNameOfDeletedAuthority_throwsException() {
+        assertThrows(AuthorityNotFoundException.class, () -> authorityService.findByName("DELETED."));
+    }
+
+    @Test
     void findByName_whenCalledWithInvalidName_throwsException() {
         assertThrows(AuthorityNotFoundException.class, () -> authorityService.findByName("Something not found."));
     }
