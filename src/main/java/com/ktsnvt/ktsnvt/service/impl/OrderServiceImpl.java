@@ -103,6 +103,7 @@ public class OrderServiceImpl extends TransactionalServiceBase implements OrderS
         return new ArrayList<>(orderItemGroups);
     }
 
+
     @Override
     public void deleteOrderItemGroup(Integer orderId, Integer groupId, String pin) {
         var orderItemGroup = this.getOrderItemGroup(orderId, groupId);
@@ -171,7 +172,7 @@ public class OrderServiceImpl extends TransactionalServiceBase implements OrderS
         return this.orderItemGroupRepository.save(orderItemGroup);
     }
 
-    private OrderItemGroup getOrderItemGroup(Integer orderId, Integer groupId) {
+    public OrderItemGroup getOrderItemGroup(Integer orderId, Integer groupId) {
         var optionalOrderItemGroup = this.orderItemGroupRepository.getGroupByIdAndOrderId(orderId, groupId);
         if (optionalOrderItemGroup.isEmpty())
             throw new NotFoundException(String.format("Order group with id %d for order with id %d does not exist.", groupId, orderId));
