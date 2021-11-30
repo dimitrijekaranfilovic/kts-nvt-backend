@@ -7,6 +7,7 @@ import com.ktsnvt.ktsnvt.model.enums.SuperUserType;
 import com.ktsnvt.ktsnvt.repository.SuperUserRepository;
 import com.ktsnvt.ktsnvt.service.AuthorityService;
 import com.ktsnvt.ktsnvt.service.SalaryService;
+import com.ktsnvt.ktsnvt.service.SuperUserService;
 import com.ktsnvt.ktsnvt.service.impl.SuperUserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -76,5 +77,24 @@ class SuperUserServiceTest {
         assertNull(superUser.getAuthority());
         verifyNoInteractions(authorityService);
         verifyNoInteractions(passwordEncoder);
+    }
+
+    @Test
+    void deleteManager_whenCalledWithValidId_isSuccess() {
+        // GIVEN
+        var manager = new SuperUser("name", "surname", new Authority("MANAGER"), "name.surname@gmail.com", "test123", SuperUserType.MANAGER);
+        var managerId = 999;
+        manager.setId(managerId);
+        SuperUserService superUserServiceSpy = spy(superUserService);
+        doNothing().when(salaryService).endActiveSalaryForUser(manager);
+        doReturn(manager).when(superUserServiceSpy).readManagerForUpdate(managerId);
+
+        // WHEN
+        superUserServiceSpy.deleteManager(managerId);
+
+        // THEN
+        assertFalse(manager.getIsActive());
+        verify(salaryService, times(1)).endActiveSalaryForUser(manager);
+        verifyNoInteractions(superUserRepository);
     }
 }
