@@ -1,6 +1,7 @@
 package com.ktsnvt.ktsnvt.unit.service;
 
 import com.ktsnvt.ktsnvt.exception.EmailAlreadyExistsException;
+import com.ktsnvt.ktsnvt.exception.InvalidPasswordException;
 import com.ktsnvt.ktsnvt.model.Authority;
 import com.ktsnvt.ktsnvt.model.SuperUser;
 import com.ktsnvt.ktsnvt.model.enums.SuperUserType;
@@ -87,7 +88,7 @@ class SuperUserServiceTest {
         manager.setId(managerId);
         SuperUserService superUserServiceSpy = spy(superUserService);
         doNothing().when(salaryService).endActiveSalaryForUser(manager);
-        doReturn(manager).when(superUserServiceSpy).readManagerForUpdate(managerId);
+        doReturn(manager).when(superUserServiceSpy).readManagerForUpdate(manager.getId());
 
         // WHEN
         superUserServiceSpy.deleteManager(managerId);
@@ -95,6 +96,48 @@ class SuperUserServiceTest {
         // THEN
         assertFalse(manager.getIsActive());
         verify(salaryService, times(1)).endActiveSalaryForUser(manager);
+        verifyNoInteractions(superUserRepository);
+    }
+
+    @Test
+    void updatePassword_whenCalledWithValidOldAndNewPasswords_isSuccess() {
+        // GIVEN
+        var oldPassword = "test123";
+        var newPassword = "pera123";
+        var superUser = new SuperUser("name", "surname", new Authority("MANAGER"), "name.surname@gmail.com", oldPassword, SuperUserType.MANAGER);
+        var superUserId = 999;
+        superUser.setId(superUserId);
+        SuperUserService superUserServiceSpy = spy(superUserService);
+        doReturn(superUser).when(superUserServiceSpy).read(superUser.getId());
+
+        // WHEN
+        superUserServiceSpy.updatePassword(superUserId, oldPassword, newPassword);
+
+        // THEN
+        assertEquals(newPassword, superUser.getPassword());
+        verify(passwordEncoder, times(1)).encode(oldPassword);
+        verify(passwordEncoder, times(1)).encode(newPassword);
+        verifyNoInteractions(superUserRepository);
+    }
+
+    @Test
+    void updatePassword_whenCalledWithNotMatchingPasswords_throwsException() {
+        // GIVEN
+        var oldPasswordMistake = "ndgksdjgskdg";
+        var oldPassword = "test123";
+        var newPassword = "pera123";
+        var superUser = new SuperUser("name", "surname", new Authority("MANAGER"), "name.surname@gmail.com", oldPassword, SuperUserType.MANAGER);
+        var superUserId = 999;
+        superUser.setId(superUserId);
+        SuperUserService superUserServiceSpy = spy(superUserService);
+        doReturn(superUser).when(superUserServiceSpy).read(superUser.getId());
+
+        // WHEN
+        assertThrows(InvalidPasswordException.class, () -> superUserServiceSpy.updatePassword(superUserId, oldPasswordMistake, newPassword));
+
+        // THEN
+        assertEquals(oldPassword, superUser.getPassword());
+        verify(passwordEncoder, times(1)).encode(oldPasswordMistake);
         verifyNoInteractions(superUserRepository);
     }
 }
