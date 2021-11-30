@@ -1,6 +1,8 @@
 package com.ktsnvt.ktsnvt.unit.service;
 
+import com.ktsnvt.ktsnvt.exception.OccupiedSectionException;
 import com.ktsnvt.ktsnvt.exception.SectionNameAlreadyExistsException;
+import com.ktsnvt.ktsnvt.model.RestaurantTable;
 import com.ktsnvt.ktsnvt.model.Section;
 import com.ktsnvt.ktsnvt.repository.RestaurantTableRepository;
 import com.ktsnvt.ktsnvt.repository.SectionRepository;
@@ -12,6 +14,7 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -112,4 +115,43 @@ class SectionServiceTest {
         assertNotEquals(newName, section.getName());
         verify(sectionRepository, times(0)).save(section);
     }
+
+    @Test
+    void delete_whenCalledWithSectionWithNoOccupiedTables_isSuccess() {
+        // GIVEN
+        var section = new Section("something");
+        var sectionId = 999;
+        section.setId(sectionId);
+        SectionService sectionServiceSpy = spy(sectionService);
+        doReturn(section).when(sectionServiceSpy).readForUpdate(sectionId);
+        doReturn(Stream.empty()).when(restaurantTableRepository).streamOccupiedTablesForSection(sectionId);
+
+        // WHEN
+        sectionServiceSpy.delete(sectionId);
+
+        // THEN
+        assertFalse(section.getIsActive());
+        verify(restaurantTableRepository, times(1)).streamOccupiedTablesForSection(sectionId);
+        verifyNoInteractions(sectionRepository);
+    }
+
+    @Test
+    void delete_whenCalledWithSectionWithOccupiedTables_throwsException() {
+        // GIVEN
+        var section = new Section("something");
+        var sectionId = 999;
+        section.setId(sectionId);
+        SectionService sectionServiceSpy = spy(sectionService);
+        doReturn(section).when(sectionServiceSpy).readForUpdate(sectionId);
+        doReturn(Stream.of(new RestaurantTable(), new RestaurantTable())).when(restaurantTableRepository).streamOccupiedTablesForSection(sectionId);
+
+        // WHEN
+        assertThrows(OccupiedSectionException.class, () -> sectionServiceSpy.delete(sectionId));
+
+        // THEN
+        assertTrue(section.getIsActive());
+        verify(restaurantTableRepository, times(1)).streamOccupiedTablesForSection(sectionId);
+        verifyNoInteractions(sectionRepository);
+    }
+
 }
