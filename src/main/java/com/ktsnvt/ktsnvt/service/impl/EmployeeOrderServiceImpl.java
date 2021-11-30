@@ -35,7 +35,8 @@ public class EmployeeOrderServiceImpl extends TransactionalServiceBase implement
         var employeeType = employee.getType();
         var itemCategory = item.getItem().getItem().getCategory();
         if ((employeeType == EmployeeType.CHEF && itemCategory  == ItemCategory.DRINK)
-                || (employeeType == EmployeeType.BARTENDER && itemCategory == ItemCategory.FOOD)) {
+                || (employeeType == EmployeeType.BARTENDER && itemCategory == ItemCategory.FOOD)
+                || employeeType == EmployeeType.WAITER) {
             throw new InvalidEmployeeTypeException(employee.getPin());
         }
     }

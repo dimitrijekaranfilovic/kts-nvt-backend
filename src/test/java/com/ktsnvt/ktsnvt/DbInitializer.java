@@ -205,6 +205,8 @@ public class DbInitializer implements ApplicationRunner {
         var orderItem8 = new OrderItem(1, orderGroup4, null, menuItem1, OrderItemStatus.DONE);
         var orderItem9 = new OrderItem(1, orderGroup4, null, menuItem3, OrderItemStatus.DONE);
 
+        var orderItem10 = new OrderItem(1, orderGroup1, employee1, menuItem1, OrderItemStatus.PREPARING);
+        var orderItem11 = new OrderItem(1, orderGroup1, employee2, menuItem3, OrderItemStatus.PREPARING);
 
         // orderItem1.setPreparedBy(employee2);
         orderGroup1.addItem(orderItem1);
@@ -215,6 +217,13 @@ public class DbInitializer implements ApplicationRunner {
         orderItem3.setSentAt(LocalDateTime.now());
         orderGroup1.addItem(orderItem4);
         orderItem4.setSentAt(LocalDateTime.now());
+
+        orderGroup1.addItem(orderItem10);
+        orderItem10.setSentAt(LocalDateTime.now());
+        orderItem10.setTakenAt(LocalDateTime.now());
+        orderGroup1.addItem(orderItem11);
+        orderItem11.setSentAt(LocalDateTime.now());
+        orderItem11.setTakenAt(LocalDateTime.now());
 
         orderGroup3.addItem(orderItem5);
         orderGroup3.addItem(orderItem6);
@@ -239,7 +248,7 @@ public class DbInitializer implements ApplicationRunner {
         orderItemRepo.save(orderItem7);
         orderItemRepo.save(orderItem8);
         orderItemRepo.save(orderItem9);
-
-        System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        orderItemRepo.save(orderItem10);
+        orderItemRepo.save(orderItem11);
     }
 }
