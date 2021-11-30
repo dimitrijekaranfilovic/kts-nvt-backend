@@ -591,7 +591,42 @@ class OrderServiceTest {
 
     private void makeOrderItem(OrderItemGroup group, int amount, long price, long cost) {
         OrderItem item = new OrderItem();
-        item.setAmount(amount); item.setCurrentMenuPrice(BigDecimal.valueOf(price)); item.setCurrentBasePrice(BigDecimal.valueOf(cost));
+        item.setAmount(amount);
+        item.setCurrentMenuPrice(BigDecimal.valueOf(price));
+        item.setCurrentBasePrice(BigDecimal.valueOf(cost));
         group.addItem(item);
     }
+
+    @Test
+    void createGroupForOrder_whenOrderStatusIsChargedOrCancelled_throwsException(){
+        //data setup
+        var waiter = new Employee();
+        waiter.setType(EmployeeType.WAITER);
+        waiter.setId(1);
+        waiter.setPin("1234");
+
+        var order = new Order();
+        order.setId(1);
+        order.setWaiter(waiter);
+        order.setStatus(OrderStatus.CHARGED);
+
+        var orderItemGroup = new OrderItemGroup();
+        orderItemGroup.setId(1);
+        orderItemGroup.setName("group 1");
+        orderItemGroup.setStatus(OrderItemGroupStatus.NEW);
+
+        //set up mock and spy objects behaviour
+        var orderServiceSpy = Mockito.spy(orderService);
+        Mockito.doReturn(order).when(orderServiceSpy).getOrder(1);
+        Mockito.doReturn(Optional.of(orderItemGroup)).when(orderServiceSpy).getOrderItemGroup(1, "group 1");
+
+        Assertions.assertThrows(IllegalOrderStateException.class, ()->orderServiceSpy.createGroupForOrder(order.getId(), "group 1", waiter.getPin()));
+
+    }
+
+
+
+
+
+
 }

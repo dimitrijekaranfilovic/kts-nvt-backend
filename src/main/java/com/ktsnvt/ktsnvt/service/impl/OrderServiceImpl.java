@@ -163,8 +163,12 @@ public class OrderServiceImpl extends TransactionalServiceBase implements OrderS
     }
 
     @Override
+    //TODO: test
     public OrderItemGroup createGroupForOrder(Integer orderId, String groupName, String pin) {
         var order = this.getOrder(orderId);
+        if (order.getStatus() != OrderStatus.CREATED && order.getStatus() != OrderStatus.IN_PROGRESS)
+            throw new IllegalOrderStateException(String.format("Status of order with id %d is neither CREATED nor IN_PROGRESS and new groups cannot be created for it.", orderId));
+
         var optionalOrderItemGroup = this.getOrderItemGroup(orderId, groupName);
         if (optionalOrderItemGroup.isPresent())
             throw new OrderItemGroupInvalidStatusException(String.format("Group with name %s already exists for order with id %d.", groupName, orderId));
