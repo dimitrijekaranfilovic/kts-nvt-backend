@@ -131,6 +131,7 @@ public class OrderItemServiceImpl extends TransactionalServiceBase implements Or
     }
 
     @Override
+    //TODO: test
     public void updateOrderItem(Integer orderItemId, Integer amount, String pin) {
         var orderItem = this.orderItemRepository
                 .findById(orderItemId)
@@ -147,6 +148,7 @@ public class OrderItemServiceImpl extends TransactionalServiceBase implements Or
     }
 
     @Override
+    //TODO: test
     public void deleteOrderItem(Integer orderItemId, String pin) {
         var orderItem = this.orderItemRepository
                 .findById(orderItemId)
