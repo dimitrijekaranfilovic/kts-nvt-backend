@@ -71,7 +71,6 @@ public class RestaurantTableServiceImpl extends TransactionalServiceBase impleme
     public void updateTablePosition(Integer sectionId, Integer tableId, Integer newX, Integer newY) {
         var section = sectionService.readForUpdate(sectionId);
         var table = readForUpdate(tableId);
-        var sectionTables = restaurantTableRepository.findAllForSection(sectionId);
 
         if (!table.getSection().getId().equals(section.getId())) {
             throw new TableSectionMismatchException(String.format("Table with id: %d does not belong to section with id: %d", tableId, sectionId));
@@ -81,6 +80,7 @@ public class RestaurantTableServiceImpl extends TransactionalServiceBase impleme
         table.setX(newX);
         table.setY(newY);
 
+        var sectionTables = restaurantTableRepository.findAllForSection(sectionId);
         if(sectionTables.stream().anyMatch(t -> intersects(t, table))) {
             throw new TableIntersectionException("Table is overlapping with another table.");
         }
