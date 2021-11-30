@@ -31,6 +31,21 @@ class EmployeeQueryServiceTest {
         assertThrows(EmployeeNotFoundException.class, () -> employeeQueryService.findByPin(pin));
     }
 
+    @ParameterizedTest
+    @MethodSource("provideExistingPinsWithEmployeeType")
+    void findByPinForUpdate_whenCalledWithExistingPin_isSuccess(String pin, EmployeeType employeeType) {
+        var employee = employeeQueryService.findByPinForUpdate(pin, employeeType);
+        assertEquals(pin, employee.getPin());
+        assertEquals(employeeType, employee.getType());
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideNonExistingPinsWithEmployeeType")
+    void findByPinForUpdate_whenCalledWithNonExistingPin_throwsException(String pin, EmployeeType employeeType) {
+        assertThrows(EmployeeNotFoundException.class, () -> employeeQueryService.findByPinForUpdate(pin, employeeType));
+    }
+
+    @SuppressWarnings("unused")
     private static Stream<Arguments> provideExistingPins() {
         return Stream.of(
                 Arguments.of("1234"),
@@ -39,6 +54,7 @@ class EmployeeQueryServiceTest {
         );
     }
 
+    @SuppressWarnings("unused")
     private static Stream<Arguments> provideNonExistentPins() {
         return Stream.of(
                 Arguments.of("4567"),
@@ -47,11 +63,24 @@ class EmployeeQueryServiceTest {
         );
     }
 
+    @SuppressWarnings("unused")
     private static Stream<Arguments> provideExistingPinsWithEmployeeType() {
         return Stream.of(
                 Arguments.of("1234", EmployeeType.CHEF),
                 Arguments.of("5678", EmployeeType.BARTENDER),
                 Arguments.of("4321", EmployeeType.WAITER)
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideNonExistingPinsWithEmployeeType() {
+        return Stream.of(
+                Arguments.of("1234", EmployeeType.BARTENDER),
+                Arguments.of("5678", EmployeeType.WAITER),
+                Arguments.of("4321", EmployeeType.CHEF),
+                Arguments.of("4567", EmployeeType.WAITER),
+                Arguments.of("9874", EmployeeType.CHEF),
+                Arguments.of("9512", EmployeeType.BARTENDER)
         );
     }
 }
