@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -54,7 +55,7 @@ class RestaurantTableServiceTest {
         RestaurantTableService restaurantTableServiceSpy = spy(restaurantTableService);
         doReturn(section).when(sectionService).readForUpdate(sectionId);
         doReturn(table).when(restaurantTableServiceSpy).readForUpdate(tableId);
-        doReturn(new ArrayList<RestaurantTable>()).when(restaurantTableRepository).findAllForSection(sectionId);
+        doReturn(List.of(table)).when(restaurantTableRepository).findAllForSection(sectionId);
 
         // WHEN
         restaurantTableServiceSpy.updateTablePosition(sectionId, tableId, 15, 20);
@@ -62,6 +63,53 @@ class RestaurantTableServiceTest {
         // THEN
         assertEquals(15, table.getX());
         assertEquals(20, table.getY());
+        verify(restaurantTableRepository, times(1)).findAllForSection(sectionId);
+    }
+
+    @Test
+    void updateTablePosition_whenCalledWithOccupiedTable_throwsException() {
+        // GIVEN
+        var section = new Section("example");
+        var sectionId = 999;
+        section.setId(sectionId);
+        var table = new RestaurantTable(123, 10, 10, 10,  section);
+        table.setAvailable(false);
+        var tableId = 999;
+        table.setId(tableId);
+        RestaurantTableService restaurantTableServiceSpy = spy(restaurantTableService);
+        doReturn(section).when(sectionService).readForUpdate(sectionId);
+        doReturn(table).when(restaurantTableServiceSpy).readForUpdate(tableId);
+        doReturn(List.of(table)).when(restaurantTableRepository).findAllForSection(sectionId);
+
+        // WHEN
+       assertThrows(OccupiedTableException.class, () ->  restaurantTableServiceSpy.updateTablePosition(sectionId, tableId, 15, 20));
+
+        // THEN
+        assertNotEquals(15, table.getX());
+        assertNotEquals(20, table.getY());
+        verify(restaurantTableRepository, times(0)).findAllForSection(sectionId);
+    }
+
+    @Test
+    void updateTablePosition_whenCalledWithIntersections_throwsException() {
+        // GIVEN
+        var section = new Section("example");
+        var sectionId = 999;
+        section.setId(sectionId);
+        var table = new RestaurantTable(123, 10, 10, 10,  section);
+        var tableId = 999;
+        table.setId(tableId);
+        var intersectingTable = new RestaurantTable(456, 8, 8, 5, section);
+        intersectingTable.setId(888);
+        RestaurantTableService restaurantTableServiceSpy = spy(restaurantTableService);
+        doReturn(section).when(sectionService).readForUpdate(sectionId);
+        doReturn(table).when(restaurantTableServiceSpy).readForUpdate(tableId);
+        doReturn(List.of(table, intersectingTable)).when(restaurantTableRepository).findAllForSection(sectionId);
+
+        // WHEN
+        assertThrows(TableIntersectionException.class, () ->  restaurantTableServiceSpy.updateTablePosition(sectionId, tableId, 15, 20));
+
+        // THEN
         verify(restaurantTableRepository, times(1)).findAllForSection(sectionId);
     }
 
@@ -81,7 +129,7 @@ class RestaurantTableServiceTest {
         doReturn(section).when(sectionService).readForUpdate(sectionId);
         doReturn(new Section()).when(sectionService).readForUpdate(invalidSectionId);
         doReturn(table).when(restaurantTableServiceSpy).readForUpdate(tableId);
-        doReturn(new ArrayList<RestaurantTable>()).when(restaurantTableRepository).findAllForSection(sectionId);
+        doReturn(List.of(table)).when(restaurantTableRepository).findAllForSection(sectionId);
 
         // WHEN
         assertThrows(TableSectionMismatchException.class, () -> restaurantTableServiceSpy.updateTablePosition(invalidSectionId, tableId, 15, 20));
