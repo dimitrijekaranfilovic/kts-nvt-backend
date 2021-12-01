@@ -1,10 +1,13 @@
 package com.ktsnvt.ktsnvt.dto.deleteorderitem;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class DeleteOrderItemRequest {
 
     @NotNull(message = "PIN cannot be null.")

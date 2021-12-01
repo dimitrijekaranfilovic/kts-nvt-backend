@@ -1,12 +1,15 @@
 package com.ktsnvt.ktsnvt.dto.updateorderitem;
 
 
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UpdateOrderItemRequest {
 
     @NotNull(message = "Amount cannot be null.")
