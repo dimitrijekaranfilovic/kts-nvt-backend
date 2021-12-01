@@ -172,11 +172,13 @@ public class DbInitializer implements ApplicationRunner {
         var order3 = new Order(IN_PROGRESS, LocalDateTime.parse("2021-02-03 16:16", formatter), null, restaurantTable1, employee3);
         var order4 = new Order(CHARGED, LocalDateTime.parse("2021-11-14 12:12", formatter), LocalDateTime.parse("2021-11-14 13:15", formatter), restaurantTable1, employee3);
         var order5 = new Order(CHARGED, LocalDateTime.parse("2021-11-13 13:12", formatter), LocalDateTime.parse("2021-11-14 14:15", formatter), restaurantTable2, employee3);
+        var order6 = new Order(IN_PROGRESS, LocalDateTime.parse("2021-02-03 16:16", formatter), null, restaurantTable1, employee3);
         orderRepo.save(order1);
         orderRepo.save(order2);
         orderRepo.save(order3);
         orderRepo.save(order4);
         orderRepo.save(order5);
+        orderRepo.save(order6);
 
         var orderGroup1 = new OrderItemGroup("Group 1", OrderItemGroupStatus.SENT, null);
         order1.addOrderItemGroup(orderGroup1);
@@ -193,6 +195,10 @@ public class DbInitializer implements ApplicationRunner {
         var orderGroup4 = new OrderItemGroup("Group 4", OrderItemGroupStatus.DONE, null);
         order4.addOrderItemGroup(orderGroup4);
         orderItemGroupRepo.save(orderGroup4);
+
+        var orderGroup5 = new OrderItemGroup("Group 5", OrderItemGroupStatus.SENT, null);
+        order6.addOrderItemGroup(orderGroup5);
+        orderItemGroupRepo.save(orderGroup5);
 
 
         var orderItem1 = new OrderItem(2, orderGroup1, null, menuItem1, OrderItemStatus.SENT);

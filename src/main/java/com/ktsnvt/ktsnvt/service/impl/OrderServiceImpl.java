@@ -125,7 +125,7 @@ public class OrderServiceImpl extends TransactionalServiceBase implements OrderS
     @Override
     public void chargeOrder(Integer id, String pin) {
         var order = getOrder(id);
-        employeeOrderService.throwIfWaiterNotResponsible(pin, id);
+        employeeOrderService.throwIfWaiterNotResponsible(pin, order.getWaiter().getId());
         if (!order.getStatus().equals(OrderStatus.IN_PROGRESS)) {
             throw new IllegalOrderStateException("Order is not in IN PROGRESS state and thus cannot be charged.");
         }

@@ -6,14 +6,12 @@ import com.ktsnvt.ktsnvt.model.enums.OrderStatus;
 import com.ktsnvt.ktsnvt.service.impl.OrderServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import javax.transaction.Transactional;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest
@@ -43,6 +41,21 @@ class OrderServiceTest {
     @Test
     void createOrder_whenCalledWithBusyTable_throwsException() {
         assertThrows(OccupiedTableException.class, () -> orderService.createOrder(10, "4321"));
+    }
+
+    @Test
+    void chargeOrder_whenCalledWithValidOrder_isSuccess() {
+        assertDoesNotThrow(() -> orderService.chargeOrder(3, "4321"));
+    }
+
+    @Test
+    void chargeOrder_whenCalledWithNotInProgressOrder_throwsException() {
+        assertThrows(IllegalOrderStateException.class, () -> orderService.chargeOrder(2, "4321"));
+    }
+
+    @Test
+    void chargeOrder_whenCalledWithNotFinishedOrder_throwsException() {
+        assertThrows(IllegalOrderStateException.class, () -> orderService.chargeOrder(6, "4321"));
     }
 
     @Test
