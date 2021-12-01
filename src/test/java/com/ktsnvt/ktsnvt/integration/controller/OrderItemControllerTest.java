@@ -4,7 +4,6 @@ import com.ktsnvt.ktsnvt.dto.readfoodanddrinkrequests.ReadFoodAndDrinkRequestRes
 import com.ktsnvt.ktsnvt.dto.updateorderitemrequest.UpdateOrderItemRequestsRequest;
 import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
 import com.ktsnvt.ktsnvt.model.enums.OrderItemStatus;
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -12,14 +11,17 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Transactional
 public class OrderItemControllerTest {
 
     @Autowired
@@ -37,6 +39,7 @@ public class OrderItemControllerTest {
 
     public static Stream<Arguments> provideFor_takeItem_success() {
         return Stream.of(
+                Arguments.of(new UpdateOrderItemRequestsRequest("PREPARE", 13, "1212")),
                 Arguments.of(new UpdateOrderItemRequestsRequest("FINISH", 13, "1212")),
                 Arguments.of(new UpdateOrderItemRequestsRequest("FINISH", 14, "1212"))
         );
