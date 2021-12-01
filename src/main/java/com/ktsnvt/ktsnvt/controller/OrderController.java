@@ -74,12 +74,15 @@ public class OrderController {
         this.orderService.sendOrderItemGroup(orderId, groupId, request.getPin());
     }
 
+
+    //TODO: maybe test?
     @GetMapping(value = "/{id}/groups")
     public List<OrderItemGroupResponse> getOrderItemGroups(@PathVariable("id") Integer orderId){
         var orderItemGroups = this.orderService.getOrderItemGroups(orderId);
         return orderItemGroups.stream().map(orderItemGroupToOrderItemGroupResponse::convert).collect(Collectors.toList());
     }
 
+    //TODO: test
     @DeleteMapping(value = "/{orderId}/groups/{groupId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteOrderItemGroup(@PathVariable("orderId") Integer orderId, @PathVariable("groupId") Integer groupId, @RequestBody @Valid DeleteOrderItemGroupRequest request){

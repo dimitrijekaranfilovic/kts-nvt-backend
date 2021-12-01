@@ -194,6 +194,14 @@ public class DbInitializer implements ApplicationRunner {
         order4.addOrderItemGroup(orderGroup4);
         orderItemGroupRepo.save(orderGroup4);
 
+        var orderGroup5 = new OrderItemGroup("Group 5", OrderItemGroupStatus.NEW, null);
+        order2.addOrderItemGroup(orderGroup5);
+        orderItemGroupRepo.save(orderGroup5);
+
+        var orderGroup6 = new OrderItemGroup("Group 6", OrderItemGroupStatus.NEW, null);
+        order3.addOrderItemGroup(orderGroup6);
+        orderItemGroupRepo.save(orderGroup6);
+
 
         var orderItem1 = new OrderItem(2, orderGroup1, null, menuItem1, OrderItemStatus.SENT);
         var orderItem2 = new OrderItem(1, orderGroup1, null, menuItem2, OrderItemStatus.SENT);
