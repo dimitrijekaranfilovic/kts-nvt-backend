@@ -2,6 +2,7 @@ package com.ktsnvt.ktsnvt.integration.service;
 
 import com.ktsnvt.ktsnvt.exception.SuperUserNotFoundException;
 import com.ktsnvt.ktsnvt.service.impl.SuperUserServiceImpl;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,5 +28,12 @@ class SuperUserServiceTest {
     @ValueSource(ints = {0, 1, 2, 3, 10, 15, 18})
     void read_whenCalledWithInvalidId_throwsException(Integer id) {
         assertThrows(SuperUserNotFoundException.class, () -> superUserService.read(id));
+    }
+
+    @Test
+    void readAll_whenCalledNormally_isSuccess() {
+        var userStream = superUserService.readAll();
+        // TODO: Update this after SalaryServiceTest is merged to be 3!
+        assertEquals(2, userStream.count());
     }
 }
