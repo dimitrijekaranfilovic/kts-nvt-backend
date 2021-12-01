@@ -1,5 +1,6 @@
 package com.ktsnvt.ktsnvt.unit.service;
 
+import com.ktsnvt.ktsnvt.exception.UserHasNoActiveSalaryException;
 import com.ktsnvt.ktsnvt.model.Employee;
 import com.ktsnvt.ktsnvt.model.Salary;
 import com.ktsnvt.ktsnvt.repository.SalaryRepository;
@@ -16,7 +17,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -50,14 +51,14 @@ class SalaryServiceTest {
     }
 
     @Test
-    void endActiveSalaryForUser_calledWithUserWithNoActiveSalary_isSuccess() {
+    void endActiveSalaryForUser_calledWithUserWithNoActiveSalary_throwsExeption() {
         // GIVEN
         var user = new Employee();
         user.setId(999);
         doReturn(Optional.empty()).when(salaryRepository).findActiveForUser(user.getId());
 
         // WHEN
-        salaryService.endActiveSalaryForUser(user);
+        assertThrows(UserHasNoActiveSalaryException.class, () -> salaryService.endActiveSalaryForUser(user));
 
         // THEN
         verify(salaryRepository, times(1)).findActiveForUser(user.getId());
