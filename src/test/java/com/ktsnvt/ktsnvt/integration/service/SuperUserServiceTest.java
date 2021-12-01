@@ -93,6 +93,16 @@ class SuperUserServiceTest {
         assertEquals(expected, page.getTotalElements());
     }
 
+    @Test
+    void deleteManager_whenCalledWithValidId_isSuccess() {
+        assertDoesNotThrow(() -> superUserService.deleteManager(4));
+    }
+
+    @Test
+    void deleteManager_whenCalledWithInvalidId_throwsException() {
+        assertThrows(ManagerNotFoundException.class, () -> superUserService.deleteManager(5));
+    }
+
     @SuppressWarnings("unused")
     private static Stream<Arguments> provideTestsForPaginatedRead() {
         var pageable = PageRequest.of(0, 10, Sort.unsorted());
