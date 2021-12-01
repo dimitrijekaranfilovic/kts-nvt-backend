@@ -1,13 +1,17 @@
 package com.ktsnvt.ktsnvt.integration.service;
 
+import com.ktsnvt.ktsnvt.exception.EmailAlreadyExistsException;
 import com.ktsnvt.ktsnvt.exception.InvalidPasswordException;
 import com.ktsnvt.ktsnvt.exception.ManagerNotFoundException;
 import com.ktsnvt.ktsnvt.exception.SuperUserNotFoundException;
+import com.ktsnvt.ktsnvt.model.Authority;
+import com.ktsnvt.ktsnvt.model.SuperUser;
 import com.ktsnvt.ktsnvt.model.enums.SuperUserType;
 import com.ktsnvt.ktsnvt.service.impl.SuperUserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,6 +116,33 @@ class SuperUserServiceTest {
     @Test
     void updatePassword_whenCalledWithInvalidOldPassword_throwsException() {
         assertThrows(InvalidPasswordException.class, () -> superUserService.updatePassword(4, "wrong", "something new"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"email1@email.com", "peraperic@gmail.com"})
+    void update_whenCalledWithValidData_isSuccess(String email) {
+        assertDoesNotThrow(() -> superUserService.update(4, "pera", "peric", email));
+    }
+
+    @Test
+    void update_whenCalledWithDuplicateEmail_throwsException() {
+        assertThrows(EmailAlreadyExistsException.class, () -> superUserService.update(4, "pera", "peric", "email2@email.com"));
+    }
+
+    @ParameterizedTest
+    @EnumSource(SuperUserType.class)
+    void create_whenCalledWithValidData_isSuccess(SuperUserType superUserType) {
+        var superUser = new SuperUser("dusan", "dusan", null, "dusan@email.com", "password", superUserType);
+        var createdUser = superUserService.create(superUser);
+        assertTrue(createdUser.getId() > 0);
+        assertEquals(superUserType.toString(), createdUser.getAuthority().getName());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"email1@email.com", "email2@email.com"})
+    void create_whenCalledWithDuplicateEmail_throwsException(String email) {
+        var superUser = new SuperUser("dusan", "dusan", null, email, "password", SuperUserType.ADMIN);
+        assertThrows(EmailAlreadyExistsException.class, () -> superUserService.create(superUser));
     }
 
     @SuppressWarnings("unused")
