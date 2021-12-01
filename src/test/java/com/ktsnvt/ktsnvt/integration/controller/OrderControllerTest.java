@@ -4,6 +4,7 @@ package com.ktsnvt.ktsnvt.integration.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktsnvt.ktsnvt.dto.createorderitemgroup.CreateOrderItemGroupRequest;
 import com.ktsnvt.ktsnvt.dto.sendorderitemgroup.SendOrderItemGroupRequest;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -14,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MockMvcBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +49,15 @@ class OrderControllerTest {
         return Stream.of(
                 Arguments.of(2, 5),
                 Arguments.of(3, 6)
+        );
+    }
+
+    private static Stream<Arguments> provideGetOrderItemGroupsData(){
+        return Stream.of(
+                Arguments.of(1, 2),
+                Arguments.of(2, 1),
+                Arguments.of(3, 2),
+                Arguments.of(4, 1)
         );
     }
 
@@ -141,6 +152,24 @@ class OrderControllerTest {
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(body)))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideGetOrderItemGroupsData")
+    void getOrderItemGroups_withValidData_isSuccess(int orderId, int numOfGroups) throws Exception{
+        this.mockMvc.perform(MockMvcRequestBuilders.get(String.format("http://localhost:%d/api/orders/%d/groups",this.port, orderId)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(numOfGroups)))
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {40, 50})
+    void getOrderItemGroups_whenGroupDoesNotExist_isResultListEmpty(int orderId) throws Exception{
+        this.mockMvc.perform(MockMvcRequestBuilders.get(String.format("http://localhost:%d/api/orders/%d/groups",this.port, orderId)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(0)))
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"));
     }
 
 
