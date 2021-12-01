@@ -63,6 +63,7 @@ public class OrderItemController {
         this.orderItemService.updateOrderItem(orderItemId, request.getAmount(), request.getPin());
     }
 
+    //TODO: test
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(value = "/{orderItemId}")
     public void deleteOrderItem(@PathVariable("orderItemId") Integer orderItemId, @RequestBody @Valid DeleteOrderItemRequest request){
