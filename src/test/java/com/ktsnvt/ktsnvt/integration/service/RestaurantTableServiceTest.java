@@ -1,21 +1,20 @@
 package com.ktsnvt.ktsnvt.integration.service;
 
-import com.ktsnvt.ktsnvt.exception.DuplicateTableNumberException;
-import com.ktsnvt.ktsnvt.exception.OccupiedTableException;
-import com.ktsnvt.ktsnvt.exception.RestaurantTableNotFoundException;
-import com.ktsnvt.ktsnvt.exception.TableIntersectionException;
+import com.ktsnvt.ktsnvt.exception.*;
 import com.ktsnvt.ktsnvt.model.RestaurantTable;
 import com.ktsnvt.ktsnvt.service.impl.RestaurantTableServiceImpl;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@Transactional
 public class RestaurantTableServiceTest {
-
     @Autowired
     private RestaurantTableServiceImpl restaurantTableService;
 
@@ -58,5 +57,26 @@ public class RestaurantTableServiceTest {
     @Test
     void deleteRestaurantTable_calledWithOccupiedTable_throwsOccupiedTableException() {
         assertThrows(OccupiedTableException.class, () -> restaurantTableService.deleteRestaurantTable(10));
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {10, 20, 30, 80})
+    void updateTablePosition_whenCalledWithValidData_isSuccess(int position) {
+        assertDoesNotThrow(() -> restaurantTableService.updateTablePosition(2, 4, position, position));
+    }
+
+    @Test
+    void updateTablePosition_whenCalledWithWrongSectionId_throwsException() {
+        assertThrows(TableSectionMismatchException.class, () -> restaurantTableService.updateTablePosition(3, 4, 50, 50));
+    }
+
+    @Test
+    void updateTablePosition_whenCalledOnNotAvailableTable_throwsException() {
+        assertThrows(OccupiedTableException.class, () -> restaurantTableService.updateTablePosition(4, 10, 50, 50));
+    }
+
+    @Test
+    void updateTablePosition_whenCalledWithIntersectingPositions_throwsException() {
+        assertThrows(TableIntersectionException.class, () -> restaurantTableService.updateTablePosition(2, 4, 2, 2));
     }
 }

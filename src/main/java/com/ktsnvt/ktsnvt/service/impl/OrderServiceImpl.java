@@ -1,9 +1,6 @@
 package com.ktsnvt.ktsnvt.service.impl;
 
-import com.ktsnvt.ktsnvt.exception.IllegalOrderStateException;
-import com.ktsnvt.ktsnvt.exception.NotFoundException;
-import com.ktsnvt.ktsnvt.exception.OccupiedTableException;
-import com.ktsnvt.ktsnvt.exception.OrderItemGroupInvalidStatusException;
+import com.ktsnvt.ktsnvt.exception.*;
 import com.ktsnvt.ktsnvt.model.BaseEntity;
 import com.ktsnvt.ktsnvt.model.Employee;
 import com.ktsnvt.ktsnvt.model.Order;
@@ -54,7 +51,9 @@ public class OrderServiceImpl extends TransactionalServiceBase implements OrderS
 
     @Override
     public Order getOrder(Integer id) {
-        return this.orderRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Order with id %d not found.", id)));
+        return this.orderRepository
+                .findById(id)
+                .orElseThrow(() -> new OrderNotFoundException(String.format("Order with id %d not found.", id)));
     }
 
     @Override
@@ -126,7 +125,7 @@ public class OrderServiceImpl extends TransactionalServiceBase implements OrderS
     @Override
     public void chargeOrder(Integer id, String pin) {
         var order = getOrder(id);
-        employeeOrderService.throwIfWaiterNotResponsible(pin, id);
+        employeeOrderService.throwIfWaiterNotResponsible(pin, order.getWaiter().getId());
         if (!order.getStatus().equals(OrderStatus.IN_PROGRESS)) {
             throw new IllegalOrderStateException("Order is not in IN PROGRESS state and thus cannot be charged.");
         }
