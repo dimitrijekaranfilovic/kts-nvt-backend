@@ -1,10 +1,13 @@
 package com.ktsnvt.ktsnvt.dto.updatesection;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 
-@Data
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class UpdateSectionRequest {
 
     @NotBlank(message = "Section name cannot be empty.")
