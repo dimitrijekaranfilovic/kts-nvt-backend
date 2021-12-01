@@ -1,11 +1,14 @@
 package com.ktsnvt.ktsnvt.dto.deleteorderitemgroup;
 
 
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 
-@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class DeleteOrderItemGroupRequest {
 
     @NotBlank(message = "PIN cannot be blank.")

@@ -3,6 +3,7 @@ package com.ktsnvt.ktsnvt.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktsnvt.ktsnvt.dto.createorderitemgroup.CreateOrderItemGroupRequest;
+import com.ktsnvt.ktsnvt.dto.deleteorderitemgroup.DeleteOrderItemGroupRequest;
 import com.ktsnvt.ktsnvt.dto.sendorderitemgroup.SendOrderItemGroupRequest;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -45,7 +46,7 @@ class OrderControllerTest {
         );
     }
 
-    private static Stream<Arguments> provideGroupSendingData() {
+    private static Stream<Arguments> provideGroupSendingAndDeletingData() {
         return Stream.of(
                 Arguments.of(2, 5),
                 Arguments.of(3, 6)
@@ -109,7 +110,7 @@ class OrderControllerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideGroupSendingData")
+    @MethodSource("provideGroupSendingAndDeletingData")
     void sendOrderItemGroup_withValidData_isSuccess(int orderId, int groupId) throws Exception {
         var body = new SendOrderItemGroupRequest("4321");
         this.mockMvc.perform(MockMvcRequestBuilders.put(String.format("http://localhost:%d/api/orders/%d/groups/%d", this.port, orderId, groupId))
@@ -170,6 +171,51 @@ class OrderControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(0)))
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideGroupSendingAndDeletingData")
+    void deleteOrderItemGroup_withValidData_isSuccess(int orderId, int groupId) throws Exception {
+        var body = new DeleteOrderItemGroupRequest("4321");
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(String.format("http://localhost:%d/api/orders/%d/groups/%d", this.port, orderId, groupId))
+                        .content(objectMapper.writeValueAsString(body))
+                        .contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {40, 50})
+    void deleteOrderItemGroup_whenGroupDoesNotExist_isNotFound(int groupId) throws Exception {
+        var body = new DeleteOrderItemGroupRequest("4321");
+        int orderId = 2;
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(String.format("http://localhost:%d/api/orders/%d/groups/%d", this.port, orderId, groupId))
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(body)))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"9998", "9999"})
+    void deleteOrderItemGroup_whenNonExistentPinIsUsed_isNotFound(String pin) throws Exception {
+        var body = new DeleteOrderItemGroupRequest(pin);
+        int orderId = 2;
+        int groupId = 5;
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(String.format("http://localhost:%d/api/orders/%d/groups/%d", this.port, orderId, groupId))
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(body)))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"1234", "5678"})
+    void deleteOrderItemGroup_whenNotResponsibleEmployeeTriesToSend_isBadRequest(String pin) throws Exception{
+        var body = new DeleteOrderItemGroupRequest(pin);
+        int orderId = 2;
+        int groupId = 5;
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(String.format("http://localhost:%d/api/orders/%d/groups/%d", this.port, orderId, groupId))
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(body)))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
 
