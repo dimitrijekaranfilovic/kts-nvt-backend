@@ -49,6 +49,11 @@ class OrderServiceTest {
     }
 
     @Test
+    void chargeOrder_whenCalledWithEmptyOrder_isSuccess() {
+        assertDoesNotThrow(() -> orderService.cancelOrder(8, "4321"));
+    }
+
+    @Test
     void chargeOrder_whenCalledWithNotInProgressOrder_throwsException() {
         assertThrows(IllegalOrderStateException.class, () -> orderService.chargeOrder(2, "4321"));
     }
@@ -56,6 +61,26 @@ class OrderServiceTest {
     @Test
     void chargeOrder_whenCalledWithNotFinishedOrder_throwsException() {
         assertThrows(IllegalOrderStateException.class, () -> orderService.chargeOrder(6, "4321"));
+    }
+
+    @Test
+    void cancelOrder_whenCalledWithValidOrder_isSuccess() {
+        assertDoesNotThrow(() -> orderService.cancelOrder(2, "4321"));
+    }
+
+    @Test
+    void cancelOrder_whenCalledWithChargedOrder_throwsException() {
+        assertThrows(IllegalOrderStateException.class, () -> orderService.cancelOrder(1, "4321"));
+    }
+
+    @Test
+    void cancelOrder_whenCalledWithCancelledOrder_throwsException() {
+        assertThrows(IllegalOrderStateException.class, () -> orderService.cancelOrder(7, "4321"));
+    }
+
+    @Test
+    void cancelOrder_whenCalledWithStartedOrder_throwsException() {
+        assertThrows(IllegalOrderStateException.class, () -> orderService.cancelOrder(6, "4321"));
     }
 
     @Test
