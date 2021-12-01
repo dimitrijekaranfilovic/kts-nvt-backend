@@ -1,11 +1,10 @@
 package com.ktsnvt.ktsnvt.config;
 
 
-import com.ktsnvt.ktsnvt.exception.BusinessException;
-import com.ktsnvt.ktsnvt.exception.ErrorInfo;
-import com.ktsnvt.ktsnvt.exception.NotFoundException;
-import com.ktsnvt.ktsnvt.exception.OrderItemGroupExistsException;
+import com.ktsnvt.ktsnvt.exception.*;
 import org.hibernate.QueryException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.dao.PessimisticLockingFailureException;
@@ -26,12 +25,6 @@ import java.util.Map;
 @ControllerAdvice
 public class ErrorHandlerController {
 
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(Exception.class)
-    @ResponseBody
-    public ErrorInfo handleException(HttpServletRequest request, Exception ex) {
-        return new ErrorInfo(request.getRequestURI(), ex.getMessage(), LocalDateTime.now(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BusinessException.class)
@@ -46,6 +39,14 @@ public class ErrorHandlerController {
     public ErrorInfo handleNotFoundException(HttpServletRequest request, NotFoundException ex) {
         return new ErrorInfo(request.getRequestURI(), ex.getMessage(), LocalDateTime.now(), HttpStatus.NOT_FOUND);
     }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(SuperUserNotFoundException.class)
+    @ResponseBody
+    public ErrorInfo handleSuperUserNotFoundException(HttpServletRequest request, SuperUserNotFoundException ex) {
+        return new ErrorInfo(request.getRequestURI(), ex.getMessage(), LocalDateTime.now(), HttpStatus.NOT_FOUND);
+    }
+
 
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
