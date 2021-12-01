@@ -1,5 +1,6 @@
 package com.ktsnvt.ktsnvt.integration.service;
 
+import com.ktsnvt.ktsnvt.exception.ManagerNotFoundException;
 import com.ktsnvt.ktsnvt.exception.SuperUserNotFoundException;
 import com.ktsnvt.ktsnvt.service.impl.SuperUserServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -48,5 +49,31 @@ class SuperUserServiceTest {
     @ValueSource(strings = {"", "pera@pera.com", "Email2@gmail.com"})
     void loadUserByUsername_whenCalledWithNonExistingUsername_throwsException(String username) {
         assertThrows(SuperUserNotFoundException.class, () -> superUserService.loadUserByUsername(username));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"email1@email.com", "email2@email.com"})
+    void findByEmail_whenCalledWithExistingEmail_isSuccess(String email) {
+        var user = superUserService.findByEmail(email);
+        assertEquals(email, user.getEmail());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "pera@pera.com", "Email2@gmail.com"})
+    void findByEmail_whenCalledWithNonExistingEmail_throwsException(String email) {
+        assertThrows(SuperUserNotFoundException.class, () -> superUserService.findByEmail(email));
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {4})
+    void readManagerForUpdate_whenCalledWithValidId_isSuccess(Integer id) {
+        var manager = superUserService.readManagerForUpdate(id);
+        assertEquals(id, manager.getId());
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 2, 3, 5, 8})
+    void readManagerForUpdate_whenCalledWithInvalidId_throwsException(Integer id) {
+        assertThrows(ManagerNotFoundException.class, () -> superUserService.readManagerForUpdate(id));
     }
 }
