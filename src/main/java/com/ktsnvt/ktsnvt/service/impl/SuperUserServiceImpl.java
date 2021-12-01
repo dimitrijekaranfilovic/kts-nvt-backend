@@ -1,9 +1,6 @@
 package com.ktsnvt.ktsnvt.service.impl;
 
-import com.ktsnvt.ktsnvt.exception.EmailAlreadyExistsException;
-import com.ktsnvt.ktsnvt.exception.InvalidPasswordException;
-import com.ktsnvt.ktsnvt.exception.ManagerNotFoundException;
-import com.ktsnvt.ktsnvt.exception.SuperUserNotFoundException;
+import com.ktsnvt.ktsnvt.exception.*;
 import com.ktsnvt.ktsnvt.model.SuperUser;
 import com.ktsnvt.ktsnvt.model.enums.SuperUserType;
 import com.ktsnvt.ktsnvt.repository.SuperUserRepository;
