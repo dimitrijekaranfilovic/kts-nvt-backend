@@ -2,6 +2,7 @@ package com.ktsnvt.ktsnvt.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktsnvt.ktsnvt.dto.addorderitem.AddOrderItemRequest;
+import com.ktsnvt.ktsnvt.dto.deleteorderitem.DeleteOrderItemRequest;
 import com.ktsnvt.ktsnvt.dto.updateorderitem.UpdateOrderItemRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -149,6 +150,58 @@ class OrderItemControllerTest {
         var body = new UpdateOrderItemRequest(2, pin);
         int orderItemId = 12;
         this.mockMvc.perform(MockMvcRequestBuilders.put(String.format("http://localhost:%d/api/order-items/%d", this.port, orderItemId))
+                        .content(objectMapper.writeValueAsString(body))
+                        .contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    void deleteOrderItem_withValidData_isSuccess() throws Exception {
+        var body = new DeleteOrderItemRequest("4321");
+        int orderItemId = 12;
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(String.format("http://localhost:%d/api/order-items/%d", this.port, orderItemId))
+                        .content(objectMapper.writeValueAsString(body))
+                        .contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {100, 101})
+    void deleteOrderItem_whenItemDoesNotExist_throwsException(int orderItemId) throws Exception {
+        var body = new DeleteOrderItemRequest("4321");
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(String.format("http://localhost:%d/api/order-items/%d", this.port, orderItemId))
+                        .content(objectMapper.writeValueAsString(body))
+                        .contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 5})
+    void deleteOrderItem_whenItemStatusIsNotNew_throwsException(int orderItemId) throws Exception {
+        var body = new DeleteOrderItemRequest("4321");
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(String.format("http://localhost:%d/api/order-items/%d", this.port, orderItemId))
+                        .content(objectMapper.writeValueAsString(body))
+                        .contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"9998", "9999"})
+    void deleteOrderItem_withNonExistentPin_throwsException(String pin) throws Exception {
+        var body = new DeleteOrderItemRequest(pin);
+        int orderItemId = 12;
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(String.format("http://localhost:%d/api/order-items/%d", this.port, orderItemId))
+                        .content(objectMapper.writeValueAsString(body))
+                        .contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"1234", "5678"})
+    void deleteOrderItem_whenNotResponsibleEmployeeTriesToUpdate_throwsException(String pin) throws Exception {
+        var body = new DeleteOrderItemRequest(pin);
+        int orderItemId = 12;
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(String.format("http://localhost:%d/api/order-items/%d", this.port, orderItemId))
                         .content(objectMapper.writeValueAsString(body))
                         .contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
