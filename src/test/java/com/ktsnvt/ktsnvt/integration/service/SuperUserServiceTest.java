@@ -36,4 +36,17 @@ class SuperUserServiceTest {
         // TODO: Update this after SalaryServiceTest is merged to be 3!
         assertEquals(2, userStream.count());
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"email1@email.com", "email2@email.com"})
+    void loadUserByUsername_whenCalledWithExistingUsername_isSuccess(String username) {
+        var user = superUserService.loadUserByUsername(username);
+        assertEquals(username, user.getUsername());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "pera@pera.com", "Email2@gmail.com"})
+    void loadUserByUsername_whenCalledWithNonExistingUsername_throwsException(String username) {
+        assertThrows(SuperUserNotFoundException.class, () -> superUserService.loadUserByUsername(username));
+    }
 }
