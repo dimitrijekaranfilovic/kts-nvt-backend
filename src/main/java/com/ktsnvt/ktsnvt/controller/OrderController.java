@@ -74,6 +74,7 @@ public class OrderController {
         this.orderService.sendOrderItemGroup(orderId, groupId, request.getPin());
     }
 
+
     @GetMapping(value = "/{id}/groups")
     public List<OrderItemGroupResponse> getOrderItemGroups(@PathVariable("id") Integer orderId){
         var orderItemGroups = this.orderService.getOrderItemGroups(orderId);

@@ -1,9 +1,6 @@
 package com.ktsnvt.ktsnvt.service.impl;
 
-import com.ktsnvt.ktsnvt.exception.EmailAlreadyExistsException;
-import com.ktsnvt.ktsnvt.exception.InvalidPasswordException;
-import com.ktsnvt.ktsnvt.exception.ManagerNotFoundException;
-import com.ktsnvt.ktsnvt.exception.SuperUserNotFoundException;
+import com.ktsnvt.ktsnvt.exception.*;
 import com.ktsnvt.ktsnvt.model.SuperUser;
 import com.ktsnvt.ktsnvt.model.enums.SuperUserType;
 import com.ktsnvt.ktsnvt.repository.SuperUserRepository;
@@ -89,7 +86,7 @@ public class SuperUserServiceImpl extends TransactionalServiceBase implements Su
     @Override
     public void updatePassword(Integer id, String oldPassword, String newPassword) {
         var user = read(id);
-        if (!user.getPassword().equals(passwordEncoder.encode(oldPassword))) {
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new InvalidPasswordException("Incorrect old password provided.");
         }
         user.setPassword(passwordEncoder.encode(newPassword));

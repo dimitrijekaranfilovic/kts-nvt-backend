@@ -21,21 +21,18 @@ class SectionServiceTest {
     private SectionServiceImpl sectionService;
 
     @Test
-    @Order(1)
     void getAllSections_isSuccess() {
         var sections = sectionService.getAllSections();
         assertEquals(4, sections.size());
     }
 
     @Test
-    @Order(1)
     void read_calledWithValidId_isSuccess() {
         var section = sectionService.read(1);
         assertEquals(1, section.getId());
     }
 
     @Test
-    @Order(2)
     void read_calledWithInvalidId_throwsSectionNotFoundException() {
         assertThrows(SectionNotFoundException.class, () -> sectionService.read(0));
     }
@@ -65,7 +62,6 @@ class SectionServiceTest {
     }
 
     @Test
-    @Order(3)
     void update_calledWithValidData_isSuccess() {
         sectionService.update(1, "New name");
         assertEquals("New name", sectionService.read(1).getName());

@@ -1,10 +1,11 @@
 package com.ktsnvt.ktsnvt.dto.auth;
 
+import lombok.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
-@Data @AllArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class AuthRequest {
 
     private String email;

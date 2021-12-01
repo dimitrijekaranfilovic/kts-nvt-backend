@@ -1,11 +1,14 @@
 package com.ktsnvt.ktsnvt.dto.createorderitemgroup;
 
 
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class CreateOrderItemGroupRequest {
 
     @NotBlank(message = "Group name cannot be blank.")

@@ -1,9 +1,6 @@
 package com.ktsnvt.ktsnvt.service.impl;
 
-import com.ktsnvt.ktsnvt.exception.IllegalOrderStateException;
-import com.ktsnvt.ktsnvt.exception.NotFoundException;
-import com.ktsnvt.ktsnvt.exception.OccupiedTableException;
-import com.ktsnvt.ktsnvt.exception.OrderItemGroupInvalidStatusException;
+import com.ktsnvt.ktsnvt.exception.*;
 import com.ktsnvt.ktsnvt.model.BaseEntity;
 import com.ktsnvt.ktsnvt.model.Employee;
 import com.ktsnvt.ktsnvt.model.Order;
@@ -18,6 +15,7 @@ import com.ktsnvt.ktsnvt.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +51,9 @@ public class OrderServiceImpl extends TransactionalServiceBase implements OrderS
 
     @Override
     public Order getOrder(Integer id) {
-        return this.orderRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Order with id %d not found.", id)));
+        return this.orderRepository
+                .findById(id)
+                .orElseThrow(() -> new OrderNotFoundException(String.format("Order with id %d not found.", id)));
     }
 
     @Override
@@ -97,6 +97,7 @@ public class OrderServiceImpl extends TransactionalServiceBase implements OrderS
 
     @Override
     public List<OrderItemGroup> getOrderItemGroups(Integer orderId) {
+        //maybe throw an exception if order does not exist
         var orderItemGroups = this.orderItemGroupRepository.getOrderItemGroupsForOrder(orderId);
         orderItemGroups.forEach(oig ->
             oig.setOrderItems(oig.getOrderItems().stream().filter(BaseEntity::getIsActive).collect(Collectors.toSet())));
@@ -125,7 +126,7 @@ public class OrderServiceImpl extends TransactionalServiceBase implements OrderS
     @Override
     public void chargeOrder(Integer id, String pin) {
         var order = getOrder(id);
-        employeeOrderService.throwIfWaiterNotResponsible(pin, id);
+        employeeOrderService.throwIfWaiterNotResponsible(pin, order.getWaiter().getId());
         if (!order.getStatus().equals(OrderStatus.IN_PROGRESS)) {
             throw new IllegalOrderStateException("Order is not in IN PROGRESS state and thus cannot be charged.");
         }
@@ -139,8 +140,8 @@ public class OrderServiceImpl extends TransactionalServiceBase implements OrderS
                         .stream()
                         .filter(BaseEntity::getIsActive)
                         .forEach(item -> {
-                            order.setTotalIncome(order.getTotalIncome().add(item.getCurrentMenuPrice()));
-                            order.setTotalCost(order.getTotalCost().add(item.getCurrentBasePrice()));
+                            order.setTotalIncome(order.getTotalIncome().add(item.getCurrentMenuPrice().multiply(BigDecimal.valueOf(item.getAmount()))));
+                            order.setTotalCost(order.getTotalCost().add(item.getCurrentBasePrice().multiply(BigDecimal.valueOf(item.getAmount()))));
                         }));
         order.setStatus(OrderStatus.CHARGED);
         order.setServedAt(localDateTimeService.currentTime());
@@ -162,8 +163,12 @@ public class OrderServiceImpl extends TransactionalServiceBase implements OrderS
     }
 
     @Override
+    //TODO: test
     public OrderItemGroup createGroupForOrder(Integer orderId, String groupName, String pin) {
         var order = this.getOrder(orderId);
+        if (order.getStatus() != OrderStatus.CREATED && order.getStatus() != OrderStatus.IN_PROGRESS)
+            throw new IllegalOrderStateException(String.format("Status of order with id %d is neither CREATED nor IN_PROGRESS and new groups cannot be created for it.", orderId));
+
         var optionalOrderItemGroup = this.getOrderItemGroup(orderId, groupName);
         if (optionalOrderItemGroup.isPresent())
             throw new OrderItemGroupInvalidStatusException(String.format("Group with name %s already exists for order with id %d.", groupName, orderId));

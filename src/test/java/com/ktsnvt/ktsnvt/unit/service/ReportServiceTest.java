@@ -6,6 +6,9 @@ import com.ktsnvt.ktsnvt.service.*;
 import com.ktsnvt.ktsnvt.service.impl.ReportServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -112,6 +115,27 @@ class ReportServiceTest {
         assertEquals(startDate, statistics.getLabels().get(0));
         assertEquals(endDate, statistics.getLabels().get(30));
         assertEquals(999, statistics.getValues().get(2));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideTestsForReadTemplate")
+    void readReportTemplate_whenCalledWithValidDates_hasCorrectNumberOfElements(LocalDate from, LocalDate to, int expected) {
+        // GIVEN
+
+        // WHEN
+        var statistics = reportService.readReportTemplate(from, to, (date) -> 999);
+
+        // THEN
+        assertEquals(expected, statistics.getLabels().size());
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideTestsForReadTemplate() {
+        return Stream.of(
+                Arguments.of(LocalDate.of(2021, 11, 14), LocalDate.of(2021, 11, 16), 3),
+                Arguments.of(LocalDate.of(2021, 11, 30), LocalDate.of(2021, 11, 30), 1),
+                Arguments.of(LocalDate.of(2021, 11, 30), LocalDate.of(2021, 11, 16), 0)
+        );
     }
 
     private <T> void assertReportTestCase(ReportStatistics<LocalDate, T> statistics, T one, T two, T three) {
