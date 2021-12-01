@@ -39,8 +39,7 @@ public class OrderItemServiceTest {
 
     public static Stream<Arguments> provideFor_finishItemRequest_success() {
         return Stream.of(
-            Arguments.of(2, "1234"),
-            Arguments.of(11, "5678")
+            Arguments.of(2, "1234")
         );
     }
 
