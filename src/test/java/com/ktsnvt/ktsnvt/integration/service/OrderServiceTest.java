@@ -1,10 +1,8 @@
 package com.ktsnvt.ktsnvt.integration.service;
 
 
-import com.ktsnvt.ktsnvt.exception.IllegalOrderStateException;
-import com.ktsnvt.ktsnvt.exception.InvalidEmployeeTypeException;
-import com.ktsnvt.ktsnvt.exception.NotFoundException;
-import com.ktsnvt.ktsnvt.exception.OrderItemGroupInvalidStatusException;
+import com.ktsnvt.ktsnvt.exception.*;
+import com.ktsnvt.ktsnvt.model.enums.OrderStatus;
 import com.ktsnvt.ktsnvt.service.impl.OrderServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -13,13 +11,77 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import static org.junit.jupiter.api.Assertions.*;
+
 @Transactional
 @SpringBootTest
 class OrderServiceTest {
-
     @Autowired
     private OrderServiceImpl orderService;
 
+    @Test
+    void getOrder_whenCalledWithValidId_isSuccess() {
+        var order = orderService.getOrder(1);
+        assertEquals(1, order.getId());
+    }
+
+    @Test
+    void getOrder_whenCalledWithInvalidId_throwsException() {
+        assertThrows(OrderNotFoundException.class, () -> orderService.getOrder(15));
+    }
+
+    @Test
+    void createOrder_whenCalledWithValidData_isSuccess() {
+        var createdOrder = orderService.createOrder(2, "4321");
+        assertTrue(createdOrder.getId() > 0);
+        assertEquals(OrderStatus.CREATED, createdOrder.getStatus());
+        assertEquals("4321", createdOrder.getWaiter().getPin());
+    }
+
+    @Test
+    void createOrder_whenCalledWithBusyTable_throwsException() {
+        assertThrows(OccupiedTableException.class, () -> orderService.createOrder(10, "4321"));
+    }
+
+    @Test
+    void chargeOrder_whenCalledWithValidOrder_isSuccess() {
+        assertDoesNotThrow(() -> orderService.chargeOrder(3, "4321"));
+    }
+
+    @Test
+    void chargeOrder_whenCalledWithEmptyOrder_isSuccess() {
+        assertDoesNotThrow(() -> orderService.cancelOrder(8, "4321"));
+    }
+
+    @Test
+    void chargeOrder_whenCalledWithNotInProgressOrder_throwsException() {
+        assertThrows(IllegalOrderStateException.class, () -> orderService.chargeOrder(2, "4321"));
+    }
+
+    @Test
+    void chargeOrder_whenCalledWithNotFinishedOrder_throwsException() {
+        assertThrows(IllegalOrderStateException.class, () -> orderService.chargeOrder(6, "4321"));
+    }
+
+    @Test
+    void cancelOrder_whenCalledWithValidOrder_isSuccess() {
+        assertDoesNotThrow(() -> orderService.cancelOrder(2, "4321"));
+    }
+
+    @Test
+    void cancelOrder_whenCalledWithChargedOrder_throwsException() {
+        assertThrows(IllegalOrderStateException.class, () -> orderService.cancelOrder(1, "4321"));
+    }
+
+    @Test
+    void cancelOrder_whenCalledWithCancelledOrder_throwsException() {
+        assertThrows(IllegalOrderStateException.class, () -> orderService.cancelOrder(7, "4321"));
+    }
+
+    @Test
+    void cancelOrder_whenCalledWithStartedOrder_throwsException() {
+        assertThrows(IllegalOrderStateException.class, () -> orderService.cancelOrder(6, "4321"));
+    }
 
     @Test
     void createGroupForOrder_withValidData_isSuccess(){

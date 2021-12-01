@@ -49,7 +49,7 @@ class OrderControllerTest {
     private static Stream<Arguments> provideGroupSendingAndDeletingData() {
         return Stream.of(
                 Arguments.of(2, 5),
-                Arguments.of(3, 6)
+                Arguments.of(1, 2)
         );
     }
 

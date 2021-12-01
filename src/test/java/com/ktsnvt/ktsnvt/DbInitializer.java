@@ -172,11 +172,17 @@ public class DbInitializer implements ApplicationRunner {
         var order3 = new Order(IN_PROGRESS, LocalDateTime.parse("2021-02-03 16:16", formatter), null, restaurantTable1, employee3);
         var order4 = new Order(CHARGED, LocalDateTime.parse("2021-11-14 12:12", formatter), LocalDateTime.parse("2021-11-14 13:15", formatter), restaurantTable1, employee3);
         var order5 = new Order(CHARGED, LocalDateTime.parse("2021-11-13 13:12", formatter), LocalDateTime.parse("2021-11-14 14:15", formatter), restaurantTable2, employee3);
+        var order6 = new Order(IN_PROGRESS, LocalDateTime.parse("2021-02-03 16:16", formatter), null, restaurantTable1, employee3);
+        var order7 = new Order(CANCELLED, LocalDateTime.parse("2021-02-03 16:16", formatter), null, restaurantTable1, employee3);
+        var order8 = new Order(CREATED, LocalDateTime.parse("2021-02-03 16:16", formatter), null, restaurantTable1, employee3);
         orderRepo.save(order1);
         orderRepo.save(order2);
         orderRepo.save(order3);
         orderRepo.save(order4);
         orderRepo.save(order5);
+        orderRepo.save(order6);
+        orderRepo.save(order7);
+        orderRepo.save(order8);
 
         var orderGroup1 = new OrderItemGroup("Group 1", OrderItemGroupStatus.SENT, null);
         order1.addOrderItemGroup(orderGroup1);
@@ -198,9 +204,18 @@ public class DbInitializer implements ApplicationRunner {
         order2.addOrderItemGroup(orderGroup5);
         orderItemGroupRepo.save(orderGroup5);
 
-        var orderGroup6 = new OrderItemGroup("Group 6", OrderItemGroupStatus.NEW, null);
+        var orderGroup6 = new OrderItemGroup("Group 6", OrderItemGroupStatus.DONE, null);
         order3.addOrderItemGroup(orderGroup6);
         orderItemGroupRepo.save(orderGroup6);
+
+        var orderGroup7 = new OrderItemGroup("Group 7", OrderItemGroupStatus.SENT, null);
+        order6.addOrderItemGroup(orderGroup7);
+        orderItemGroupRepo.save(orderGroup7);
+
+//        var orderGroup5 = new OrderItemGroup("Group 5", OrderItemGroupStatus.SENT, null);
+//        order6.addOrderItemGroup(orderGroup5);
+//        orderItemGroupRepo.save(orderGroup5);
+
 
 
         var orderItem1 = new OrderItem(2, orderGroup1, null, menuItem1, OrderItemStatus.SENT);
@@ -216,7 +231,7 @@ public class DbInitializer implements ApplicationRunner {
         var orderItem9 = new OrderItem(1, orderGroup4, null, menuItem3, OrderItemStatus.DONE);
 
         var orderItem10 = new OrderItem(1, orderGroup1, employee1, menuItem1, OrderItemStatus.PREPARING);
-        var orderItem11 = new OrderItem(1, orderGroup1, employee2, menuItem3, OrderItemStatus.PREPARING);
+        var orderItem11 = new OrderItem(1, orderGroup1, employee1, menuItem3, OrderItemStatus.PREPARING);
 
         var orderItem12 = new OrderItem(1, orderGroup2, null, menuItem1, OrderItemStatus.NEW);
 
