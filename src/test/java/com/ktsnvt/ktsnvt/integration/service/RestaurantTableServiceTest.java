@@ -9,11 +9,13 @@ import com.ktsnvt.ktsnvt.service.impl.RestaurantTableServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
+@Transactional
 public class RestaurantTableServiceTest {
 
     @Autowired
@@ -32,8 +34,8 @@ public class RestaurantTableServiceTest {
 
     @Test
     void getAllTablesForSection_calledWithValidSectionId_isSuccess() {
-        var tables = restaurantTableService.getAllTablesForSection(1);
-        assertEquals(3, tables.size());
+        var tables = restaurantTableService.getAllTablesForSection(4);
+        assertEquals(2, tables.size());
     }
 
     @Test
@@ -46,13 +48,13 @@ public class RestaurantTableServiceTest {
     @Test
     void createRestaurantTable_hasSameNumberAsOtherTableInSection_throwsDuplicateTableNumberException() {
         var newTable = new RestaurantTable(1, 11, 11, 1, null);
-        assertThrows(DuplicateTableNumberException.class, () -> restaurantTableService.createRestaurantTable(newTable, 1));
+        assertThrows(DuplicateTableNumberException.class, () -> restaurantTableService.createRestaurantTable(newTable, 3));
     }
 
     @Test
-    void createRestaurantTable_hasSameNumberAsOtherTableInSection_throwsTableIntersectionException() {
-        var newTable = new RestaurantTable(0, 20, 20, 1, null);
-        assertThrows(TableIntersectionException.class, () -> restaurantTableService.createRestaurantTable(newTable, 1));
+    void createRestaurantTable_overlappingWithTableInSection_throwsTableIntersectionException() {
+        var newTable = new RestaurantTable(0, 0, 0, 1, null);
+        assertThrows(TableIntersectionException.class, () -> restaurantTableService.createRestaurantTable(newTable, 3));
     }
 
     @Test
