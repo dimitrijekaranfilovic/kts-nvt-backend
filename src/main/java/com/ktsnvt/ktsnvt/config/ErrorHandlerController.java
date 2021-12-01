@@ -11,6 +11,7 @@ import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -31,6 +32,13 @@ public class ErrorHandlerController {
     @ResponseBody
     public ErrorInfo handleBusinessException(HttpServletRequest request, BusinessException ex) {
         return new ErrorInfo(request.getRequestURI(), ex.getMessage(), LocalDateTime.now(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseBody
+    public ErrorInfo handleBadCredentialsException(HttpServletRequest request, BadCredentialsException ex) {
+        return new ErrorInfo(request.getRequestURI(), ex.getMessage(), LocalDateTime.now(), HttpStatus.UNAUTHORIZED);
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
