@@ -34,4 +34,13 @@ class ReportServiceTest {
         assertEquals(0, statistics.getValues().get(0).compareTo(BigDecimal.valueOf(0)));
         assertEquals(0, statistics.getValues().get(statistics.getLabels().size() - 1).compareTo(BigDecimal.valueOf(3462)));
     }
+
+    @Test
+    void readOrderCosts_whenCalledWithValidDate_isSuccess() {
+        var from = LocalDate.of(2020, 11, 30);
+        var to = LocalDate.of(2021, 11, 14);
+        var statistics = reportService.readOrderCosts(from, to);
+        assertEquals(0, statistics.getValues().get(0).compareTo(BigDecimal.valueOf(0)));
+        assertEquals(0, statistics.getValues().get(statistics.getLabels().size() - 1).compareTo(BigDecimal.valueOf(162)));
+    }
 }
