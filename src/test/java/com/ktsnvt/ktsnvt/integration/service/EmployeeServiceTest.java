@@ -1,5 +1,6 @@
 package com.ktsnvt.ktsnvt.integration.service;
 
+import com.ktsnvt.ktsnvt.exception.BusyEmployeeDeletionException;
 import com.ktsnvt.ktsnvt.exception.EmployeeNotFoundException;
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
 import com.ktsnvt.ktsnvt.service.impl.EmployeeServiceImpl;
@@ -57,6 +58,21 @@ public class EmployeeServiceTest {
     void read_whenCalledWithPagination_isSuccess(String query, BigDecimal salaryFrom, BigDecimal salaryTo, EmployeeType type, Pageable pageable, int expected) {
         var page = employeeService.read(query, salaryFrom, salaryTo, type, pageable);
         assertEquals(expected, page.getTotalElements());
+    }
+
+    @Test
+    void delete_whenCalledWithValidId_isSuccess() {
+        assertDoesNotThrow(() -> employeeService.delete(2));
+    }
+
+    @Test
+    void delete_whenCalledWithEmployeeWithAssignedOrders_throwsException() {
+        assertThrows(BusyEmployeeDeletionException.class, () -> employeeService.delete(3));
+    }
+
+    @Test
+    void delete_whenCalledWithEmployeeWithActiveOrderItems_throwsException() {
+        assertThrows(BusyEmployeeDeletionException.class, () -> employeeService.delete(1));
     }
 
     @SuppressWarnings("unused")
