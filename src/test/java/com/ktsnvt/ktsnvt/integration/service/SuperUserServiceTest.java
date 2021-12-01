@@ -26,7 +26,6 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-// TODO: Check this tests after SalaryServiceTest has been merged!!!
 @SpringBootTest
 @Transactional
 class SuperUserServiceTest {
@@ -49,7 +48,7 @@ class SuperUserServiceTest {
     @Test
     void readAll_whenCalledNormally_isSuccess() {
         var userStream = superUserService.readAll();
-        assertEquals(2, userStream.count());
+        assertEquals(3, userStream.count());
     }
 
     @ParameterizedTest
@@ -149,7 +148,7 @@ class SuperUserServiceTest {
     private static Stream<Arguments> provideTestsForPaginatedRead() {
         var pageable = PageRequest.of(0, 10, Sort.unsorted());
         return Stream.of(
-                Arguments.of("", null, null, null, pageable, 2),
+                Arguments.of("", null, null, null, pageable, 3),
                 Arguments.of("iKO", null, null, null, pageable, 1),
                 Arguments.of("iKO", null, BigDecimal.valueOf(500), null, pageable, 1),
                 Arguments.of("iKO", null, null, SuperUserType.MANAGER, pageable, 0),
