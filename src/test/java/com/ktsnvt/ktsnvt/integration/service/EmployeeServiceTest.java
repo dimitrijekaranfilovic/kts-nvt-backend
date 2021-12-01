@@ -2,11 +2,16 @@ package com.ktsnvt.ktsnvt.integration.service;
 
 import com.ktsnvt.ktsnvt.exception.BusyEmployeeDeletionException;
 import com.ktsnvt.ktsnvt.exception.EmployeeNotFoundException;
+import com.ktsnvt.ktsnvt.exception.PinAlreadyExistsException;
+import com.ktsnvt.ktsnvt.model.Authority;
+import com.ktsnvt.ktsnvt.model.Employee;
+import com.ktsnvt.ktsnvt.model.Salary;
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
 import com.ktsnvt.ktsnvt.service.impl.EmployeeServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -75,6 +81,24 @@ public class EmployeeServiceTest {
         assertThrows(BusyEmployeeDeletionException.class, () -> employeeService.delete(1));
     }
 
+    @ParameterizedTest
+    @EnumSource(EmployeeType.class)
+    void create_whenCalledWithValidData_isSuccess(EmployeeType employeeType) {
+        var employee = makeEmployee("pera", "peric", "99999999", employeeType, 123L);
+        var createdEmployee = employeeService.create(employee);
+        assertTrue(createdEmployee.getId() > 0);
+        assertEquals(employeeType.toString(), employee.getAuthority().getName());
+        assertEquals(1, employee.getSalaries().size());
+        assertEquals(0, BigDecimal.valueOf(123L).compareTo(employee.getCurrentSalary()));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"1234", "5678", "4321"})
+    void create_whenCalledWithDuplicatePin_throwsException(String pin) {
+        var employee = makeEmployee("pera", "peric", pin, EmployeeType.WAITER, 456L);
+        assertThrows(PinAlreadyExistsException.class, () -> employeeService.create(employee));
+    }
+
     @SuppressWarnings("unused")
     private static Stream<Arguments> provideTestsForPaginatedRead() {
         var pageable = PageRequest.of(0, 10, Sort.unsorted());
@@ -86,6 +110,13 @@ public class EmployeeServiceTest {
                 Arguments.of("aRk", null, null, EmployeeType.CHEF, pageable, 0),
                 Arguments.of("", BigDecimal.valueOf(200), BigDecimal.valueOf(600), null, pageable, 3)
         );
+    }
+
+    private Employee makeEmployee(String name, String surname, String pinCode, EmployeeType type, long salaryValue) {
+        var employee = new Employee(name, surname, null, pinCode, type);
+        var salary = new Salary(LocalDate.of(2021, 11, 30), null, BigDecimal.valueOf(salaryValue), employee);
+        employee.addSalary(salary);
+        return employee;
     }
 
 }
