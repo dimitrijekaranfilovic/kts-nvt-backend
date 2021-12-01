@@ -96,8 +96,10 @@ public class DbInitializer implements ApplicationRunner {
         manager1.addSalary(salary4);
         var admin1 = new SuperUser("Nikola", "Stankovic", admin, "email2@email.com", passwordEncoder.encode("password"), SuperUserType.ADMIN);
         admin1.addSalary(salary5);
+        var admin2 = new SuperUser("Vidoje", "Gavrilovic", admin, "vidojegavrilovic@email.com", passwordEncoder.encode("password"), SuperUserType.ADMIN);
         superUserRepo.save(manager1);
         superUserRepo.save(admin1);
+        superUserRepo.save(admin2);
 
         var basePrice1 = new BasePrice(LocalDateTime.parse("2021-01-01 12:12", formatter), null, BigDecimal.valueOf(30.00), null);
         var basePrice2 = new BasePrice(LocalDateTime.parse("2021-01-02 12:12", formatter), null, BigDecimal.valueOf(440.00), null);

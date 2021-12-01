@@ -51,7 +51,7 @@ class SalaryServiceTest {
     }
 
     @Test
-    void endActiveSalaryForUser_calledWithUserWithNoActiveSalary_throwsExeption() {
+    void endActiveSalaryForUser_calledWithUserWithNoActiveSalary_throwsException() {
         // GIVEN
         var user = new Employee();
         user.setId(999);
