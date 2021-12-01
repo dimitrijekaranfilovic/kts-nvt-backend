@@ -98,6 +98,7 @@ public class OrderServiceImpl extends TransactionalServiceBase implements OrderS
 
     @Override
     public List<OrderItemGroup> getOrderItemGroups(Integer orderId) {
+        //maybe throw an exception if order does not exist
         var orderItemGroups = this.orderItemGroupRepository.getOrderItemGroupsForOrder(orderId);
         orderItemGroups.forEach(oig ->
             oig.setOrderItems(oig.getOrderItems().stream().filter(BaseEntity::getIsActive).collect(Collectors.toSet())));

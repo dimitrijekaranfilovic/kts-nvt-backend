@@ -1,11 +1,14 @@
 package com.ktsnvt.ktsnvt.dto.sendorderitemgroup;
 
 
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 
-@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class SendOrderItemGroupRequest {
 
     @NotBlank(message = "PIN cannot be blank.")
