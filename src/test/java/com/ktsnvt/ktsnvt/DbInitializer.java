@@ -71,11 +71,11 @@ public class DbInitializer implements ApplicationRunner {
         authorityRepo.save(manager);
         authorityRepo.save(admin);
 
-        var salary1 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
-        var salary2 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("512.00"), null);
-        var salary3 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
-        var salary4 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("550.00"), null);
-        var salary5 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
+        var salary1 = new Salary(LocalDate.parse("2021-01-01"), null, BigDecimal.valueOf(500), null);
+        var salary2 = new Salary(LocalDate.parse("2021-01-01"), null, BigDecimal.valueOf(512), null);
+        var salary3 = new Salary(LocalDate.parse("2021-01-01"), null, BigDecimal.valueOf(500), null);
+        var salary4 = new Salary(LocalDate.parse("2021-12-01"), null, BigDecimal.valueOf(550), null);
+        var salary5 = new Salary(LocalDate.parse("2021-12-01"), null, BigDecimal.valueOf(500), null);
         salaryRepo.save(salary1);
         salaryRepo.save(salary2);
         salaryRepo.save(salary3);

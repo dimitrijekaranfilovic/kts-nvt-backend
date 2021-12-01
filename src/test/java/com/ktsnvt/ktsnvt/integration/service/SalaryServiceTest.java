@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -19,6 +20,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@Transactional
 class SalaryServiceTest {
     @Autowired
     private SalaryServiceImpl salaryService;
@@ -49,10 +51,20 @@ class SalaryServiceTest {
         assertThrows(UserHasNoActiveSalaryException.class, () -> salaryService.updateUserSalary(user.getId(), salary));
     }
 
-    private static User makeUser(Integer id) {
-        var user = new Employee();
-        user.setId(id);
-        return user;
+    @ParameterizedTest
+    @MethodSource("provideDatesAndExpenses")
+    void readExpensesForDate_whenCalledWithValidDate_isSuccess(LocalDate date, BigDecimal expected) {
+        assertEquals(0, salaryService.readExpensesForDate(date).compareTo(expected));
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideDatesAndExpenses() {
+        return Stream.of(
+                Arguments.of(LocalDate.of(2021, 11, 11), BigDecimal.valueOf(1512)),
+                Arguments.of(LocalDate.of(2021, 12, 1), BigDecimal.valueOf(2562)),
+                Arguments.of(LocalDate.of(2022, 12, 1), BigDecimal.valueOf(2562)),
+                Arguments.of(LocalDate.of(2020, 12, 1), BigDecimal.ZERO)
+        );
     }
 
     @SuppressWarnings("unused")
@@ -72,4 +84,10 @@ class SalaryServiceTest {
                 Arguments.of(makeUser(8))
         );
     }
+    private static User makeUser(Integer id) {
+        var user = new Employee();
+        user.setId(id);
+        return user;
+    }
+
 }
