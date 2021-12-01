@@ -71,6 +71,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/sections/{sectionId}/tables").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/sections").permitAll()
 
+                .antMatchers(HttpMethod.GET, "/api/menu-items").permitAll()
+
                 .antMatchers("/socket").permitAll()
                 .antMatchers("/socket-publisher").permitAll()
                 .antMatchers("/socket-subscriber").permitAll()
