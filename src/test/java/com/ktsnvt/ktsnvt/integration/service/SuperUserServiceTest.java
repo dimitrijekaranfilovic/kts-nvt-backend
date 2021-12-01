@@ -2,13 +2,22 @@ package com.ktsnvt.ktsnvt.integration.service;
 
 import com.ktsnvt.ktsnvt.exception.ManagerNotFoundException;
 import com.ktsnvt.ktsnvt.exception.SuperUserNotFoundException;
+import com.ktsnvt.ktsnvt.model.enums.SuperUserType;
 import com.ktsnvt.ktsnvt.service.impl.SuperUserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -75,5 +84,24 @@ class SuperUserServiceTest {
     @ValueSource(ints = {1, 2, 3, 5, 8})
     void readManagerForUpdate_whenCalledWithInvalidId_throwsException(Integer id) {
         assertThrows(ManagerNotFoundException.class, () -> superUserService.readManagerForUpdate(id));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideTestsForPaginatedRead")
+    void read_whenCalledWithPagination_isSuccess(String query, BigDecimal salaryFrom, BigDecimal salaryTo, SuperUserType type, Pageable pageable, int expected) {
+        var page = superUserService.read(query, salaryFrom, salaryTo, type, pageable);
+        assertEquals(expected, page.getTotalElements());
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideTestsForPaginatedRead() {
+        var pageable = PageRequest.of(0, 10, Sort.unsorted());
+        return Stream.of(
+                Arguments.of("", null, null, null, pageable, 2),
+                Arguments.of("iKO", null, null, null, pageable, 1),
+                Arguments.of("iKO", null, BigDecimal.valueOf(500), null, pageable, 1),
+                Arguments.of("iKO", null, null, SuperUserType.MANAGER, pageable, 0),
+                Arguments.of("", BigDecimal.valueOf(200), BigDecimal.valueOf(600), null, pageable, 2)
+        );
     }
 }

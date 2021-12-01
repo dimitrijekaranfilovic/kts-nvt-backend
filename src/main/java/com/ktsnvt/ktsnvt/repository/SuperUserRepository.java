@@ -22,7 +22,8 @@ public interface SuperUserRepository extends JpaRepository<SuperUser, Integer> {
     Optional<SuperUser> findByEmail(String email);
 
     @Query("select u from SuperUser u where ((lower(u.name) like concat('%', :query, '%')) or (lower(u.surname) like concat('%', :query, '%')))" +
-            " and u.currentSalary >= :salaryFrom and u.currentSalary <= :salaryTo and (:type is null or u.type = : type) and u.isActive = true")
+            " and (:salaryFrom is null or u.currentSalary >= :salaryFrom) and (:salaryTo is null or u.currentSalary <= :salaryTo) " +
+            " and (:type is null or u.type = : type) and u.isActive = true")
     Page<SuperUser> findAll(String query, BigDecimal salaryFrom, BigDecimal salaryTo, SuperUserType type, Pageable pageable);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
