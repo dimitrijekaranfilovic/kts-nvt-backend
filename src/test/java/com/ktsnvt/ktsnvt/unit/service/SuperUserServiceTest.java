@@ -19,9 +19,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class SuperUserServiceTest {
@@ -109,13 +109,14 @@ class SuperUserServiceTest {
         superUser.setId(superUserId);
         SuperUserService superUserServiceSpy = spy(superUserService);
         doReturn(superUser).when(superUserServiceSpy).read(superUser.getId());
+        doReturn(true).when(passwordEncoder).matches(oldPassword, superUser.getPassword());
 
         // WHEN
         superUserServiceSpy.updatePassword(superUserId, oldPassword, newPassword);
 
         // THEN
         assertEquals(newPassword, superUser.getPassword());
-        verify(passwordEncoder, times(1)).encode(oldPassword);
+        verify(passwordEncoder, times(1)).matches(oldPassword, oldPassword);
         verify(passwordEncoder, times(1)).encode(newPassword);
         verifyNoInteractions(superUserRepository);
     }
@@ -131,13 +132,15 @@ class SuperUserServiceTest {
         superUser.setId(superUserId);
         SuperUserService superUserServiceSpy = spy(superUserService);
         doReturn(superUser).when(superUserServiceSpy).read(superUser.getId());
+        doReturn(false).when(passwordEncoder).matches(oldPasswordMistake, oldPassword);
 
         // WHEN
         assertThrows(InvalidPasswordException.class, () -> superUserServiceSpy.updatePassword(superUserId, oldPasswordMistake, newPassword));
 
         // THEN
         assertEquals(oldPassword, superUser.getPassword());
-        verify(passwordEncoder, times(1)).encode(oldPasswordMistake);
+        verify(passwordEncoder, times(1)).matches(oldPasswordMistake, oldPassword);
+        verify(passwordEncoder, times(0)).encode(oldPasswordMistake);
         verifyNoInteractions(superUserRepository);
     }
 

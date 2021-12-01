@@ -86,7 +86,7 @@ public class SuperUserServiceImpl extends TransactionalServiceBase implements Su
     @Override
     public void updatePassword(Integer id, String oldPassword, String newPassword) {
         var user = read(id);
-        if (!user.getPassword().equals(passwordEncoder.encode(oldPassword))) {
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new InvalidPasswordException("Incorrect old password provided.");
         }
         user.setPassword(passwordEncoder.encode(newPassword));
