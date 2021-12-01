@@ -1,5 +1,6 @@
 package com.ktsnvt.ktsnvt.service.impl;
 
+import com.ktsnvt.ktsnvt.exception.UserHasNoActiveSalaryException;
 import com.ktsnvt.ktsnvt.model.Salary;
 import com.ktsnvt.ktsnvt.model.User;
 import com.ktsnvt.ktsnvt.repository.SalaryRepository;
@@ -28,8 +29,10 @@ public class SalaryServiceImpl extends TransactionalServiceBase implements Salar
 
     @Override
     public void endActiveSalaryForUser(User user) {
-        salaryRepository.findActiveForUser(user.getId())
-                        .ifPresent(salary -> salary.setEndDate(localDateTimeService.currentDate()));
+        var salary = salaryRepository
+                .findActiveForUser(user.getId())
+                .orElseThrow(() -> new UserHasNoActiveSalaryException(String.format("User with id: '%d' has no active salary.", user.getId())));
+        salary.setEndDate(localDateTimeService.currentDate());
     }
 
     @Override
