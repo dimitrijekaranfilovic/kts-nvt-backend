@@ -2,6 +2,7 @@ package com.ktsnvt.ktsnvt.integration.service;
 
 import com.ktsnvt.ktsnvt.exception.BusyEmployeeDeletionException;
 import com.ktsnvt.ktsnvt.exception.EmployeeNotFoundException;
+import com.ktsnvt.ktsnvt.exception.IllegalEmployeeTypeChangeException;
 import com.ktsnvt.ktsnvt.exception.PinAlreadyExistsException;
 import com.ktsnvt.ktsnvt.model.Authority;
 import com.ktsnvt.ktsnvt.model.Employee;
@@ -99,6 +100,27 @@ public class EmployeeServiceTest {
         assertThrows(PinAlreadyExistsException.class, () -> employeeService.create(employee));
     }
 
+    @ParameterizedTest
+    @MethodSource("provideTestsForValidUpdate")
+    void update_whenCalledWithValidData_isSuccess(Integer id, String pin, EmployeeType employeeType) {
+        assertDoesNotThrow(() -> employeeService.update(id, "ime", "prezime", pin, employeeType));
+    }
+
+    @Test
+    void update_whenCalledWithWaiterWithAssignedOrders_throwsException() {
+        assertThrows(IllegalEmployeeTypeChangeException.class, () -> employeeService.update(3, "a", "a", "4321", EmployeeType.BARTENDER));
+    }
+
+    @Test
+    void update_whenCalledWithNotWaiterWithActiveOrderItems_throwsException() {
+        assertThrows(IllegalEmployeeTypeChangeException.class, () -> employeeService.update(1, "b", "b", "1234", EmployeeType.WAITER));
+    }
+
+    @Test
+    void update_whenCalledWithDuplicatePin_throwsException() {
+        assertThrows(PinAlreadyExistsException.class, () -> employeeService.update(1, "c", "c", "5678", EmployeeType.CHEF));
+    }
+
     @SuppressWarnings("unused")
     private static Stream<Arguments> provideTestsForPaginatedRead() {
         var pageable = PageRequest.of(0, 10, Sort.unsorted());
@@ -109,6 +131,18 @@ public class EmployeeServiceTest {
                 Arguments.of("aRk", null, null, EmployeeType.WAITER, pageable, 1),
                 Arguments.of("aRk", null, null, EmployeeType.CHEF, pageable, 0),
                 Arguments.of("", BigDecimal.valueOf(200), BigDecimal.valueOf(600), null, pageable, 3)
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideTestsForValidUpdate() {
+        return Stream.of(
+                Arguments.of(2, "5678", EmployeeType.WAITER),
+                Arguments.of(2, "5678", EmployeeType.BARTENDER),
+                Arguments.of(2, "5678", EmployeeType.CHEF),
+                Arguments.of(2, "9999", EmployeeType.BARTENDER),
+                Arguments.of(1, "1234", EmployeeType.CHEF),
+                Arguments.of(3, "4321", EmployeeType.WAITER)
         );
     }
 
