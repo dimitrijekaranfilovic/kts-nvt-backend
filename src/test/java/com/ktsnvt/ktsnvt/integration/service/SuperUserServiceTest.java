@@ -1,5 +1,6 @@
 package com.ktsnvt.ktsnvt.integration.service;
 
+import com.ktsnvt.ktsnvt.exception.InvalidPasswordException;
 import com.ktsnvt.ktsnvt.exception.ManagerNotFoundException;
 import com.ktsnvt.ktsnvt.exception.SuperUserNotFoundException;
 import com.ktsnvt.ktsnvt.model.enums.SuperUserType;
@@ -21,6 +22,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+// TODO: Check this tests after SalaryServiceTest has been merged!!!
 @SpringBootTest
 @Transactional
 class SuperUserServiceTest {
@@ -43,7 +45,6 @@ class SuperUserServiceTest {
     @Test
     void readAll_whenCalledNormally_isSuccess() {
         var userStream = superUserService.readAll();
-        // TODO: Update this after SalaryServiceTest is merged to be 3!
         assertEquals(2, userStream.count());
     }
 
@@ -101,6 +102,16 @@ class SuperUserServiceTest {
     @Test
     void deleteManager_whenCalledWithInvalidId_throwsException() {
         assertThrows(ManagerNotFoundException.class, () -> superUserService.deleteManager(5));
+    }
+
+    @Test
+    void updatePassword_whenCalledWithValidData_isSuccess() {
+        assertDoesNotThrow(() -> superUserService.updatePassword(4, "password", "something new"));
+    }
+
+    @Test
+    void updatePassword_whenCalledWithInvalidOldPassword_throwsException() {
+        assertThrows(InvalidPasswordException.class, () -> superUserService.updatePassword(4, "wrong", "something new"));
     }
 
     @SuppressWarnings("unused")
