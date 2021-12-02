@@ -2,6 +2,7 @@ package com.ktsnvt.ktsnvt.integration.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ktsnvt.ktsnvt.dto.cancelorder.CancelOrderRequest;
 import com.ktsnvt.ktsnvt.dto.chargeorder.ChargeOrderRequest;
 import com.ktsnvt.ktsnvt.dto.createorder.CreateOrderRequest;
 import com.ktsnvt.ktsnvt.dto.createorderitemgroup.CreateOrderItemGroupRequest;
@@ -63,7 +64,7 @@ class OrderControllerTest {
 
     @ParameterizedTest
     @MethodSource("provideInvalidCreateOrderRequests")
-    void createOrder_whenCalledWithInvalidRequest_throwsException(CreateOrderRequest request, int status) throws Exception {
+    void createOrder_whenCalledWithInvalidRequest_notCreated(CreateOrderRequest request, int status) throws Exception {
         mockMvc.perform(post("/api/orders")
                     .contentType("application/json")
                     .content(objectMapper.writeValueAsString(request)))
@@ -87,8 +88,31 @@ class OrderControllerTest {
 
     @ParameterizedTest
     @MethodSource("provideInvalidChargeOrderRequests")
-    void chargeOrder_whenCalledWithValidData_isSuccess(ChargeOrderRequest request, int orderId, int status) throws Exception {
+    void chargeOrder_whenCalledWithInvalidData_notNoContent(ChargeOrderRequest request, int orderId, int status) throws Exception {
         mockMvc.perform(put("/api/orders/{id}/charge", orderId)
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().is(status)
+                );
+    }
+
+    @Test
+    void cancelOrder_whenCalledWithValidOrder_isSuccess() throws Exception {
+        var request = new CancelOrderRequest("4321");
+        var orderId = 2;
+        mockMvc.perform(put("/api/orders/{id}/cancel", orderId)
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().isNoContent()
+                );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideInvalidCancelOrderRequests")
+    void cancelOrder_whenCalledWithInvalidRequest_notNoContent(CancelOrderRequest request, int orderId, int status) throws Exception {
+        mockMvc.perform(put("/api/orders/{id}/cancel", orderId)
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpectAll(
@@ -269,6 +293,17 @@ class OrderControllerTest {
                 Arguments.of(new ChargeOrderRequest(""), 3, 400),               // invalid request
                 Arguments.of(new ChargeOrderRequest("4321"), 2, 400),           // order not in progress
                 Arguments.of(new ChargeOrderRequest("4321"), 6, 400)            // order not finished
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideInvalidCancelOrderRequests() {
+        return Stream.of(
+                Arguments.of(new CancelOrderRequest(null), 2, 400),             // invalid request
+                Arguments.of(new CancelOrderRequest(""), 2, 400),               // invalid request
+                Arguments.of(new CancelOrderRequest("4321"), 1, 400),           // order already charged
+                Arguments.of(new CancelOrderRequest("4321"), 7, 400),           // order already cancelled
+                Arguments.of(new CancelOrderRequest("4321"), 6, 400)            // order preparation started
         );
     }
 
