@@ -1,11 +1,11 @@
 package com.ktsnvt.ktsnvt.dto.updatesuperuser;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
-@Data
+@NoArgsConstructor @AllArgsConstructor @Getter @Setter
 public class UpdateSuperUserRequest {
 
     @NotBlank(message = "First name cannot be blank.")

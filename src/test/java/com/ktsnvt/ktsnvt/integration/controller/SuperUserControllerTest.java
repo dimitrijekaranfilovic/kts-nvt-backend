@@ -4,6 +4,8 @@ package com.ktsnvt.ktsnvt.integration.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktsnvt.ktsnvt.dto.auth.AuthRequest;
 import com.ktsnvt.ktsnvt.dto.updatepassword.UpdatePasswordRequest;
+import com.ktsnvt.ktsnvt.dto.updatesuperuser.UpdateSuperUserRequest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -62,6 +64,33 @@ class SuperUserControllerTest extends AuthorizingControllerTestBase {
                 );
     }
 
+    @Test
+    void updateSuperUser_whenCalledWithValidData_isSuccess() throws Exception {
+        login("email1@email.com", "password");
+        var request = new UpdateSuperUserRequest("pera", "peric", "pera@gmail.com");
+        var id = 4;
+        mockMvc.perform(put("/api/super-users/{id}", id)
+                    .contentType("application/json")
+                    .header("Authorization", "Bearer " + token)
+                    .content(mapper.writeValueAsBytes(request)))
+                .andExpectAll(
+                        status().isNoContent()
+                );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideInvalidUpdateSuperUserRequests")
+    void updateSuperUser_whenCalledWithInvalidData_isFailure(String email, String password, UpdateSuperUserRequest request, int id, int status) throws Exception {
+        login(email, password);
+        mockMvc.perform(put("/api/super-users/{id}", id)
+                .contentType("application/json")
+                .header("Authorization", "Bearer " + token)
+                .content(mapper.writeValueAsBytes(request)))
+                .andExpectAll(
+                        status().is(status)
+                );
+    }
+
     @ParameterizedTest
     @MethodSource("provideValidLoginParams")
     void authenticate_withValidData_isSuccess(String email, String password) throws Exception {
@@ -99,6 +128,15 @@ class SuperUserControllerTest extends AuthorizingControllerTestBase {
                 Arguments.of("email2@email.com", "password", "password", 4, 403),
                 Arguments.of("email1@email.com", "password", "password123", 4, 400),
                 Arguments.of("email2@email.com", "password", "password123", 5, 400)
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideInvalidUpdateSuperUserRequests() {
+        return Stream.of(
+                Arguments.of("email1@email.com", "password", new UpdateSuperUserRequest("", "", ""), 4, 400),
+                Arguments.of("email1@email.com", "password", new UpdateSuperUserRequest("a", "b", "c@gmail.com"), 5, 403),
+                Arguments.of("email1@email.com", "password", new UpdateSuperUserRequest("a", "b", "email2@email.com"), 4, 400)
         );
     }
 
