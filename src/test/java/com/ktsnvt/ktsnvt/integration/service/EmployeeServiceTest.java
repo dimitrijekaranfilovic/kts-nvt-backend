@@ -42,7 +42,7 @@ public class EmployeeServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {4, 5, 6, 7, 8})
+    @ValueSource(ints = {4, 5, 6, 8})
     void read_whenCalledWithInvalidId_throwsException(Integer id) {
         assertThrows(EmployeeNotFoundException.class, () -> employeeService.read(id));
     }
@@ -55,7 +55,7 @@ public class EmployeeServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {4, 5, 6, 7, 8})
+    @ValueSource(ints = {4, 5, 6, 8})
     void readForUpdate_whenCalledWithInvalidId_throwsException(Integer id) {
         assertThrows(EmployeeNotFoundException.class, () -> employeeService.readForUpdate(id));
     }
@@ -125,7 +125,7 @@ public class EmployeeServiceTest {
     private static Stream<Arguments> provideTestsForPaginatedRead() {
         var pageable = PageRequest.of(0, 10, Sort.unsorted());
         return Stream.of(
-                Arguments.of("", null, null, null, pageable, 3),
+                Arguments.of("", null, null, null, pageable, 4),
                 Arguments.of("arK    ", null, null, null, pageable, 2),
                 Arguments.of("  arK", null, BigDecimal.valueOf(500), null, pageable, 1),
                 Arguments.of("aRk", null, null, EmployeeType.WAITER, pageable, 1),

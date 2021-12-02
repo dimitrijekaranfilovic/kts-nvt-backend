@@ -73,9 +73,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .antMatchers(HttpMethod.GET, "/api/menu-items").permitAll()
 
-                .antMatchers("/socket").permitAll()
-                .antMatchers("/socket-publisher").permitAll()
-                .antMatchers("/socket-subscriber").permitAll()
+                .antMatchers("/socket/**").permitAll()
+                .antMatchers("/socket-publisher/**").permitAll()
+                .antMatchers("/socket-subscriber/**").permitAll()
                 .antMatchers("/send/message").permitAll()
                 .anyRequest().authenticated();
 
