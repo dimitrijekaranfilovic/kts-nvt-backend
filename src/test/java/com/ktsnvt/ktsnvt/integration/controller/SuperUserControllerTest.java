@@ -22,7 +22,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.math.BigDecimal;
 import java.util.stream.Stream;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -120,6 +120,29 @@ class SuperUserControllerTest extends AuthorizingControllerTestBase {
                 );
     }
 
+    @Test
+    void deleteManager_whenCalledWithValidData_isSuccess() throws Exception {
+        login("email2@email.com", "password");
+        var id = 4;
+        mockMvc.perform(delete("/api/super-users/{id}", id)
+                .header("Authorization", "Bearer " + token))
+                .andExpectAll(
+                        status().isNoContent()
+                );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideInvalidDeleteManagerRequests")
+    void deleteManager_whenCalledWithInvalidData_isFailure(String email, String password, int id, int status) throws Exception {
+        login(email, password);
+        mockMvc.perform(delete("/api/super-users/{id}", id)
+                .header("Authorization", "Bearer " + token))
+                .andExpectAll(
+                        status().is(status)
+                );
+    }
+
+
     @ParameterizedTest
     @MethodSource("provideValidLoginParams")
     void authenticate_withValidData_isSuccess(String email, String password) throws Exception {
@@ -176,6 +199,15 @@ class SuperUserControllerTest extends AuthorizingControllerTestBase {
                 Arguments.of("email2@email.com", "password", 4, new UpdateSalaryRequest(BigDecimal.valueOf(-12L)), 400),
                 Arguments.of("email2@email.com", "password", 6, new UpdateSalaryRequest(BigDecimal.ONE), 400),
                 Arguments.of("email2@email.com", "password", 1, new UpdateSalaryRequest(BigDecimal.ONE), 404)
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideInvalidDeleteManagerRequests() {
+        return Stream.of(
+                Arguments.of("email1@email.com", "password", 5, 403),
+                Arguments.of("email2@email.com", "password", 1, 404),
+                Arguments.of("email2@email.com", "password", 6, 404)
         );
     }
 
