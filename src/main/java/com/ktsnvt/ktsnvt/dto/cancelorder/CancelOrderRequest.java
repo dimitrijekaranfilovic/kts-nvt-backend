@@ -1,10 +1,10 @@
 package com.ktsnvt.ktsnvt.dto.cancelorder;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 
-@Data
+@NoArgsConstructor @AllArgsConstructor @Getter @Setter
 public class CancelOrderRequest {
 
     @NotBlank(message = "Pin cannot be blank.")

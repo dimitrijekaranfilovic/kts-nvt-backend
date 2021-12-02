@@ -127,8 +127,8 @@ public class OrderServiceImpl extends TransactionalServiceBase implements OrderS
     public void chargeOrder(Integer id, String pin) {
         var order = getOrder(id);
         employeeOrderService.throwIfWaiterNotResponsible(pin, order.getWaiter().getId());
-        if (!order.getStatus().equals(OrderStatus.IN_PROGRESS)) {
-            throw new IllegalOrderStateException("Order is not in IN PROGRESS state and thus cannot be charged.");
+        if (!order.getStatus().equals(OrderStatus.IN_PROGRESS) && !order.getStatus().equals(OrderStatus.CREATED)) {
+            throw new IllegalOrderStateException("Order has already been processed and thus cannot be charged.");
         }
         if (order.getItemGroups().stream().anyMatch(ig -> ig.getIsActive() && ig.getStatus() != OrderItemGroupStatus.DONE)) {
             throw new IllegalOrderStateException("Order cannot be charged because not all of its groups are done.");

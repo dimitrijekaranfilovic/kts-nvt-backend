@@ -2,6 +2,9 @@ package com.ktsnvt.ktsnvt.integration.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ktsnvt.ktsnvt.dto.cancelorder.CancelOrderRequest;
+import com.ktsnvt.ktsnvt.dto.chargeorder.ChargeOrderRequest;
+import com.ktsnvt.ktsnvt.dto.createorder.CreateOrderRequest;
 import com.ktsnvt.ktsnvt.dto.createorderitemgroup.CreateOrderItemGroupRequest;
 import com.ktsnvt.ktsnvt.dto.deleteorderitemgroup.DeleteOrderItemGroupRequest;
 import com.ktsnvt.ktsnvt.dto.sendorderitemgroup.SendOrderItemGroupRequest;
@@ -16,12 +19,17 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MockMvcBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.stream.Stream;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -39,29 +47,78 @@ class OrderControllerTest {
     private ObjectMapper objectMapper;
 
 
-    private static Stream<Arguments> provideGroupCreationData() {
-        return Stream.of(
-                Arguments.of("some group 1", 2),
-                Arguments.of("some group 2", 3)
-        );
+    @Test
+    void createOrder_whenCalledWithValidData_isSuccess() throws Exception {
+        var request = new CreateOrderRequest("4321", 2);
+        mockMvc.perform(post("/api/orders")
+                    .contentType("application/json")
+                    .content(objectMapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().isCreated(),
+                        content().contentType("application/json"),
+                        jsonPath("$.id", greaterThan(0)),
+                        jsonPath("$.waiterPin", equalTo("4321"))
+                );
     }
 
-    private static Stream<Arguments> provideGroupSendingAndDeletingData() {
-        return Stream.of(
-                Arguments.of(2, 5),
-                Arguments.of(1, 2)
-        );
+
+    @ParameterizedTest
+    @MethodSource("provideInvalidCreateOrderRequests")
+    void createOrder_whenCalledWithInvalidRequest_notCreated(CreateOrderRequest request, int status) throws Exception {
+        mockMvc.perform(post("/api/orders")
+                    .contentType("application/json")
+                    .content(objectMapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().is(status),
+                        content().contentType("application/json")
+                );
     }
 
-    private static Stream<Arguments> provideGetOrderItemGroupsData(){
-        return Stream.of(
-                Arguments.of(1, 2),
-                Arguments.of(2, 1),
-                Arguments.of(3, 2),
-                Arguments.of(4, 1)
-        );
+    @ParameterizedTest
+    @ValueSource(ints = {3, 8})
+    void chargeOrder_whenCalledWithValidData_isSuccess(int orderId) throws Exception {
+        var request = new ChargeOrderRequest("4321");
+        mockMvc.perform(put("/api/orders/{id}/charge", orderId)
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().isNoContent()
+                );
     }
 
+    @ParameterizedTest
+    @MethodSource("provideInvalidChargeOrderRequests")
+    void chargeOrder_whenCalledWithInvalidData_notNoContent(ChargeOrderRequest request, int orderId, int status) throws Exception {
+        mockMvc.perform(put("/api/orders/{id}/charge", orderId)
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().is(status)
+                );
+    }
+
+    @Test
+    void cancelOrder_whenCalledWithValidOrder_isSuccess() throws Exception {
+        var request = new CancelOrderRequest("4321");
+        var orderId = 2;
+        mockMvc.perform(put("/api/orders/{id}/cancel", orderId)
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().isNoContent()
+                );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideInvalidCancelOrderRequests")
+    void cancelOrder_whenCalledWithInvalidRequest_notNoContent(CancelOrderRequest request, int orderId, int status) throws Exception {
+        mockMvc.perform(put("/api/orders/{id}/cancel", orderId)
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().is(status)
+                );
+    }
 
     @ParameterizedTest
     @MethodSource("provideGroupCreationData")
@@ -218,5 +275,61 @@ class OrderControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideInvalidCreateOrderRequests() {
+        return Stream.of(
+                Arguments.of(new CreateOrderRequest(null, null), 400),    // invalid request
+                Arguments.of(new CreateOrderRequest("", 2), 400),         // invalid request
+                Arguments.of(new CreateOrderRequest("1234", 2), 404),     // waiter not found
+                Arguments.of(new CreateOrderRequest("4321", 10), 400),    // busy table
+                Arguments.of(new CreateOrderRequest("4321", 153), 404)    // table not found
+        );
+    }
 
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideInvalidChargeOrderRequests() {
+        return Stream.of(
+                Arguments.of(new ChargeOrderRequest(null), 3, 400),             // invalid request
+                Arguments.of(new ChargeOrderRequest(""), 3, 400),               // invalid request
+                Arguments.of(new ChargeOrderRequest("4321"), 2, 400),           // order not in progress
+                Arguments.of(new ChargeOrderRequest("4321"), 6, 400)            // order not finished
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideInvalidCancelOrderRequests() {
+        return Stream.of(
+                Arguments.of(new CancelOrderRequest(null), 2, 400),             // invalid request
+                Arguments.of(new CancelOrderRequest(""), 2, 400),               // invalid request
+                Arguments.of(new CancelOrderRequest("4321"), 1, 400),           // order already charged
+                Arguments.of(new CancelOrderRequest("4321"), 7, 400),           // order already cancelled
+                Arguments.of(new CancelOrderRequest("4321"), 6, 400)            // order preparation started
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideGroupCreationData() {
+        return Stream.of(
+                Arguments.of("some group 1", 2),
+                Arguments.of("some group 2", 3)
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideGroupSendingAndDeletingData() {
+        return Stream.of(
+                Arguments.of(2, 5),
+                Arguments.of(1, 2)
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideGetOrderItemGroupsData(){
+        return Stream.of(
+                Arguments.of(1, 2),
+                Arguments.of(2, 1),
+                Arguments.of(3, 2),
+                Arguments.of(4, 1)
+        );
+    }
 }
