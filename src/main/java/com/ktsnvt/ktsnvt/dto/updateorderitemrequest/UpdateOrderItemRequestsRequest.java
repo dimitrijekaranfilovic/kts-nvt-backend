@@ -1,12 +1,12 @@
 package com.ktsnvt.ktsnvt.dto.updateorderitemrequest;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 
-@Data
+@AllArgsConstructor @NoArgsConstructor @Getter @Setter
 public class UpdateOrderItemRequestsRequest {
     @NotNull(message = "Requested action cannot be null.")
     @Pattern(regexp = "PREPARE|FINISH", message = "Requested action can be PREPARE or FINISH.")

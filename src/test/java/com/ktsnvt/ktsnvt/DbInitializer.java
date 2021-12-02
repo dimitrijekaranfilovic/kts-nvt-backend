@@ -92,6 +92,7 @@ public class DbInitializer implements ApplicationRunner {
         employeeRepo.save(employee2);
         employeeRepo.save(employee3);
 
+
         var manager1 = new SuperUser("Jasna", "Perovic", manager, "email1@email.com", passwordEncoder.encode("password"), SuperUserType.MANAGER);
         manager1.addSalary(salary4);
         var admin1 = new SuperUser("Nikola", "Stankovic", admin, "email2@email.com", passwordEncoder.encode("password"), SuperUserType.ADMIN);
@@ -100,6 +101,9 @@ public class DbInitializer implements ApplicationRunner {
         superUserRepo.save(manager1);
         superUserRepo.save(admin1);
         superUserRepo.save(admin2);
+
+        var employee4 = new Employee("Rajka", "Jovanovic", bartender, "1212", EmployeeType.BARTENDER);
+        employeeRepo.save(employee4);
 
         var basePrice1 = new BasePrice(LocalDateTime.parse("2021-01-01 12:12", formatter), null, BigDecimal.valueOf(30.00), null);
         var basePrice2 = new BasePrice(LocalDateTime.parse("2021-01-02 12:12", formatter), null, BigDecimal.valueOf(440.00), null);
@@ -237,6 +241,9 @@ public class DbInitializer implements ApplicationRunner {
 
         var orderItem12 = new OrderItem(1, orderGroup2, null, menuItem1, OrderItemStatus.NEW);
 
+        var orderItem13 = new OrderItem(1, orderGroup1, null, menuItem3, OrderItemStatus.SENT);
+        var orderItem14 = new OrderItem(1, orderGroup1, employee4, menuItem3, OrderItemStatus.PREPARING);
+
         // orderItem1.setPreparedBy(employee2);
         orderGroup1.addItem(orderItem1);
         orderItem1.setSentAt(LocalDateTime.of(2021, 1, 15, 12, 12));
@@ -246,13 +253,23 @@ public class DbInitializer implements ApplicationRunner {
         orderItem3.setSentAt(LocalDateTime.of(2021, 1, 15, 12, 12));
         orderGroup1.addItem(orderItem4);
         orderItem4.setSentAt(LocalDateTime.of(2021, 1, 15, 12, 12));
+        orderItem4.setTakenAt(LocalDateTime.of(2021, 1, 15, 12, 20));
+
+        orderGroup1.addItem(orderItem13);
+        orderItem13.setSentAt(LocalDateTime.of(2021, 1, 15, 12, 12));
+        orderGroup1.addItem(orderItem14);
+        orderItem14.setSentAt(LocalDateTime.of(2021, 1, 15, 12, 12));
 
         orderGroup1.addItem(orderItem10);
-        orderItem10.setSentAt(LocalDateTime.now());
-        orderItem10.setTakenAt(LocalDateTime.now());
+        orderItem10.setSentAt(LocalDateTime.of(2021, 1, 15, 12, 20));
+        orderItem10.setTakenAt(LocalDateTime.of(2021, 1, 15, 12, 20));
         orderGroup1.addItem(orderItem11);
-        orderItem11.setSentAt(LocalDateTime.now());
-        orderItem11.setTakenAt(LocalDateTime.now());
+        orderItem11.setSentAt(LocalDateTime.of(2021, 1, 15, 12, 20));
+        orderItem11.setTakenAt(LocalDateTime.of(2021, 1, 15, 12, 20));
+
+        orderItem13.setSentAt(LocalDateTime.of(2021, 1, 15, 12, 20));
+        orderItem14.setSentAt(LocalDateTime.of(2021, 1, 15, 12, 20));
+        orderItem13.setTakenAt(LocalDateTime.of(2021, 1, 15, 12, 20));
 
         orderGroup2.addItem(orderItem12);
 
