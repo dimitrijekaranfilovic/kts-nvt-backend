@@ -13,13 +13,13 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
-public abstract class AuthorizingControllerTestBase {
+public abstract class AuthorizingControllerMockMvcTestBase {
     protected WebApplicationContext webApplicationContext;
     protected MockMvc mockMvc;
     protected String token;
     protected ObjectMapper mapper;
 
-    protected AuthorizingControllerTestBase(WebApplicationContext webApplicationContext, ObjectMapper mapper) {
+    protected AuthorizingControllerMockMvcTestBase(WebApplicationContext webApplicationContext, ObjectMapper mapper) {
         this.webApplicationContext = webApplicationContext;
         this.mapper = mapper;
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();

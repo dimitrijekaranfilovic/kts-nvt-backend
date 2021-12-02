@@ -3,9 +3,11 @@ package com.ktsnvt.ktsnvt.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktsnvt.ktsnvt.dto.auth.AuthRequest;
+import com.ktsnvt.ktsnvt.dto.readsuperusers.ReadSuperUsersRequest;
 import com.ktsnvt.ktsnvt.dto.updatepassword.UpdatePasswordRequest;
 import com.ktsnvt.ktsnvt.dto.updatesalary.UpdateSalaryRequest;
 import com.ktsnvt.ktsnvt.dto.updatesuperuser.UpdateSuperUserRequest;
+import com.ktsnvt.ktsnvt.model.enums.SuperUserType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -14,22 +16,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.Matchers.*;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @Transactional
-class SuperUserControllerTest extends AuthorizingControllerTestBase {
+class SuperUserControllerTest extends AuthorizingControllerMockMvcTestBase {
     @LocalServerPort
     private int port;
 
@@ -142,6 +149,25 @@ class SuperUserControllerTest extends AuthorizingControllerTestBase {
                 );
     }
 
+    @ParameterizedTest
+    @MethodSource("provideQueryParameters")
+    void readSuperUsers_whenCalledWithValidQueryParameters_isSuccess(String query, BigDecimal from, BigDecimal to, SuperUserType type, Pageable pageable, int expected) throws Exception {
+        login("email2@email.com", "password");
+        mockMvc.perform(get("/api/super-users")
+                .header("Authorization", "Bearer " + token)
+                .param("query", query)
+                .param("salaryLowerBound", Objects.requireNonNullElse(from, "").toString())
+                .param("salaryUpperBound", Objects.requireNonNullElse(to, "").toString())
+                .param("type", Objects.requireNonNullElse(type, "").toString())
+                .param("page", String.valueOf(pageable.getPageNumber()))
+                .param("size", String.valueOf(pageable.getPageSize())))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.totalElements", equalTo(expected)),
+                        jsonPath("$.totalPages", lessThanOrEqualTo(1)),
+                        jsonPath("$.content", hasSize(expected))
+                );
+    }
 
     @ParameterizedTest
     @MethodSource("provideValidLoginParams")
@@ -208,6 +234,18 @@ class SuperUserControllerTest extends AuthorizingControllerTestBase {
                 Arguments.of("email1@email.com", "password", 5, 403),
                 Arguments.of("email2@email.com", "password", 1, 404),
                 Arguments.of("email2@email.com", "password", 6, 404)
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideQueryParameters() {
+        var pageable = PageRequest.of(0, 10, Sort.unsorted());
+        return Stream.of(
+                Arguments.of("", null, null, null, pageable, 3),
+                Arguments.of("iKO", null, null, null, pageable, 1),
+                Arguments.of("iKO", null, BigDecimal.valueOf(500), null, pageable, 1),
+                Arguments.of("iKO", null, null, SuperUserType.MANAGER, pageable, 0),
+                Arguments.of("", BigDecimal.valueOf(200), BigDecimal.valueOf(600), null, pageable, 2)
         );
     }
 
