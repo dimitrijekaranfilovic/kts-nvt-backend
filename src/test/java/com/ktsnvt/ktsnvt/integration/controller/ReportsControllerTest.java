@@ -58,4 +58,20 @@ class ReportsControllerTest extends AuthorizingControllerRestTemplateTestBase {
         assertEquals(0, statistics.getValues().get(0).compareTo(BigDecimal.valueOf(0)));
         assertEquals(0, statistics.getValues().get(statistics.getLabels().size() - 1).compareTo(BigDecimal.valueOf(3462)));
     }
+
+    @Test
+    void readOrderCosts_whenCalledWithValidDate_isSuccess() {
+        login("email2@email.com", "password");
+        var from = LocalDate.of(2020, 11, 30);
+        var to = LocalDate.of(2021, 11, 14);
+
+        var url = String.format("/api/reports/order-costs?from=%s&to=%s", from, to);
+        var responseEntity = restTemplate.exchange(url, HttpMethod.GET, makeEntity(), LocalDateBigDecimalReportStatistics.class);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertNotNull(responseEntity.getBody());
+        var statistics = Objects.requireNonNull(responseEntity.getBody());
+        assertEquals(0, statistics.getValues().get(0).compareTo(BigDecimal.valueOf(0)));
+        assertEquals(0, statistics.getValues().get(statistics.getLabels().size() - 1).compareTo(BigDecimal.valueOf(162)));
+    }
 }
