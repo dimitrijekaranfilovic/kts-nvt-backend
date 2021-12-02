@@ -159,6 +159,7 @@ public class DbInitializer implements ApplicationRunner {
         var restaurantTable8 = new RestaurantTable(2, 0, 0, 5, terrace);
         var restaurantTable9 = new RestaurantTable(3, 0, 0, 5, terrace);
         var restaurantTable10 = new RestaurantTable(3, 0, 0, 5, secondFloor);
+        var restaurantTable11 = new RestaurantTable(4, 10, 10, 5, secondFloor);
         restaurantTable10.setAvailable(false);
         tableRepo.save(restaurantTable1);
         tableRepo.save(restaurantTable2);
@@ -170,6 +171,7 @@ public class DbInitializer implements ApplicationRunner {
         tableRepo.save(restaurantTable8);
         tableRepo.save(restaurantTable9);
         tableRepo.save(restaurantTable10);
+        tableRepo.save(restaurantTable11);
 
         var order1 = new Order(CHARGED, LocalDateTime.parse("2021-01-01 12:12", formatter), LocalDateTime.parse("2021-01-01 12:15", formatter), restaurantTable1, employee3);
         var order2 = new Order(CREATED, LocalDateTime.parse("2021-02-02 15:15", formatter), null, restaurantTable1, employee3);
@@ -204,13 +206,22 @@ public class DbInitializer implements ApplicationRunner {
         order4.addOrderItemGroup(orderGroup4);
         orderItemGroupRepo.save(orderGroup4);
 
-        var orderGroup5 = new OrderItemGroup("Group 5", OrderItemGroupStatus.SENT, null);
-        order6.addOrderItemGroup(orderGroup5);
+        var orderGroup5 = new OrderItemGroup("Group 5", OrderItemGroupStatus.NEW, null);
+        order2.addOrderItemGroup(orderGroup5);
         orderItemGroupRepo.save(orderGroup5);
+
+        var orderGroup6 = new OrderItemGroup("Group 6", OrderItemGroupStatus.DONE, null);
+        order3.addOrderItemGroup(orderGroup6);
+        orderItemGroupRepo.save(orderGroup6);
+
+        var orderGroup7 = new OrderItemGroup("Group 7", OrderItemGroupStatus.SENT, null);
+        order6.addOrderItemGroup(orderGroup7);
+        orderItemGroupRepo.save(orderGroup7);
 
 //        var orderGroup5 = new OrderItemGroup("Group 5", OrderItemGroupStatus.SENT, null);
 //        order6.addOrderItemGroup(orderGroup5);
 //        orderItemGroupRepo.save(orderGroup5);
+
 
 
         var orderItem1 = new OrderItem(2, orderGroup1, null, menuItem1, OrderItemStatus.SENT);

@@ -1,6 +1,5 @@
 package com.ktsnvt.ktsnvt.dto.auth;
 
-
 import lombok.*;
 
 @NoArgsConstructor

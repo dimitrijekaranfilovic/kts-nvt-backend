@@ -1,10 +1,11 @@
 package com.ktsnvt.ktsnvt.dto.movetable;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 
-@Data
+@Data @AllArgsConstructor
 public class MoveTableRequest {
 
     @NotNull(message = "New x coordinate must be provided.")

@@ -1,13 +1,16 @@
 package com.ktsnvt.ktsnvt.dto.addorderitem;
 
 
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
-@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class AddOrderItemRequest {
     @NotNull(message = "Order item group id cannot be null.")
     private Integer orderItemGroupId;

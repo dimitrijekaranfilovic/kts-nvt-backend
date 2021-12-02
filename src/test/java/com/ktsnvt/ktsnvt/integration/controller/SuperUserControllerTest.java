@@ -31,8 +31,21 @@ class SuperUserControllerTest {
 
 
     @ParameterizedTest
-    @MethodSource("provideLoginParams")
-    void authenticate_withValidData_isSuccess(String email, String password, int status) throws Exception {
+    @MethodSource("provideValidLoginParams")
+    void authenticate_withValidData_isSuccess(String email, String password) throws Exception {
+        var authRequest = new AuthRequest(email, password);
+
+        this.mockMvc.perform(MockMvcRequestBuilders.post(String.format("http://localhost:%d/api/super-users/authenticate", this.port))
+                        .content(mapper.writeValueAsString(authRequest))
+                        .contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideInvalidLoginParams")
+    void authenticate_withInvalidData_throwsException(String email, String password, int status) throws Exception {
         var authRequest = new AuthRequest(email, password);
 
         this.mockMvc.perform(MockMvcRequestBuilders.post(String.format("http://localhost:%d/api/super-users/authenticate", this.port))
@@ -43,12 +56,18 @@ class SuperUserControllerTest {
 
     }
 
-
-    private static Stream<Arguments> provideLoginParams(){
+    private static Stream<Arguments> provideValidLoginParams(){
         return Stream.of(
-                Arguments.of("email1@email.com", "password", 200),
-                Arguments.of("email2@email.com", "password", 200),
-                Arguments.of("someemail@email.com", "password", 404)
+                Arguments.of("email1@email.com", "password"),
+                Arguments.of("email2@email.com", "password")
+        );
+    }
+
+
+    private static Stream<Arguments> provideInvalidLoginParams(){
+        return Stream.of(
+                Arguments.of("someemail@email.com", "password", 404),
+                Arguments.of("email1@email.com", "some-random-password", 401)
         );
     }
 }
