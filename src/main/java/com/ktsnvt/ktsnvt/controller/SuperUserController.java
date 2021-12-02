@@ -67,21 +67,21 @@ public class SuperUserController {
 
     @PreAuthorize("hasAnyAuthority({'ADMIN', 'MANAGER'}) and #id == authentication.principal.id")
     @PutMapping("/{id}/password")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     public void updatePassword(@PathVariable Integer id, @RequestBody @Valid UpdatePasswordRequest request) {
         superUserService.updatePassword(id, request.getOldPassword(), request.getNewPassword());
     }
 
     @PreAuthorize("hasAnyAuthority({'ADMIN', 'MANAGER'}) and #id == authentication.principal.id")
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     public void updateSuperUser(@PathVariable Integer id, @RequestBody @Valid UpdateSuperUserRequest request) {
         superUserService.update(id, request.getName(), request.getSurname(), request.getEmail());
     }
 
     @IsAdmin
     @PutMapping("/{id}/salary")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     public void updateSalary(@PathVariable Integer id, @RequestBody @Valid UpdateSalaryRequest request) {
         // This will throw if the id is not an id of super user -> prevent updating employee's salary on this endpoint
         superUserService.read(id);

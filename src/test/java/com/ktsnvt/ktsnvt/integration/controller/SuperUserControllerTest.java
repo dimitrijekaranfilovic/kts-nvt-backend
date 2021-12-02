@@ -4,6 +4,7 @@ package com.ktsnvt.ktsnvt.integration.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktsnvt.ktsnvt.dto.auth.AuthRequest;
 import com.ktsnvt.ktsnvt.dto.updatepassword.UpdatePasswordRequest;
+import com.ktsnvt.ktsnvt.dto.updatesalary.UpdateSalaryRequest;
 import com.ktsnvt.ktsnvt.dto.updatesuperuser.UpdateSuperUserRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,6 +19,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.math.BigDecimal;
 import java.util.stream.Stream;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -46,7 +48,7 @@ class SuperUserControllerTest extends AuthorizingControllerTestBase {
                     .header("Authorization", "Bearer " + token)
                     .content(mapper.writeValueAsString(request)))
                 .andExpectAll(
-                        status().isNoContent()
+                        status().isOk()
                 );
     }
 
@@ -74,7 +76,7 @@ class SuperUserControllerTest extends AuthorizingControllerTestBase {
                     .header("Authorization", "Bearer " + token)
                     .content(mapper.writeValueAsBytes(request)))
                 .andExpectAll(
-                        status().isNoContent()
+                        status().isOk()
                 );
     }
 
@@ -83,6 +85,33 @@ class SuperUserControllerTest extends AuthorizingControllerTestBase {
     void updateSuperUser_whenCalledWithInvalidData_isFailure(String email, String password, UpdateSuperUserRequest request, int id, int status) throws Exception {
         login(email, password);
         mockMvc.perform(put("/api/super-users/{id}", id)
+                .contentType("application/json")
+                .header("Authorization", "Bearer " + token)
+                .content(mapper.writeValueAsBytes(request)))
+                .andExpectAll(
+                        status().is(status)
+                );
+    }
+
+    @Test
+    void updateSalary_whenCalledWithValidData_isSuccess() throws Exception {
+        login("email2@email.com", "password");
+        var id = 4;
+        var request = new UpdateSalaryRequest(BigDecimal.valueOf(242424L));
+        mockMvc.perform(put("/api/super-users/{id}/salary", id)
+                    .contentType("application/json")
+                    .header("Authorization", "Bearer " + token)
+                    .content(mapper.writeValueAsBytes(request)))
+                .andExpectAll(
+                        status().isOk()
+                );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideInvalidUpdateSalaryRequests")
+    void updateSalary_whenCalledWIthInvalidData_isFailure(String email, String password, int id, UpdateSalaryRequest request, int status) throws Exception {
+        login(email, password);
+        mockMvc.perform(put("/api/super-users/{id}/salary", id)
                 .contentType("application/json")
                 .header("Authorization", "Bearer " + token)
                 .content(mapper.writeValueAsBytes(request)))
@@ -137,6 +166,16 @@ class SuperUserControllerTest extends AuthorizingControllerTestBase {
                 Arguments.of("email1@email.com", "password", new UpdateSuperUserRequest("", "", ""), 4, 400),
                 Arguments.of("email1@email.com", "password", new UpdateSuperUserRequest("a", "b", "c@gmail.com"), 5, 403),
                 Arguments.of("email1@email.com", "password", new UpdateSuperUserRequest("a", "b", "email2@email.com"), 4, 400)
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideInvalidUpdateSalaryRequests() {
+        return Stream.of(
+                Arguments.of("email1@email.com", "password", 4, new UpdateSalaryRequest(BigDecimal.ONE), 403),
+                Arguments.of("email2@email.com", "password", 4, new UpdateSalaryRequest(BigDecimal.valueOf(-12L)), 400),
+                Arguments.of("email2@email.com", "password", 6, new UpdateSalaryRequest(BigDecimal.ONE), 400),
+                Arguments.of("email2@email.com", "password", 1, new UpdateSalaryRequest(BigDecimal.ONE), 404)
         );
     }
 
