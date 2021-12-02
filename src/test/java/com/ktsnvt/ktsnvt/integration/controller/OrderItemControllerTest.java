@@ -3,19 +3,31 @@ package com.ktsnvt.ktsnvt.integration.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktsnvt.ktsnvt.dto.addorderitem.AddOrderItemRequest;
 import com.ktsnvt.ktsnvt.dto.deleteorderitem.DeleteOrderItemRequest;
+import com.ktsnvt.ktsnvt.dto.readfoodanddrinkrequests.ReadFoodAndDrinkRequestResponse;
 import com.ktsnvt.ktsnvt.dto.updateorderitem.UpdateOrderItemRequest;
+import com.ktsnvt.ktsnvt.dto.updateorderitemrequest.UpdateOrderItemRequestsRequest;
+import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
+import com.ktsnvt.ktsnvt.model.enums.OrderItemStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.*;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+
+import javax.validation.constraints.NotNull;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -209,9 +221,9 @@ class OrderItemControllerTest {
                         .contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
-  
+
+    @NotNull
     public static Stream<Arguments> provideFor_getFoodRequests() {
-        Pageable pageable = PageRequest.of(0, 10);
         return Stream.of(
                 Arguments.of(0, 10, OrderItemStatus.SENT, ItemCategory.FOOD),
                 Arguments.of(0, 10, OrderItemStatus.SENT, ItemCategory.DRINK),
@@ -220,14 +232,15 @@ class OrderItemControllerTest {
         );
     }
 
+    @NotNull
     public static Stream<Arguments> provideFor_takeItem_success() {
         return Stream.of(
-                Arguments.of(new UpdateOrderItemRequestsRequest("PREPARE", 13, "1212")),
                 Arguments.of(new UpdateOrderItemRequestsRequest("FINISH", 13, "1212")),
                 Arguments.of(new UpdateOrderItemRequestsRequest("FINISH", 14, "1212"))
         );
     }
 
+    @NotNull
     public static Stream<Arguments> provideFor_takeItem_failed() {
         return Stream.of(
                 Arguments.of(new UpdateOrderItemRequestsRequest("PREPARE", 1, "5678")),

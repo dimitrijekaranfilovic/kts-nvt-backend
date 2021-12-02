@@ -267,10 +267,6 @@ public class DbInitializer implements ApplicationRunner {
         orderItem11.setSentAt(LocalDateTime.of(2021, 1, 15, 12, 20));
         orderItem11.setTakenAt(LocalDateTime.of(2021, 1, 15, 12, 20));
 
-        orderItem13.setSentAt(LocalDateTime.of(2021, 1, 15, 12, 20));
-        orderItem14.setSentAt(LocalDateTime.of(2021, 1, 15, 12, 20));
-        orderItem13.setTakenAt(LocalDateTime.of(2021, 1, 15, 12, 20));
-
         orderGroup2.addItem(orderItem12);
 
         orderGroup3.addItem(orderItem5);
@@ -299,7 +295,5 @@ public class DbInitializer implements ApplicationRunner {
         orderItemRepo.save(orderItem10);
         orderItemRepo.save(orderItem11);
         orderItemRepo.save(orderItem12);
-
-        System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     }
 }
