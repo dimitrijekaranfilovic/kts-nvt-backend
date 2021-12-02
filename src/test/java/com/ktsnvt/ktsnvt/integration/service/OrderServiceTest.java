@@ -50,7 +50,7 @@ class OrderServiceTest {
 
     @Test
     void chargeOrder_whenCalledWithEmptyOrder_isSuccess() {
-        assertDoesNotThrow(() -> orderService.cancelOrder(8, "4321"));
+        assertDoesNotThrow(() -> orderService.chargeOrder(8, "4321"));
     }
 
     @Test

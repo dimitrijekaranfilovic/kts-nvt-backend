@@ -1,8 +1,8 @@
 package com.ktsnvt.ktsnvt.integration.controller;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ktsnvt.ktsnvt.dto.chargeorder.ChargeOrderRequest;
 import com.ktsnvt.ktsnvt.dto.createorder.CreateOrderRequest;
 import com.ktsnvt.ktsnvt.dto.createorderitemgroup.CreateOrderItemGroupRequest;
 import com.ktsnvt.ktsnvt.dto.deleteorderitemgroup.DeleteOrderItemGroupRequest;
@@ -14,7 +14,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -23,11 +22,13 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.hamcrest.Matchers.*;
-
 import java.util.stream.Stream;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -47,7 +48,7 @@ class OrderControllerTest {
 
     @Test
     void createOrder_whenCalledWithValidData_isSuccess() throws Exception {
-        var request = CreateOrderRequest.builder().pin("4321").tableId(2).build();
+        var request = new CreateOrderRequest("4321", 2);
         mockMvc.perform(post("/api/orders")
                     .contentType("application/json")
                     .content(objectMapper.writeValueAsString(request)))
@@ -64,11 +65,34 @@ class OrderControllerTest {
     @MethodSource("provideInvalidCreateOrderRequests")
     void createOrder_whenCalledWithInvalidRequest_throwsException(CreateOrderRequest request, int status) throws Exception {
         mockMvc.perform(post("/api/orders")
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(request)))
+                    .contentType("application/json")
+                    .content(objectMapper.writeValueAsString(request)))
                 .andExpectAll(
                         status().is(status),
                         content().contentType("application/json")
+                );
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {3, 8})
+    void chargeOrder_whenCalledWithValidData_isSuccess(int orderId) throws Exception {
+        var request = new ChargeOrderRequest("4321");
+        mockMvc.perform(put("/api/orders/{id}/charge", orderId)
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().isNoContent()
+                );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideInvalidChargeOrderRequests")
+    void chargeOrder_whenCalledWithValidData_isSuccess(ChargeOrderRequest request, int orderId, int status) throws Exception {
+        mockMvc.perform(put("/api/orders/{id}/charge", orderId)
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().is(status)
                 );
     }
 
@@ -230,11 +254,21 @@ class OrderControllerTest {
     @SuppressWarnings("unused")
     private static Stream<Arguments> provideInvalidCreateOrderRequests() {
         return Stream.of(
-                Arguments.of(CreateOrderRequest.builder().pin(null).tableId(null).build(), 400),    // invalid request
-                Arguments.of(CreateOrderRequest.builder().pin("").tableId(2).build(), 400),         // invalid request
-                Arguments.of(CreateOrderRequest.builder().pin("1234").tableId(2).build(), 404),     // waiter not found
-                Arguments.of(CreateOrderRequest.builder().pin("4321").tableId(10).build(), 400),    // busy table
-                Arguments.of(CreateOrderRequest.builder().pin("4321").tableId(153).build(), 404)    // table not found
+                Arguments.of(new CreateOrderRequest(null, null), 400),    // invalid request
+                Arguments.of(new CreateOrderRequest("", 2), 400),         // invalid request
+                Arguments.of(new CreateOrderRequest("1234", 2), 404),     // waiter not found
+                Arguments.of(new CreateOrderRequest("4321", 10), 400),    // busy table
+                Arguments.of(new CreateOrderRequest("4321", 153), 404)    // table not found
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideInvalidChargeOrderRequests() {
+        return Stream.of(
+                Arguments.of(new ChargeOrderRequest(null), 3, 400),             // invalid request
+                Arguments.of(new ChargeOrderRequest(""), 3, 400),               // invalid request
+                Arguments.of(new ChargeOrderRequest("4321"), 2, 400),           // order not in progress
+                Arguments.of(new ChargeOrderRequest("4321"), 6, 400)            // order not finished
         );
     }
 

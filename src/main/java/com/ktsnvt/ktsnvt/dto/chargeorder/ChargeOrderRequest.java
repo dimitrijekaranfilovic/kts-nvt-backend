@@ -1,11 +1,13 @@
 package com.ktsnvt.ktsnvt.dto.chargeorder;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
-import java.math.BigDecimal;
 
-@Data
+@NoArgsConstructor @AllArgsConstructor @Getter @Setter
 public class ChargeOrderRequest {
 
     @NotBlank(message = "Pin cannot be blank.")
