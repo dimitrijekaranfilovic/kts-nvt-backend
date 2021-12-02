@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -35,9 +36,26 @@ class ReportsControllerTest extends AuthorizingControllerRestTemplateTestBase {
         var url = String.format("/api/reports/salary-costs?from=%s&to=%s", from, to);
         var responseEntity = restTemplate.exchange(url, HttpMethod.GET, makeEntity(), LocalDateBigDecimalReportStatistics.class);
 
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertNotNull(responseEntity.getBody());
         var statistics = Objects.requireNonNull(responseEntity.getBody());
         assertEquals(0, statistics.getValues().get(0).compareTo(BigDecimal.valueOf(50.40)));
         assertEquals(0, statistics.getValues().get(4).compareTo(BigDecimal.valueOf(82.65)));
+    }
+
+    @Test
+    void readOrderIncomes_whenCalledWithValidDate_isSuccess() {
+        login("email2@email.com", "password");
+        var from = LocalDate.of(2020, 11, 30);
+        var to = LocalDate.of(2021, 11, 14);
+
+        var url = String.format("/api/reports/order-incomes?from=%s&to=%s", from, to);
+        var responseEntity = restTemplate.exchange(url, HttpMethod.GET, makeEntity(), LocalDateBigDecimalReportStatistics.class);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertNotNull(responseEntity.getBody());
+        var statistics = Objects.requireNonNull(responseEntity.getBody());
+        assertEquals(0, statistics.getValues().get(0).compareTo(BigDecimal.valueOf(0)));
+        assertEquals(0, statistics.getValues().get(statistics.getLabels().size() - 1).compareTo(BigDecimal.valueOf(3462)));
     }
 }
