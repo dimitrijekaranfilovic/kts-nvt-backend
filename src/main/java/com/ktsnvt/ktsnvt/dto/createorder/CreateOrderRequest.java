@@ -1,11 +1,12 @@
 package com.ktsnvt.ktsnvt.dto.createorder;
 
+import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-@Data
+@Data @Builder
 public class CreateOrderRequest {
 
     @NotBlank(message = "Pin cannot be empty.")

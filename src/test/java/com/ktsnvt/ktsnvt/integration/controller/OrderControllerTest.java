@@ -1,7 +1,9 @@
 package com.ktsnvt.ktsnvt.integration.controller;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ktsnvt.ktsnvt.dto.createorder.CreateOrderRequest;
 import com.ktsnvt.ktsnvt.dto.createorderitemgroup.CreateOrderItemGroupRequest;
 import com.ktsnvt.ktsnvt.dto.deleteorderitemgroup.DeleteOrderItemGroupRequest;
 import com.ktsnvt.ktsnvt.dto.sendorderitemgroup.SendOrderItemGroupRequest;
@@ -12,14 +14,18 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MockMvcBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.Matchers.*;
 
 import java.util.stream.Stream;
 
@@ -39,29 +45,32 @@ class OrderControllerTest {
     private ObjectMapper objectMapper;
 
 
-    private static Stream<Arguments> provideGroupCreationData() {
-        return Stream.of(
-                Arguments.of("some group 1", 2),
-                Arguments.of("some group 2", 3)
-        );
+    @Test
+    void createOrder_whenCalledWithValidData_isSuccess() throws Exception {
+        var request = CreateOrderRequest.builder().pin("4321").tableId(2).build();
+        mockMvc.perform(post("/api/orders")
+                    .contentType("application/json")
+                    .content(objectMapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().isCreated(),
+                        content().contentType("application/json"),
+                        jsonPath("$.id", greaterThan(0)),
+                        jsonPath("$.waiterPin", equalTo("4321"))
+                );
     }
 
-    private static Stream<Arguments> provideGroupSendingAndDeletingData() {
-        return Stream.of(
-                Arguments.of(2, 5),
-                Arguments.of(1, 2)
-        );
-    }
 
-    private static Stream<Arguments> provideGetOrderItemGroupsData(){
-        return Stream.of(
-                Arguments.of(1, 2),
-                Arguments.of(2, 1),
-                Arguments.of(3, 2),
-                Arguments.of(4, 1)
-        );
+    @ParameterizedTest
+    @MethodSource("provideInvalidCreateOrderRequests")
+    void createOrder_whenCalledWithInvalidRequest_throwsException(CreateOrderRequest request, int status) throws Exception {
+        mockMvc.perform(post("/api/orders")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().is(status),
+                        content().contentType("application/json")
+                );
     }
-
 
     @ParameterizedTest
     @MethodSource("provideGroupCreationData")
@@ -218,5 +227,40 @@ class OrderControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideInvalidCreateOrderRequests() {
+        return Stream.of(
+                Arguments.of(CreateOrderRequest.builder().pin(null).tableId(null).build(), 400),    // invalid request
+                Arguments.of(CreateOrderRequest.builder().pin("").tableId(2).build(), 400),         // invalid request
+                Arguments.of(CreateOrderRequest.builder().pin("1234").tableId(2).build(), 404),     // waiter not found
+                Arguments.of(CreateOrderRequest.builder().pin("4321").tableId(10).build(), 400),    // busy table
+                Arguments.of(CreateOrderRequest.builder().pin("4321").tableId(153).build(), 404)    // table not found
+        );
+    }
 
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideGroupCreationData() {
+        return Stream.of(
+                Arguments.of("some group 1", 2),
+                Arguments.of("some group 2", 3)
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideGroupSendingAndDeletingData() {
+        return Stream.of(
+                Arguments.of(2, 5),
+                Arguments.of(1, 2)
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideGetOrderItemGroupsData(){
+        return Stream.of(
+                Arguments.of(1, 2),
+                Arguments.of(2, 1),
+                Arguments.of(3, 2),
+                Arguments.of(4, 1)
+        );
+    }
 }
