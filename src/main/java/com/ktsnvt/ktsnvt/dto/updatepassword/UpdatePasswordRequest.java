@@ -1,10 +1,10 @@
 package com.ktsnvt.ktsnvt.dto.updatepassword;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 
-@Data
+@NoArgsConstructor @AllArgsConstructor @Getter @Setter
 public class UpdatePasswordRequest {
 
     @NotBlank(message = "Old password can't be blank.")

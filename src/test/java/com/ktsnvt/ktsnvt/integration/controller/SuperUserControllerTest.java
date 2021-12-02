@@ -3,6 +3,7 @@ package com.ktsnvt.ktsnvt.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktsnvt.ktsnvt.dto.auth.AuthRequest;
+import com.ktsnvt.ktsnvt.dto.updatepassword.UpdatePasswordRequest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -10,25 +11,56 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.stream.Stream;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-class SuperUserControllerTest {
-
+@Transactional
+class SuperUserControllerTest extends AuthorizingControllerTestBase {
     @LocalServerPort
     private int port;
 
     @Autowired
-    private MockMvc mockMvc;
+    public SuperUserControllerTest(WebApplicationContext webApplicationContext, ObjectMapper mapper) {
+        super(webApplicationContext, mapper);
+    }
 
-    @Autowired
-    private ObjectMapper mapper;
+    @ParameterizedTest
+    @MethodSource("provideValidUpdatePasswordCredentials")
+    void updatePassword_whenCalledWithValidData_isSuccess(String email, String password, int id) throws Exception {
+        login(email, password);
+        var request = new UpdatePasswordRequest(password, "new password");
+        mockMvc.perform(put("/api/super-users/{id}/password", id)
+                    .contentType("application/json")
+                    .header("Authorization", "Bearer " + token)
+                    .content(mapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().isNoContent()
+                );
+    }
 
+    @ParameterizedTest
+    @MethodSource("provideInvalidUpdatePasswordCredentials")
+    void updatePassword_whenCalledWithInvalidData_isFailure(String email, String password, String oldPassword, int id, int status) throws Exception {
+        login(email, password);
+        var request = new UpdatePasswordRequest(oldPassword, "new password");
+        mockMvc.perform(put("/api/super-users/{id}/password", id)
+                .contentType("application/json")
+                .header("Authorization", "Bearer " + token)
+                .content(mapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().is(status)
+                );
+    }
 
     @ParameterizedTest
     @MethodSource("provideValidLoginParams")
@@ -39,8 +71,6 @@ class SuperUserControllerTest {
                         .content(mapper.writeValueAsString(authRequest))
                         .contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
-
-
     }
 
     @ParameterizedTest
@@ -52,10 +82,27 @@ class SuperUserControllerTest {
                         .content(mapper.writeValueAsString(authRequest))
                         .contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.status().is(status));
-
-
     }
 
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideValidUpdatePasswordCredentials() {
+        return Stream.of(
+                Arguments.of("email1@email.com", "password", 4),
+                Arguments.of("email2@email.com", "password", 5)
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideInvalidUpdatePasswordCredentials() {
+        return Stream.of(
+                Arguments.of("email1@email.com", "password", "password", 5, 403),
+                Arguments.of("email2@email.com", "password", "password", 4, 403),
+                Arguments.of("email1@email.com", "password", "password123", 4, 400),
+                Arguments.of("email2@email.com", "password", "password123", 5, 400)
+        );
+    }
+
+    @SuppressWarnings("unused")
     private static Stream<Arguments> provideValidLoginParams(){
         return Stream.of(
                 Arguments.of("email1@email.com", "password"),
@@ -64,6 +111,7 @@ class SuperUserControllerTest {
     }
 
 
+    @SuppressWarnings("unused")
     private static Stream<Arguments> provideInvalidLoginParams(){
         return Stream.of(
                 Arguments.of("someemail@email.com", "password", 404),
