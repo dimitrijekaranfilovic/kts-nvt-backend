@@ -3,7 +3,7 @@ package com.ktsnvt.ktsnvt.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktsnvt.ktsnvt.dto.auth.AuthRequest;
-import com.ktsnvt.ktsnvt.dto.readsuperusers.ReadSuperUsersRequest;
+import com.ktsnvt.ktsnvt.dto.createesuperuser.CreateSuperUserRequest;
 import com.ktsnvt.ktsnvt.dto.updatepassword.UpdatePasswordRequest;
 import com.ktsnvt.ktsnvt.dto.updatesalary.UpdateSalaryRequest;
 import com.ktsnvt.ktsnvt.dto.updatesuperuser.UpdateSuperUserRequest;
@@ -11,6 +11,7 @@ import com.ktsnvt.ktsnvt.model.enums.SuperUserType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -28,9 +29,10 @@ import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -170,6 +172,36 @@ class SuperUserControllerTest extends AuthorizingControllerMockMvcTestBase {
     }
 
     @ParameterizedTest
+    @EnumSource(SuperUserType.class)
+    void createSuperUser_whenCalledWithValidData_isSuccess(SuperUserType type) throws Exception {
+        login("email2@email.com", "password");
+        var request = new CreateSuperUserRequest("pera", "peric", "pera@pera.com", "pera123", BigDecimal.valueOf(123L), type);
+        mockMvc.perform(post("/api/super-users")
+                    .contentType("application/json")
+                    .header("Authorization", "Bearer " + token)
+                    .content(mapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().isCreated(),
+                        jsonPath("$.id", notNullValue()),
+                        jsonPath("$.id", greaterThan(0)),
+                        jsonPath("$.email", equalTo("pera@pera.com"))
+                );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideInvalidCreateSuperUserRequests")
+    void createSuperUser_whenCalledWIthInvalidData_isFailure(CreateSuperUserRequest request, int status) throws Exception {
+        login("email2@email.com", "password");
+        mockMvc.perform(post("/api/super-users")
+                .contentType("application/json")
+                .header("Authorization", "Bearer " + token)
+                .content(mapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().is(status)
+                );
+    }
+
+    @ParameterizedTest
     @MethodSource("provideValidLoginParams")
     void authenticate_withValidData_isSuccess(String email, String password) throws Exception {
         var authRequest = new AuthRequest(email, password);
@@ -246,6 +278,15 @@ class SuperUserControllerTest extends AuthorizingControllerMockMvcTestBase {
                 Arguments.of("iKO", null, BigDecimal.valueOf(500), null, pageable, 1),
                 Arguments.of("iKO", null, null, SuperUserType.MANAGER, pageable, 0),
                 Arguments.of("", BigDecimal.valueOf(200), BigDecimal.valueOf(600), null, pageable, 2)
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideInvalidCreateSuperUserRequests() {
+        return Stream.of(
+                Arguments.of(new CreateSuperUserRequest(), 400),
+                Arguments.of(new CreateSuperUserRequest("a", "b", "email2@email.com", "asdf", BigDecimal.valueOf(123L), SuperUserType.ADMIN), 400),
+                Arguments.of(new CreateSuperUserRequest("a", "b", "email22@email.com", "asdf", BigDecimal.valueOf(-12L), SuperUserType.MANAGER), 400)
         );
     }
 
