@@ -235,6 +235,7 @@ class OrderItemControllerTest {
     @NotNull
     public static Stream<Arguments> provideFor_takeItem_success() {
         return Stream.of(
+                Arguments.of(new UpdateOrderItemRequestsRequest("PREPARE", 13, "1212")),
                 Arguments.of(new UpdateOrderItemRequestsRequest("FINISH", 13, "1212")),
                 Arguments.of(new UpdateOrderItemRequestsRequest("FINISH", 14, "1212"))
         );

@@ -295,5 +295,7 @@ public class DbInitializer implements ApplicationRunner {
         orderItemRepo.save(orderItem10);
         orderItemRepo.save(orderItem11);
         orderItemRepo.save(orderItem12);
+        orderItemRepo.save(orderItem13);
+        orderItemRepo.save(orderItem14);
     }
 }
