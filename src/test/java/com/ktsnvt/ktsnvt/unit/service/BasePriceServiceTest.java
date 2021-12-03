@@ -5,6 +5,8 @@ import com.ktsnvt.ktsnvt.exception.InventoryItemHasNoActiveBasePrice;
 import com.ktsnvt.ktsnvt.model.BasePrice;
 import com.ktsnvt.ktsnvt.model.InventoryItem;
 import com.ktsnvt.ktsnvt.repository.BasePriceRepository;
+import com.ktsnvt.ktsnvt.service.BasePriceService;
+import com.ktsnvt.ktsnvt.service.InventoryItemService;
 import com.ktsnvt.ktsnvt.service.LocalDateTimeService;
 import com.ktsnvt.ktsnvt.service.impl.BasePriceServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -28,6 +30,9 @@ class BasePriceServiceTest {
 
     @Mock
     private LocalDateTimeService localDateTimeService;
+
+    @Mock
+    private InventoryItemService inventoryItemService;
 
     @InjectMocks
     private BasePriceServiceImpl basePriceService;
@@ -69,5 +74,31 @@ class BasePriceServiceTest {
 
         // THEN
         verify(basePriceRepository, times(1)).findActiveForInventoryItem(inventoryItem.getId());
+    }
+
+    @Test
+    void updateInventoryItemBasePrice_calledWithValidData_isSuccess() {
+        // GIVEN
+        var inventoryItemForUpdate = new InventoryItem();
+        var paramId = 42;
+        inventoryItemForUpdate.setId(paramId);
+        var currentBasePrice = new BasePrice(LocalDateTime.of(2021, 12, 1, 3, 14),
+                null, BigDecimal.valueOf(42), inventoryItemForUpdate);
+        inventoryItemForUpdate.addBasePrice(currentBasePrice);
+
+        var paramNewBasePrice = new BasePrice(LocalDateTime.of(2021, 12, 3, 2, 2),
+                null, BigDecimal.valueOf(42), inventoryItemForUpdate);
+        BasePriceService basePriceServiceSpy = spy(basePriceService);
+        doReturn(inventoryItemForUpdate).when(inventoryItemService).readForUpdate(paramId);
+        doNothing().when(basePriceServiceSpy).endActiveBasePriceForInventoryItem(inventoryItemForUpdate);
+
+        // WHEN
+        basePriceServiceSpy.updateInventoryItemBasePrice(paramId, paramNewBasePrice);
+
+        // THEN
+        assertEquals(2, inventoryItemForUpdate.getBasePrices().size());
+        assertEquals(paramNewBasePrice.getAmount(), inventoryItemForUpdate.getCurrentBasePrice());
+        verify(basePriceServiceSpy, times(1)).endActiveBasePriceForInventoryItem(inventoryItemForUpdate);
+        verify(inventoryItemService, times(1)).readForUpdate(paramId);
     }
 }
