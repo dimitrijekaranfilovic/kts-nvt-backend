@@ -1,12 +1,12 @@
 package com.ktsnvt.ktsnvt.dto.createesuperuser;
 
 import com.ktsnvt.ktsnvt.model.enums.SuperUserType;
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.*;
 import java.math.BigDecimal;
 
-@Data
+@NoArgsConstructor @AllArgsConstructor @Getter @Setter
 public class CreateSuperUserRequest {
 
     @NotBlank(message = "First name cannot be blank.")
