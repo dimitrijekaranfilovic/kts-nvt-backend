@@ -1,7 +1,7 @@
 package com.ktsnvt.ktsnvt.dto.createemployee;
 
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 
-@Data
+@NoArgsConstructor @AllArgsConstructor @Getter @Setter
 public class CreateEmployeeRequest {
 
     @NotBlank(message = "Pin cannot be blank.")

@@ -1,6 +1,7 @@
 package com.ktsnvt.ktsnvt.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ktsnvt.ktsnvt.dto.createemployee.CreateEmployeeRequest;
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -32,6 +33,36 @@ public class EmployeeControllerTest extends AuthorizingControllerMockMvcTestBase
     @Autowired
     protected EmployeeControllerTest(WebApplicationContext webApplicationContext, ObjectMapper mapper) {
         super(webApplicationContext, mapper);
+    }
+
+    @Test
+    void createEmployee_whenCalledWithValidData_isSuccess() throws Exception {
+        login("email1@email.com", "password");
+        var pin = "9999";
+        var request = new CreateEmployeeRequest(pin, "pera", "peric", BigDecimal.valueOf(123L), EmployeeType.WAITER);
+        mockMvc.perform(post("/api/employees")
+                .header("Authorization", "Bearer " + token)
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().isCreated(),
+                        jsonPath("$.id", notNullValue()),
+                        jsonPath("$.id", greaterThanOrEqualTo(0)),
+                        jsonPath("$.pin", equalTo(pin))
+                );
+    }
+
+    @Test
+    void createEmployee_whenCalledWithDuplicatePin_isBadRequest() throws Exception {
+        login("email1@email.com", "password");
+        var request = new CreateEmployeeRequest("1234", "pera", "peric", BigDecimal.valueOf(123L), EmployeeType.WAITER);
+        mockMvc.perform(post("/api/employees")
+                .header("Authorization", "Bearer " + token)
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().isBadRequest()
+                );
     }
 
     @Test
