@@ -1,12 +1,12 @@
 package com.ktsnvt.ktsnvt.dto.updateemployee;
 
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-@Data
+@NoArgsConstructor @AllArgsConstructor @Getter @Setter
 public class UpdateEmployeeRequest {
 
     @NotBlank(message = "First name cannot be blank.")

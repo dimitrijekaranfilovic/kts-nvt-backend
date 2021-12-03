@@ -83,6 +83,12 @@ public class EmployeeServiceTest {
     }
 
     @ParameterizedTest
+    @ValueSource(ints = {4, 100})
+    void delete_whenCalledWithNonExistingId_throwsException(Integer id) {
+        assertThrows(EmployeeNotFoundException.class, () -> employeeService.delete(id));
+    }
+
+    @ParameterizedTest
     @EnumSource(EmployeeType.class)
     void create_whenCalledWithValidData_isSuccess(EmployeeType employeeType) {
         var employee = makeEmployee("pera", "peric", "99999999", employeeType, 123L);
