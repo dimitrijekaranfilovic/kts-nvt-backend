@@ -69,14 +69,14 @@ public class EmployeeController {
 
     @IsSuperUser
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     public void update(@PathVariable Integer id, @RequestBody @Valid UpdateEmployeeRequest request) {
         employeeService.update(id, request.getName(), request.getSurname(), request.getPin(), request.getType());
     }
 
     @IsSuperUser
     @PutMapping("/{id}/salary")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     public void updateSalary(@PathVariable Integer id, @RequestBody @Valid UpdateSalaryRequest request) {
         // This will throw if the id is not an id of employee -> prevent updating super user's salary on this endpoint
         employeeService.read(id);

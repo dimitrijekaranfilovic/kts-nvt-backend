@@ -2,6 +2,7 @@ package com.ktsnvt.ktsnvt.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktsnvt.ktsnvt.dto.createemployee.CreateEmployeeRequest;
+import com.ktsnvt.ktsnvt.dto.updatesalary.UpdateSalaryRequest;
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -33,6 +34,34 @@ public class EmployeeControllerTest extends AuthorizingControllerMockMvcTestBase
     @Autowired
     protected EmployeeControllerTest(WebApplicationContext webApplicationContext, ObjectMapper mapper) {
         super(webApplicationContext, mapper);
+    }
+
+    @Test
+    void updateSalary_whenCalledWithValidData_isSuccess() throws Exception {
+        login("email1@email.com", "password");
+        var id = 1;
+        var request = new UpdateSalaryRequest(BigDecimal.valueOf(789L));
+        mockMvc.perform(put("/api/employees/{id}/salary", id)
+                .header("Authorization", "Bearer " + token)
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().isOk()
+                );
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {4, 100})
+    void updateSalary_whenCalledWithInvalidData_isNotFound(Integer id) throws Exception {
+        login("email1@email.com", "password");
+        var request = new UpdateSalaryRequest(BigDecimal.valueOf(789L));
+        mockMvc.perform(put("/api/employees/{id}/salary", id)
+                .header("Authorization", "Bearer " + token)
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().isNotFound()
+                );
     }
 
     @Test
