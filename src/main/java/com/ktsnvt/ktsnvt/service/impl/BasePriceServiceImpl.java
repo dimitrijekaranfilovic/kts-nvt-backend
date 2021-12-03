@@ -1,5 +1,6 @@
 package com.ktsnvt.ktsnvt.service.impl;
 
+import com.ktsnvt.ktsnvt.exception.InventoryItemHasNoActiveBasePrice;
 import com.ktsnvt.ktsnvt.model.BasePrice;
 import com.ktsnvt.ktsnvt.model.InventoryItem;
 import com.ktsnvt.ktsnvt.repository.BasePriceRepository;
@@ -27,9 +28,15 @@ public class BasePriceServiceImpl extends TransactionalServiceBase implements Ba
 
     @Override
     public void endActiveBasePriceForInventoryItem(InventoryItem inventoryItem) {
-        this.basePriceRepository.findActiveForInventoryItem(inventoryItem.getId()).ifPresent(
-                bp -> bp.setEndDate(localDateTimeService.currentTime())
-        );
+        this.basePriceRepository.findActiveForInventoryItem(inventoryItem.getId())
+                .ifPresentOrElse(
+                        bp -> bp.setEndDate(localDateTimeService.currentTime()),
+                        () -> {
+                            throw new InventoryItemHasNoActiveBasePrice(
+                                    String.format("Inventory item with id: %d has no active base price",
+                                            inventoryItem.getId()));
+                        }
+                );
     }
 
     @Override
