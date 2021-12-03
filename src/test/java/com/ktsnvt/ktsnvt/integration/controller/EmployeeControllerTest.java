@@ -2,9 +2,11 @@ package com.ktsnvt.ktsnvt.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktsnvt.ktsnvt.model.enums.EmployeeType;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,6 +32,50 @@ public class EmployeeControllerTest extends AuthorizingControllerMockMvcTestBase
     @Autowired
     protected EmployeeControllerTest(WebApplicationContext webApplicationContext, ObjectMapper mapper) {
         super(webApplicationContext, mapper);
+    }
+
+    @Test
+    void deleteEmployee_whenCalledWithValidId_isSuccess() throws Exception {
+        login("email1@email.com", "password");
+        var id = 2;
+        mockMvc.perform(delete("/api/employees/{id}", id)
+                .header("Authorization", "Bearer " + token))
+                .andExpectAll(
+                        status().isNoContent()
+                );
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {4, 100})
+    void deleteEmployee_whenCalledWithNonExistingId_isNotFound(Integer id) throws Exception {
+        login("email1@email.com", "password");
+        mockMvc.perform(delete("/api/employees/{id}", id)
+                .header("Authorization", "Bearer " + token))
+                .andExpectAll(
+                        status().isNotFound()
+                );
+    }
+
+    @Test
+    void deleteEmployee_whenCalledWithEmployeeWithAssignedOrders_isBadRequest() throws Exception {
+        login("email1@email.com", "password");
+        var id = 3;
+        mockMvc.perform(delete("/api/employees/{id}", id)
+                .header("Authorization", "Bearer " + token))
+                .andExpectAll(
+                        status().isBadRequest()
+                );
+    }
+
+    @Test
+    void deleteEmployee_whenCalledWithEmployeeWithActiveOrderItems_isBadRequest() throws Exception {
+        login("email1@email.com", "password");
+        var id = 1;
+        mockMvc.perform(delete("/api/employees/{id}", id)
+                .header("Authorization", "Bearer " + token))
+                .andExpectAll(
+                        status().isBadRequest()
+                );
     }
 
     @ParameterizedTest
