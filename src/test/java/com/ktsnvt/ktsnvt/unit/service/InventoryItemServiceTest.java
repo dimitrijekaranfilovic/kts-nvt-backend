@@ -1,6 +1,7 @@
 package com.ktsnvt.ktsnvt.unit.service;
 
 import com.ktsnvt.ktsnvt.exception.InventoryItemNameAlreadyExistsException;
+import com.ktsnvt.ktsnvt.exception.InventoryItemNotFoundException;
 import com.ktsnvt.ktsnvt.model.InventoryItem;
 import com.ktsnvt.ktsnvt.repository.InventoryItemRepository;
 import com.ktsnvt.ktsnvt.service.BasePriceService;
@@ -77,6 +78,35 @@ class InventoryItemServiceTest {
         // THEN
         verify(inventoryItemRepository, times(1)).findByName(inventoryItem.getName());
         verifyNoMoreInteractions(inventoryItemRepository);
+    }
+
+    @Test
+    void readForUpdate_whenCalledWithExistingId_isSuccess() {
+        // GIVEN
+        var id = Integer.valueOf(42);
+        var inventoryItem = new InventoryItem();
+        inventoryItem.setId(id);
+        doReturn(Optional.of(inventoryItem)).when(inventoryItemRepository).findOneForUpdate(id);
+
+        // WHEN
+        var returnedItem = inventoryItemService.readForUpdate(id);
+
+        // THEN
+        assertEquals(returnedItem.getId(), id);
+        verify(inventoryItemRepository, times(1)).findOneForUpdate(id);
+    }
+
+    @Test
+    void readForUpdate_whenCalledWithNonexistentId_throwsException() {
+        // GIVEN
+        var id = Integer.valueOf(42);
+        doReturn(Optional.empty()).when(inventoryItemRepository).findOneForUpdate(id);
+
+        // WHEN
+        assertThrows(InventoryItemNotFoundException.class, () -> inventoryItemService.readForUpdate(id));
+
+        // THEN
+        verify(inventoryItemRepository, times(1)).findOneForUpdate(id);
     }
 
 }
