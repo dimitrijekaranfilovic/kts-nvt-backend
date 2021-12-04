@@ -18,7 +18,7 @@ import java.time.LocalDate;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class ReportServiceTest {
@@ -164,4 +164,24 @@ class ReportServiceTest {
         order.setTotalCost(BigDecimal.valueOf(cost));
         return order;
     }
+
+    @Test
+    void readTotalOrderCost_whenCalledWithValidDate_isSuccess() {
+        // GIVEN
+        var orders = buildTestDataForStreamingOrders();
+        doReturn(orders).when(orderService).streamChargedOrdersInTimeRange(first, third);
+        // a case when no results are returned
+        doReturn(Stream.of()).when(orderService).streamChargedOrdersInTimeRange(third, first);
+
+        // WHEN
+        var totalCost = reportService.readTotalOrderCost(first, third);
+        var totalCostNoOrders = reportService.readTotalOrderCost(third, first);
+
+        // THEN
+        assertEquals(BigDecimal.valueOf(470), totalCost);
+        assertEquals(BigDecimal.ZERO, totalCostNoOrders);
+        verify(orderService, times(1)).streamChargedOrdersInTimeRange(first, third);
+        verify(orderService, times(1)).streamChargedOrdersInTimeRange(third, first);
+    }
+
 }
