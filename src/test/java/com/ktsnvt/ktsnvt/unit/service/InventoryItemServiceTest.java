@@ -2,6 +2,7 @@ package com.ktsnvt.ktsnvt.unit.service;
 
 import com.ktsnvt.ktsnvt.exception.InventoryItemNameAlreadyExistsException;
 import com.ktsnvt.ktsnvt.exception.InventoryItemNotFoundException;
+import com.ktsnvt.ktsnvt.exception.UsedInventoryItemDeletionException;
 import com.ktsnvt.ktsnvt.model.InventoryItem;
 import com.ktsnvt.ktsnvt.repository.InventoryItemRepository;
 import com.ktsnvt.ktsnvt.service.BasePriceService;
@@ -107,6 +108,54 @@ class InventoryItemServiceTest {
 
         // THEN
         verify(inventoryItemRepository, times(1)).findOneForUpdate(id);
+    }
+
+    @Test
+    void delete_whenCalledWithInventoryItemWithNoActiveOrders_isSuccess() {
+        // GIVEN
+        var id = Integer.valueOf(42);
+        var inventoryItem = new InventoryItem();
+        inventoryItem.setId(id);
+
+        var inventoryItemServiceSpy = spy(inventoryItemService);
+
+        doReturn(inventoryItem).when(inventoryItemServiceSpy).readForUpdate(id);
+        doReturn(Boolean.FALSE).when(orderItemService).hasActiveOrderItems(inventoryItem);
+        doNothing().when(basePriceService).endActiveBasePriceForInventoryItem(inventoryItem);
+        doNothing().when(menuItemService).removeActiveMenuItemForInventoryItem(id);
+
+        // WHEN
+        inventoryItemServiceSpy.delete(id);
+
+        // THEN
+        assertEquals(Boolean.FALSE, inventoryItem.getIsActive());
+        verify(inventoryItemServiceSpy, times(1)).readForUpdate(id);
+        verify(orderItemService, times(1)).hasActiveOrderItems(inventoryItem);
+        verify(basePriceService, times(1)).endActiveBasePriceForInventoryItem(inventoryItem);
+        verify(menuItemService, times(1)).removeActiveMenuItemForInventoryItem(id);
+    }
+
+    @Test
+    void delete_whenCalledWithInventoryItemWithActiveOrderItems_throwsException() {
+        // GIVEN
+        var id = Integer.valueOf(42);
+        var inventoryItem = new InventoryItem();
+        inventoryItem.setId(42);
+
+        var inventoryItemServiceSpy = spy(inventoryItemService);
+
+        doReturn(inventoryItem).when(inventoryItemServiceSpy).readForUpdate(id);
+        doReturn(Boolean.TRUE).when(orderItemService).hasActiveOrderItems(inventoryItem);
+
+        // WHEN
+        assertThrows(UsedInventoryItemDeletionException.class, () -> inventoryItemServiceSpy.delete(id));
+
+        // THEN
+        assertEquals(Boolean.TRUE, inventoryItem.getIsActive());
+        verify(inventoryItemServiceSpy, times(1)).readForUpdate(id);
+        verify(orderItemService, times(1)).hasActiveOrderItems(inventoryItem);
+        verifyNoInteractions(basePriceService);
+        verifyNoInteractions(menuItemService);
     }
 
 }
