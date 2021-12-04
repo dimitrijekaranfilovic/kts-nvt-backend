@@ -100,7 +100,31 @@ class MenuItemServiceTest {
                 .removeActiveMenuItemForInventoryItem(inventoryItemId);
         verify(localDateTimeService, times(1)).currentTime();
         verify(menuItemRepository, times(1)).save(any(MenuItem.class));
+    }
 
+    @Test
+    void removeActiveMenuItemForInventoryItem_calledWithExistingInventoryItemId_isSuccess() {
+        //GIVEN
+        var id = Integer.valueOf(42);
+        var inventoryItem = new InventoryItem();
+        inventoryItem.setId(322);
+        var menuItem = new MenuItem();
+        menuItem.setId(id);
+        inventoryItem.addMenuItem(menuItem);
+        var currentTime = LocalDateTime.of(2021, 12, 1, 3, 14);
+
+        doReturn(Optional.of(menuItem)).when(menuItemRepository).findActiveForInventoryItem(id);
+        doReturn(currentTime).when(localDateTimeService).currentTime();
+
+        // WHEN
+        menuItemService.removeActiveMenuItemForInventoryItem(id);
+
+        // THEN
+        assertEquals(currentTime, menuItem.getEndDate());
+        assertEquals(Boolean.FALSE, menuItem.getIsActive());
+        assertEquals(Boolean.FALSE, inventoryItem.getIsInMenu());
+        verify(menuItemRepository, times(1)).findActiveForInventoryItem(id);
+        verify(localDateTimeService, times(1)).currentTime();
     }
 
 }
