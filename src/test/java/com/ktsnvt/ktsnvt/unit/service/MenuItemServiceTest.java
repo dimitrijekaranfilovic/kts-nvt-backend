@@ -127,4 +127,28 @@ class MenuItemServiceTest {
         verify(localDateTimeService, times(1)).currentTime();
     }
 
+    @Test
+    void updateMenuItemPrice_whenCalledWithValidArguments_isSuccess() {
+        // GIVEN
+        var price = BigDecimal.valueOf(42);
+        var menuItemId = Integer.valueOf(322);
+        var menuItem = new MenuItem();
+        menuItem.setId(menuItemId);
+        var inventoryItem = new InventoryItem();
+        inventoryItem.setId(28);
+        inventoryItem.addMenuItem(menuItem);
+
+        var menuItemServiceSpy = spy(menuItemService);
+        doReturn(menuItem).when(menuItemServiceSpy).readForUpdate(menuItemId);
+        doReturn(menuItem).when(menuItemServiceSpy).createMenuItem(price, inventoryItem.getId());
+
+        // WHEN
+        var returnedMenuItem = menuItemServiceSpy.updateMenuItemPrice(price, menuItemId);
+
+        // THEN
+        assertEquals(menuItem, returnedMenuItem);
+        verify(menuItemServiceSpy, times(1)).readForUpdate(menuItemId);
+        verify(menuItemServiceSpy, times(1)).createMenuItem(price, inventoryItem.getId());
+    }
+
 }
