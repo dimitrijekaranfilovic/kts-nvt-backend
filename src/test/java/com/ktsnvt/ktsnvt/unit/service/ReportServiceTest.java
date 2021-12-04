@@ -4,6 +4,7 @@ import com.ktsnvt.ktsnvt.model.Order;
 import com.ktsnvt.ktsnvt.model.ReportStatistics;
 import com.ktsnvt.ktsnvt.service.*;
 import com.ktsnvt.ktsnvt.service.impl.ReportServiceImpl;
+import org.apache.tomcat.jni.Local;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -201,6 +202,31 @@ class ReportServiceTest {
         assertEquals(BigDecimal.ZERO, totalIncomeNoOrders);
         verify(orderService, times(1)).streamChargedOrdersInTimeRange(first, third);
         verify(orderService, times(1)).streamChargedOrdersInTimeRange(third, first);
+    }
+
+    @Test
+    void readTotalSalaryExpense_whenCalledWithValidDate_isSuccess() {
+        // GIVEN
+        var reportStatistics = new ReportStatistics<LocalDate, BigDecimal>();
+        reportStatistics.addSample(first, BigDecimal.valueOf(42));
+        reportStatistics.addSample(second, BigDecimal.valueOf(322));
+        reportStatistics.addSample(third, BigDecimal.valueOf(28));
+        var reportStatisticsEmpty = new ReportStatistics<LocalDate, BigDecimal>();
+
+        var reportServiceSpy = spy(reportService);
+
+        doReturn(reportStatistics).when(reportServiceSpy).readSalaryExpenses(first, third);
+        doReturn(reportStatisticsEmpty).when(reportServiceSpy).readSalaryExpenses(third, first);
+
+        // WHEN
+        var totalExpenses = reportServiceSpy.readTotalSalaryExpense(first, third);
+        var totalExpensesNoSalaries = reportServiceSpy.readTotalSalaryExpense(third, first);
+
+        // THEN
+        assertEquals(BigDecimal.valueOf(392), totalExpenses);
+        assertEquals(BigDecimal.ZERO, totalExpensesNoSalaries);
+        verify(reportServiceSpy, times(1)).readSalaryExpenses(first, third);
+        verify(reportServiceSpy, times(1)).readSalaryExpenses(third, first);
     }
 
 }
