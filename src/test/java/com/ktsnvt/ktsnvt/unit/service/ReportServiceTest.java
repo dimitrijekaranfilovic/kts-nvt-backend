@@ -4,7 +4,6 @@ import com.ktsnvt.ktsnvt.model.Order;
 import com.ktsnvt.ktsnvt.model.ReportStatistics;
 import com.ktsnvt.ktsnvt.service.*;
 import com.ktsnvt.ktsnvt.service.impl.ReportServiceImpl;
-import org.apache.tomcat.jni.Local;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
