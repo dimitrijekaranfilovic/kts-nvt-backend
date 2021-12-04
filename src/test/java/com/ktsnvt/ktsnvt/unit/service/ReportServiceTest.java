@@ -171,7 +171,7 @@ class ReportServiceTest {
         var orders = buildTestDataForStreamingOrders();
         doReturn(orders).when(orderService).streamChargedOrdersInTimeRange(first, third);
         // a case when no results are returned
-        doReturn(Stream.of()).when(orderService).streamChargedOrdersInTimeRange(third, first);
+        doReturn(Stream.empty()).when(orderService).streamChargedOrdersInTimeRange(third, first);
 
         // WHEN
         var totalCost = reportService.readTotalOrderCost(first, third);
@@ -180,6 +180,25 @@ class ReportServiceTest {
         // THEN
         assertEquals(BigDecimal.valueOf(470), totalCost);
         assertEquals(BigDecimal.ZERO, totalCostNoOrders);
+        verify(orderService, times(1)).streamChargedOrdersInTimeRange(first, third);
+        verify(orderService, times(1)).streamChargedOrdersInTimeRange(third, first);
+    }
+
+    @Test
+    void readTotalOrderIncome_whenCalledWithValidDate_isSuccess() {
+        // GIVEN
+        var orders = buildTestDataForStreamingOrders();
+        doReturn(orders).when(orderService).streamChargedOrdersInTimeRange(first, third);
+        // a case when no results are returned
+        doReturn(Stream.empty()).when(orderService).streamChargedOrdersInTimeRange(third, first);
+
+        // WHEN
+        var totalIncome = reportService.readTotalOrderIncome(first, third);
+        var totalIncomeNoOrders = reportService.readTotalOrderIncome(third, first);
+
+        // THEN
+        assertEquals(BigDecimal.valueOf(730), totalIncome);
+        assertEquals(BigDecimal.ZERO, totalIncomeNoOrders);
         verify(orderService, times(1)).streamChargedOrdersInTimeRange(first, third);
         verify(orderService, times(1)).streamChargedOrdersInTimeRange(third, first);
     }
