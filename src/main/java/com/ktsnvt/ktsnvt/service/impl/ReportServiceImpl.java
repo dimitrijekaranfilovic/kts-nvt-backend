@@ -95,11 +95,13 @@ public class ReportServiceImpl extends TransactionalServiceBase implements Repor
     @Override
     @Async
     public void generateMonthlyFinancialReport(LocalDate from, LocalDate to) {
+        var totalSalaryExpense = readTotalSalaryExpense(from, to);
+        var totalOrderIncome = readTotalOrderIncome(from, to);
+        var totalOrderCost = readTotalOrderCost(from, to);
         superUserService.readAll()
-                .forEach(superUser -> emailService.sendMonthlyFinancialReport(superUser,
-                        readTotalSalaryExpense(from, to),
-                        readTotalOrderIncome(from, to),
-                        readTotalOrderCost(from, to)));
+                .forEach(superUser -> emailService
+                        .sendMonthlyFinancialReport(superUser, totalSalaryExpense, totalOrderIncome, totalOrderCost)
+                );
 
     }
 

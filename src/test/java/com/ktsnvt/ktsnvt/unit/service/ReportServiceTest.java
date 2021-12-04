@@ -2,6 +2,7 @@ package com.ktsnvt.ktsnvt.unit.service;
 
 import com.ktsnvt.ktsnvt.model.Order;
 import com.ktsnvt.ktsnvt.model.ReportStatistics;
+import com.ktsnvt.ktsnvt.model.SuperUser;
 import com.ktsnvt.ktsnvt.service.*;
 import com.ktsnvt.ktsnvt.service.impl.ReportServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +19,7 @@ import java.time.LocalDate;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class ReportServiceTest {
@@ -164,4 +165,96 @@ class ReportServiceTest {
         order.setTotalCost(BigDecimal.valueOf(cost));
         return order;
     }
+
+    @Test
+    void readTotalOrderCost_whenCalledWithValidDate_isSuccess() {
+        // GIVEN
+        var orders = buildTestDataForStreamingOrders();
+        doReturn(orders).when(orderService).streamChargedOrdersInTimeRange(first, third);
+        // a case when no results are returned
+        doReturn(Stream.empty()).when(orderService).streamChargedOrdersInTimeRange(third, first);
+
+        // WHEN
+        var totalCost = reportService.readTotalOrderCost(first, third);
+        var totalCostNoOrders = reportService.readTotalOrderCost(third, first);
+
+        // THEN
+        assertEquals(BigDecimal.valueOf(470), totalCost);
+        assertEquals(BigDecimal.ZERO, totalCostNoOrders);
+        verify(orderService, times(1)).streamChargedOrdersInTimeRange(first, third);
+        verify(orderService, times(1)).streamChargedOrdersInTimeRange(third, first);
+    }
+
+    @Test
+    void readTotalOrderIncome_whenCalledWithValidDate_isSuccess() {
+        // GIVEN
+        var orders = buildTestDataForStreamingOrders();
+        doReturn(orders).when(orderService).streamChargedOrdersInTimeRange(first, third);
+        // a case when no results are returned
+        doReturn(Stream.empty()).when(orderService).streamChargedOrdersInTimeRange(third, first);
+
+        // WHEN
+        var totalIncome = reportService.readTotalOrderIncome(first, third);
+        var totalIncomeNoOrders = reportService.readTotalOrderIncome(third, first);
+
+        // THEN
+        assertEquals(BigDecimal.valueOf(730), totalIncome);
+        assertEquals(BigDecimal.ZERO, totalIncomeNoOrders);
+        verify(orderService, times(1)).streamChargedOrdersInTimeRange(first, third);
+        verify(orderService, times(1)).streamChargedOrdersInTimeRange(third, first);
+    }
+
+    @Test
+    void readTotalSalaryExpense_whenCalledWithValidDate_isSuccess() {
+        // GIVEN
+        var reportStatistics = new ReportStatistics<LocalDate, BigDecimal>();
+        reportStatistics.addSample(first, BigDecimal.valueOf(42));
+        reportStatistics.addSample(second, BigDecimal.valueOf(322));
+        reportStatistics.addSample(third, BigDecimal.valueOf(28));
+        var reportStatisticsEmpty = new ReportStatistics<LocalDate, BigDecimal>();
+
+        var reportServiceSpy = spy(reportService);
+
+        doReturn(reportStatistics).when(reportServiceSpy).readSalaryExpenses(first, third);
+        doReturn(reportStatisticsEmpty).when(reportServiceSpy).readSalaryExpenses(third, first);
+
+        // WHEN
+        var totalExpenses = reportServiceSpy.readTotalSalaryExpense(first, third);
+        var totalExpensesNoSalaries = reportServiceSpy.readTotalSalaryExpense(third, first);
+
+        // THEN
+        assertEquals(BigDecimal.valueOf(392), totalExpenses);
+        assertEquals(BigDecimal.ZERO, totalExpensesNoSalaries);
+        verify(reportServiceSpy, times(1)).readSalaryExpenses(first, third);
+        verify(reportServiceSpy, times(1)).readSalaryExpenses(third, first);
+    }
+
+
+    @Test
+    void generateMonthlyFinancialReport_whenCalledWithValidDate_isSuccess() {
+        // GIVEN
+        Stream<SuperUser> superUsers = Stream.of(new SuperUser(), new SuperUser(), new SuperUser());
+        Stream<SuperUser> emptyStream = Stream.empty();
+
+        var reportServiceSpy = spy(reportService);
+
+        doReturn(BigDecimal.valueOf(42)).when(reportServiceSpy).readTotalSalaryExpense(first, third);
+        doReturn(BigDecimal.valueOf(322)).when(reportServiceSpy).readTotalOrderIncome(first, third);
+        doReturn(BigDecimal.valueOf(28)).when(reportServiceSpy).readTotalOrderCost(first, third);
+        doNothing().when(emailService).sendMonthlyFinancialReport(
+                any(SuperUser.class), any(BigDecimal.class), any(BigDecimal.class), any(BigDecimal.class));
+        doReturn(superUsers).when(superUserService).readAll();
+
+        // WHEN
+        reportServiceSpy.generateMonthlyFinancialReport(first, third);
+
+        // THEN
+        verify(reportServiceSpy, times(1)).readTotalSalaryExpense(first, third);
+        verify(reportServiceSpy, times(1)).readTotalOrderIncome(first, third);
+        verify(reportServiceSpy, times(1)).readTotalOrderCost(first, third);
+        verify(superUserService, times(1)).readAll();
+        verify(emailService, times(3)).sendMonthlyFinancialReport(
+                any(SuperUser.class), any(BigDecimal.class), any(BigDecimal.class), any(BigDecimal.class));
+    }
+
 }

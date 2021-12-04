@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 @RestController
 @RequestMapping("api/reports")
@@ -34,7 +34,7 @@ public class ReportsController {
     @IsAdmin
     @GetMapping("/salary-costs")
     @ResponseStatus(HttpStatus.OK)
-    public ReadReportsResponse readSalaryExpenses(ReadReportsRequest request) {
+    public ReadReportsResponse readSalaryExpenses(@Valid ReadReportsRequest request) {
         var result = reportService.readSalaryExpenses(request.getFromLocalDate(), request.getToLocalDate());
         return toReportResponse.convert(result);
     }
@@ -42,7 +42,7 @@ public class ReportsController {
     @IsAdmin
     @GetMapping("/order-costs")
     @ResponseStatus(HttpStatus.OK)
-    public ReadReportsResponse readOrderCosts(ReadReportsRequest request) {
+    public ReadReportsResponse readOrderCosts(@Valid ReadReportsRequest request) {
         var result = reportService.readOrderCosts(request.getFromLocalDate(), request.getToLocalDate());
         return toReportResponse.convert(result);
     }
@@ -50,7 +50,7 @@ public class ReportsController {
     @IsAdmin
     @GetMapping("/order-incomes")
     @ResponseStatus(HttpStatus.OK)
-    public ReadReportsResponse readOrderIncomes(ReadReportsRequest request) {
+    public ReadReportsResponse readOrderIncomes(@Valid ReadReportsRequest request) {
         var result = reportService.readOrderIncomes(request.getFromLocalDate(), request.getToLocalDate());
         return toReportResponse.convert(result);
     }
