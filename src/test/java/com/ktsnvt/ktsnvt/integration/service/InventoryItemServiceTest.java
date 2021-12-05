@@ -99,6 +99,24 @@ class InventoryItemServiceTest {
                 () -> inventoryItemService.createInventoryItem(inventoryItem));
     }
 
+    @ParameterizedTest
+    @MethodSource("provideValidArgumentsForInventoryItemUpdate")
+    void update_whenCalledWithValidArguments_isSuccess(Integer id, String name, String description,
+                                                       String allergies, String image, ItemCategory category,
+                                                       BigDecimal basePrice) {
+        assertDoesNotThrow(
+                () -> inventoryItemService.update(id, name, description, allergies, image, category, basePrice));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideTakenNameArgumentsForInventoryItemUpdate")
+    void update_whenCalledWithValidArguments_throwsException(Integer id, String name, String description,
+                                                             String allergies, String image, ItemCategory category,
+                                                             BigDecimal basePrice) {
+        assertThrows(InventoryItemNameAlreadyExistsException.class,
+                () -> inventoryItemService.update(id, name, description, allergies, image, category, basePrice));
+    }
+
     @SuppressWarnings("unused")
     private static Stream<Arguments> provideArgumentsAndExpectedValueForReadingPaginatedInventoryItems() {
         var pageable = PageRequest.of(0, 10, Sort.unsorted());
@@ -116,6 +134,36 @@ class InventoryItemServiceTest {
                 Arguments.of("", null, null, ItemCategory.FOOD, pageable, 7),
                 Arguments.of(" ice ", BigDecimal.valueOf(-100), BigDecimal.valueOf(1000),
                         ItemCategory.DRINK, pageable, 1)
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideValidArgumentsForInventoryItemUpdate() {
+        return Stream.of(
+                Arguments.of(1, "unique name", "new description", "new allergies", "new image",
+                        ItemCategory.DRINK, BigDecimal.valueOf(496)),
+                Arguments.of(1, "Ice cream", "new description", "new allergies", "new image",
+                        ItemCategory.DRINK, BigDecimal.valueOf(496)),
+                Arguments.of(1, "unique name", "new description", "new allergies", "new image",
+                        ItemCategory.FOOD, BigDecimal.valueOf(496)),
+                Arguments.of(1, "unique name", "new description", "new allergies", "new image",
+                        ItemCategory.FOOD, BigDecimal.valueOf(30)),
+                Arguments.of(10, "Whiskey", "new description", "new allergies", "new image",
+                        ItemCategory.FOOD, BigDecimal.valueOf(42))
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideTakenNameArgumentsForInventoryItemUpdate() {
+        return Stream.of(
+                Arguments.of(1, "Wine", "new description", "new allergies", "new image",
+                        ItemCategory.DRINK, BigDecimal.valueOf(496)),
+                Arguments.of(1, "Cake", "new description", "new allergies", "new image",
+                        ItemCategory.DRINK, BigDecimal.valueOf(496)),
+                Arguments.of(2, "Pizza", "new description", "new allergies", "new image",
+                        ItemCategory.FOOD, BigDecimal.valueOf(30)),
+                Arguments.of(10, "Ice cream", "new description", "new allergies", "new image",
+                        ItemCategory.FOOD, BigDecimal.valueOf(42))
         );
     }
 
