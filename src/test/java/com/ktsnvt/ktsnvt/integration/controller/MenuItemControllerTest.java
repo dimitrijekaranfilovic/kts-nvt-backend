@@ -26,7 +26,7 @@ class MenuItemControllerTest {
 
 
     @Test
-    void getPaginatedMenuItems_withValidData_isSuccess() throws Exception{
+    void getPaginatedMenuItems_withValidData_isSuccess() throws Exception {
         String name = "";
         int page = 0;
         int size = 8;
@@ -37,14 +37,14 @@ class MenuItemControllerTest {
         this.mockMvc.perform(MockMvcRequestBuilders.get(url))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content", Matchers.hasSize(4)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content", Matchers.hasSize(5)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.totalPages").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements").value(4));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements").value(5));
 
     }
 
     @Test
-    void getPaginatedMenuItems_whenNameDoesNotExist_isEmptyPage() throws Exception{
+    void getPaginatedMenuItems_whenNameDoesNotExist_isEmptyPage() throws Exception {
         String name = "some-test-name";
         int page = 0;
         int size = 8;
