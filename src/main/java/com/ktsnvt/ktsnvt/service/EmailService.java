@@ -8,9 +8,9 @@ import java.math.BigDecimal;
 public interface EmailService {
 
     @Async
-    public void sendSimpleMessage(String to, String subject, String text);
+    void sendSimpleMessage(String to, String subject, String text);
 
     @Async
-    public void sendMonthlyFinancialReport(SuperUser user, BigDecimal totalSalaryExpense,
-                                           BigDecimal totalOrderIncome, BigDecimal totalOrderCost);
+    void sendMonthlyFinancialReport(SuperUser user, BigDecimal totalSalaryExpense,
+                                    BigDecimal totalOrderIncome, BigDecimal totalOrderCost);
 }
