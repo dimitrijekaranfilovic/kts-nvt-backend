@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
@@ -72,6 +73,12 @@ class ReportServiceTest {
         assertEquals(0, expectedTotal.compareTo(returnedTotal));
     }
 
+    @ParameterizedTest
+    @MethodSource("provideValidDateRangesForGeneratingMonthlyFinancialReport")
+    void generateMonthlyFinancialReport_whenCalledWithValidDate_isSuccess(LocalDate from, LocalDate to) {
+        assertDoesNotThrow(() -> reportService.generateMonthlyFinancialReport(from, to));
+    }
+
     @SuppressWarnings("unused")
     private static Stream<Arguments> provideValidDateRangesAndExpectedTotalsForSalaryExpenses() {
         return Stream.of(
@@ -123,6 +130,18 @@ class ReportServiceTest {
                         LocalDate.of(2021, 12, 31), BigDecimal.valueOf(0)),
                 Arguments.of(LocalDate.of(2021, 12, 31),
                         LocalDate.of(2021, 12, 1), BigDecimal.valueOf(0))
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideValidDateRangesForGeneratingMonthlyFinancialReport() {
+        return Stream.of(
+                Arguments.of(LocalDate.of(2010, 1, 1),
+                        LocalDate.of(2011, 11, 30)),
+                Arguments.of(LocalDate.of(2020, 1, 1),
+                        LocalDate.of(2022, 1, 1)),
+                Arguments.of(LocalDate.of(2022, 1, 1),
+                        LocalDate.of(2020, 1, 1))
         );
     }
 }
