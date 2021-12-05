@@ -6,11 +6,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@Transactional
 class MenuItemServiceTest {
 
     @Autowired
@@ -27,6 +28,12 @@ class MenuItemServiceTest {
     @ValueSource(ints = {28, 496, 42, -1})
     void readForUpdate_calledWithNonExistingId_throwsException(Integer id) {
         assertThrows(MenuItemNotFoundException.class, () -> menuItemService.readForUpdate(id));
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 42, -1})
+    void removeActiveMenuItemForInventoryItem_calledWithValidId_isSuccess(Integer id) {
+        assertDoesNotThrow(() -> menuItemService.removeActiveMenuItemForInventoryItem(id));
     }
 
 }
