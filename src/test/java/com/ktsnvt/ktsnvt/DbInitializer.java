@@ -122,10 +122,18 @@ public class DbInitializer implements ApplicationRunner {
         item3.addBasePrice(basePrice3);
         var item4 = new InventoryItem("Pizza", "Description", "image", "Allergies", ItemCategory.FOOD);
         item4.addBasePrice(basePrice4);
+        var item5 = new InventoryItem("Steak", "Description", "image", "Allergies", ItemCategory.FOOD);
+        var item6 = new InventoryItem("Water", "Description", "image", "Allergies", ItemCategory.DRINK);
+        var item7 = new InventoryItem("Pancake", "Description", "image", "Allergies", ItemCategory.FOOD);
+        var item8 = new InventoryItem("Lemonade", "Description", "image", "Allergies", ItemCategory.DRINK);
         inventoryItemRepo.save(item1);
         inventoryItemRepo.save(item2);
         inventoryItemRepo.save(item3);
         inventoryItemRepo.save(item4);
+        inventoryItemRepo.save(item5);
+        inventoryItemRepo.save(item6);
+        inventoryItemRepo.save(item7);
+        inventoryItemRepo.save(item8);
 
         var menuItem1 = new MenuItem(BigDecimal.valueOf(100.00), LocalDateTime.parse("2021-01-01 12:12", formatter), null, item1);
         item1.addMenuItem(menuItem1);
@@ -221,7 +229,6 @@ public class DbInitializer implements ApplicationRunner {
 //        var orderGroup5 = new OrderItemGroup("Group 5", OrderItemGroupStatus.SENT, null);
 //        order6.addOrderItemGroup(orderGroup5);
 //        orderItemGroupRepo.save(orderGroup5);
-
 
 
         var orderItem1 = new OrderItem(2, orderGroup1, null, menuItem1, OrderItemStatus.SENT);
