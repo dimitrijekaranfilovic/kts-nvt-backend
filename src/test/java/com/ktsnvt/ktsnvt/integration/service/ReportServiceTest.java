@@ -64,6 +64,14 @@ class ReportServiceTest {
         assertEquals(0, expectedTotal.compareTo(returnedTotal));
     }
 
+    @ParameterizedTest
+    @MethodSource("provideValidDateRangesAndExpectedTotalForTotalOrderCost")
+    void readTotalOrderCost_whenCalledWithValidDate_isSuccess(LocalDate from, LocalDate to,
+                                                              BigDecimal expectedTotal) {
+        var returnedTotal = reportService.readTotalOrderCost(from, to);
+        assertEquals(0, expectedTotal.compareTo(returnedTotal));
+    }
+
     @SuppressWarnings("unused")
     private static Stream<Arguments> provideValidDateRangesAndExpectedTotalsForSalaryExpenses() {
         return Stream.of(
@@ -93,6 +101,24 @@ class ReportServiceTest {
                         LocalDate.of(2021, 11, 13), BigDecimal.valueOf(0)),
                 Arguments.of(LocalDate.of(2021, 11, 14),
                         LocalDate.of(2021, 11, 15), BigDecimal.valueOf(3462)),
+                Arguments.of(LocalDate.of(2021, 12, 1),
+                        LocalDate.of(2021, 12, 31), BigDecimal.valueOf(0)),
+                Arguments.of(LocalDate.of(2021, 12, 31),
+                        LocalDate.of(2021, 12, 1), BigDecimal.valueOf(0))
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideValidDateRangesAndExpectedTotalForTotalOrderCost() {
+        return Stream.of(
+                Arguments.of(LocalDate.of(2010, 1, 1),
+                        LocalDate.of(2011, 11, 30), BigDecimal.valueOf(0)),
+                Arguments.of(LocalDate.of(2021, 11, 10),
+                        LocalDate.of(2021, 11, 15), BigDecimal.valueOf(162)),
+                Arguments.of(LocalDate.of(2021, 11, 10),
+                        LocalDate.of(2021, 11, 13), BigDecimal.valueOf(0)),
+                Arguments.of(LocalDate.of(2021, 11, 14),
+                        LocalDate.of(2021, 11, 15), BigDecimal.valueOf(162)),
                 Arguments.of(LocalDate.of(2021, 12, 1),
                         LocalDate.of(2021, 12, 31), BigDecimal.valueOf(0)),
                 Arguments.of(LocalDate.of(2021, 12, 31),
