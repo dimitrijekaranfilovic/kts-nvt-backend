@@ -42,6 +42,14 @@ class BasePriceServiceTest {
     }
 
     @ParameterizedTest
+    @MethodSource("provideNonExistingInventoryItems")
+    void endActiveBasePriceForInventoryItem_calledWithNonExistingInventoryItems_throwsException(
+            InventoryItem inventoryItem) {
+        assertThrows(InventoryItemHasNoActiveBasePrice.class,
+                () -> basePriceService.endActiveBasePriceForInventoryItem(inventoryItem));
+    }
+
+    @ParameterizedTest
     @MethodSource("provideInventoryItemsWithActiveBasePrice")
     void updateInventoryItemBasePrice_calledWithValidIdAndBasePrice_isSuccess(InventoryItem inventoryItem) {
         var basePrice = new BasePrice(LocalDateTime.of(2021, 11, 20, 3, 42), null,
