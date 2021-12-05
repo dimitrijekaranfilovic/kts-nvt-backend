@@ -109,10 +109,19 @@ public class DbInitializer implements ApplicationRunner {
         var basePrice2 = new BasePrice(LocalDateTime.parse("2021-01-02 12:12", formatter), null, BigDecimal.valueOf(440.00), null);
         var basePrice3 = new BasePrice(LocalDateTime.parse("2021-01-03 12:12", formatter), null, BigDecimal.valueOf(50.00), null);
         var basePrice4 = new BasePrice(LocalDateTime.parse("2021-01-03 12:12", formatter), null, BigDecimal.valueOf(42.00), null);
+        var basePrice5 = new BasePrice(LocalDateTime.parse("2021-01-01 12:12", formatter), null, BigDecimal.valueOf(322.00), null);
+        var basePrice6 = new BasePrice(LocalDateTime.parse("2021-01-02 12:12", formatter), null, BigDecimal.valueOf(42.00), null);
+        var basePrice7 = new BasePrice(LocalDateTime.parse("2021-01-03 12:12", formatter), null, BigDecimal.valueOf(28.00), null);
+        var basePrice8 = new BasePrice(LocalDateTime.parse("2021-01-03 12:12", formatter), null, BigDecimal.valueOf(14.00), null);
         basePriceRepo.save(basePrice1);
         basePriceRepo.save(basePrice2);
         basePriceRepo.save(basePrice3);
         basePriceRepo.save(basePrice4);
+        basePriceRepo.save(basePrice5);
+        basePriceRepo.save(basePrice6);
+        basePriceRepo.save(basePrice7);
+        basePriceRepo.save(basePrice8);
+
 
         var item1 = new InventoryItem("Ice cream", "Description", "image", "Allergies", ItemCategory.FOOD);
         item1.addBasePrice(basePrice1);
@@ -126,6 +135,15 @@ public class DbInitializer implements ApplicationRunner {
         var item6 = new InventoryItem("Water", "Description", "image", "Allergies", ItemCategory.DRINK);
         var item7 = new InventoryItem("Pancake", "Description", "image", "Allergies", ItemCategory.FOOD);
         var item8 = new InventoryItem("Lemonade", "Description", "image", "Allergies", ItemCategory.DRINK);
+
+        var item9 = new InventoryItem("Cake", "Description", "image", "Allergies", ItemCategory.FOOD);
+        item9.addBasePrice(basePrice5);
+        var item10 = new InventoryItem("Whiskey", "Description", "image", "Allergies", ItemCategory.DRINK);
+        item10.addBasePrice(basePrice6);
+        var item11 = new InventoryItem("Squids", "Description", "image", "Allergies", ItemCategory.FOOD);
+        item11.addBasePrice(basePrice7);
+        var item12 = new InventoryItem("Wine", "Description", "image", "Allergies", ItemCategory.DRINK);
+        item12.addBasePrice(basePrice8);
         inventoryItemRepo.save(item1);
         inventoryItemRepo.save(item2);
         inventoryItemRepo.save(item3);
@@ -134,6 +152,10 @@ public class DbInitializer implements ApplicationRunner {
         inventoryItemRepo.save(item6);
         inventoryItemRepo.save(item7);
         inventoryItemRepo.save(item8);
+        inventoryItemRepo.save(item9);
+        inventoryItemRepo.save(item10);
+        inventoryItemRepo.save(item11);
+        inventoryItemRepo.save(item12);
 
         var menuItem1 = new MenuItem(BigDecimal.valueOf(100.00), LocalDateTime.parse("2021-01-01 12:12", formatter), null, item1);
         item1.addMenuItem(menuItem1);

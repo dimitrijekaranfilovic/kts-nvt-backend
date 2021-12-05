@@ -71,8 +71,8 @@ public class InventoryItemServiceImpl extends TransactionalServiceBase implement
     }
 
     @Override
-    public void update(Integer id, String name, String description, String allergies, String image, ItemCategory category,
-                       BigDecimal basePrice) {
+    public void update(Integer id, String name, String description, String allergies, String image,
+                       ItemCategory category, BigDecimal basePrice) {
         var inventoryItem = readForUpdate(id);
 
         if (!name.equals(inventoryItem.getName())) {
