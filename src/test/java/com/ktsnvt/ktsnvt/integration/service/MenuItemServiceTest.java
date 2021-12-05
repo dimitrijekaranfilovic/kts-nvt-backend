@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -34,6 +36,13 @@ class MenuItemServiceTest {
     @ValueSource(ints = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 42, -1})
     void removeActiveMenuItemForInventoryItem_calledWithValidId_isSuccess(Integer id) {
         assertDoesNotThrow(() -> menuItemService.removeActiveMenuItemForInventoryItem(id));
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12})
+    void createMenuItem_calledWithValidPriceAndValidInventoryItemId_isSuccess(Integer inventoryItemId) {
+        var menuItem = menuItemService.createMenuItem(BigDecimal.valueOf(42), inventoryItemId);
+        assertEquals(inventoryItemId, menuItem.getItem().getId());
     }
 
 }
