@@ -1,12 +1,15 @@
 package com.ktsnvt.ktsnvt.integration.service;
 
 import com.ktsnvt.ktsnvt.exception.InventoryItemHasNoActiveBasePrice;
+import com.ktsnvt.ktsnvt.exception.InventoryItemNameAlreadyExistsException;
 import com.ktsnvt.ktsnvt.exception.InventoryItemNotFoundException;
 import com.ktsnvt.ktsnvt.exception.UsedInventoryItemDeletionException;
+import com.ktsnvt.ktsnvt.model.InventoryItem;
 import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
 import com.ktsnvt.ktsnvt.service.impl.InventoryItemServiceImpl;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,6 +78,25 @@ class InventoryItemServiceTest {
     @ValueSource(ints = {5, 6, 7, 8})
     void delete_whenCalledWithItemsWithNoBasePrice_throwsException(Integer id) {
         assertThrows(InventoryItemHasNoActiveBasePrice.class, () -> inventoryItemService.delete(id));
+    }
+
+    @ParameterizedTest
+    @EnumSource(ItemCategory.class)
+    void createInventoryItem_whenCalledWithValidId_isSuccess(ItemCategory itemCategory) {
+        var inventoryItem = new InventoryItem("unique name", "description",
+                "image", "allergies", itemCategory, Boolean.FALSE);
+        var createdInventoryItem = inventoryItemService.createInventoryItem(inventoryItem);
+        assertNotNull(createdInventoryItem.getId());
+        assertEquals(inventoryItem.getName(), createdInventoryItem.getName());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Ice cream", "Orange juice", "Pizza", "Steak", "Water", "Cake", "Wine"})
+    void createInventoryItem_whenCalledWithNonUniqueName_throwsException(String name) {
+        var inventoryItem = new InventoryItem(name, "description",
+                "image", "allergies", ItemCategory.FOOD, Boolean.FALSE);
+        assertThrows(InventoryItemNameAlreadyExistsException.class,
+                () -> inventoryItemService.createInventoryItem(inventoryItem));
     }
 
     @SuppressWarnings("unused")
