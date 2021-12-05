@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -114,7 +115,7 @@ class MenuItemControllerTest extends AuthorizingControllerMockMvcTestBase {
 
     @ParameterizedTest
     @MethodSource("provideValidDataForMenuItemPriceUpdate")
-    void updatePrice_whenCalledWithValidData_isSuccess(Integer id, UpdateMenuItemPriceRequest request) throws Exception {
+    void updatePrice_calledWithValidData_isSuccess(Integer id, UpdateMenuItemPriceRequest request) throws Exception {
         mockMvc.perform(post("/api/menu-items/{id}/price", id)
                 .header("Authorization", "Bearer " + token)
                 .contentType("application/json")
@@ -128,7 +129,7 @@ class MenuItemControllerTest extends AuthorizingControllerMockMvcTestBase {
 
     @ParameterizedTest
     @ValueSource(ints = {28, 42, -1})
-    void updatePrice_whenCalledWithNonExistingId_isBadRequest(Integer id) throws Exception {
+    void updatePrice_calledWithNonExistingId_isBadRequest(Integer id) throws Exception {
         var request = new UpdateMenuItemPriceRequest(BigDecimal.valueOf(42));
         mockMvc.perform(post("/api/menu-items/{id}/price", id)
                 .header("Authorization", "Bearer " + token)
@@ -139,6 +140,35 @@ class MenuItemControllerTest extends AuthorizingControllerMockMvcTestBase {
                 );
     }
 
+    @ParameterizedTest
+    @ValueSource(ints = {4, 5})
+    void deactivateMenuItem_calledWithValidId_isSuccess(Integer id) throws Exception {
+        mockMvc.perform(delete("/api/menu-items/{id}", id)
+                .header("Authorization", "Bearer " + token))
+                .andExpectAll(
+                        status().isNoContent()
+                );
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {6, 7})
+    void deactivateMenuItem_calledWithDeactivateMenuItemId_isBadRequest(Integer id) throws Exception {
+        mockMvc.perform(delete("/api/menu-items/{id}", id)
+                .header("Authorization", "Bearer " + token))
+                .andExpectAll(
+                        status().isBadRequest()
+                );
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 2, 3})
+    void deactivateMenuItem_calledWithMenuItemWithActiveOrdersId_isBadRequest(Integer id) throws Exception {
+        mockMvc.perform(delete("/api/menu-items/{id}", id)
+                .header("Authorization", "Bearer " + token))
+                .andExpectAll(
+                        status().isBadRequest()
+                );
+    }
 
     @SuppressWarnings("unused")
     private static Stream<Arguments> provideValidCreateMenuItemRequests() {
