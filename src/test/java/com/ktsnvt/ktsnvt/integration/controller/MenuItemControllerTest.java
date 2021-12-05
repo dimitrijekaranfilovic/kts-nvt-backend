@@ -3,12 +3,14 @@ package com.ktsnvt.ktsnvt.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktsnvt.ktsnvt.dto.createmenuitem.CreateMenuItemRequest;
+import com.ktsnvt.ktsnvt.dto.updatemenuitemprice.UpdateMenuItemPriceRequest;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -110,6 +112,33 @@ class MenuItemControllerTest extends AuthorizingControllerMockMvcTestBase {
                 );
     }
 
+    @ParameterizedTest
+    @MethodSource("provideValidDataForMenuItemPriceUpdate")
+    void updatePrice_whenCalledWithValidData_isSuccess(Integer id, UpdateMenuItemPriceRequest request) throws Exception {
+        mockMvc.perform(post("/api/menu-items/{id}/price", id)
+                .header("Authorization", "Bearer " + token)
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().isCreated(),
+                        jsonPath("$.id", notNullValue()),
+                        jsonPath("$.id", greaterThanOrEqualTo(0))
+                );
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {28, 42, -1})
+    void updatePrice_whenCalledWithNonExistingId_isBadRequest(Integer id) throws Exception {
+        var request = new UpdateMenuItemPriceRequest(BigDecimal.valueOf(42));
+        mockMvc.perform(post("/api/menu-items/{id}/price", id)
+                .header("Authorization", "Bearer " + token)
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().isBadRequest()
+                );
+    }
+
 
     @SuppressWarnings("unused")
     private static Stream<Arguments> provideValidCreateMenuItemRequests() {
@@ -126,6 +155,17 @@ class MenuItemControllerTest extends AuthorizingControllerMockMvcTestBase {
                 Arguments.of(new CreateMenuItemRequest(10, BigDecimal.valueOf(496))),
                 Arguments.of(new CreateMenuItemRequest(11, BigDecimal.valueOf(496))),
                 Arguments.of(new CreateMenuItemRequest(12, BigDecimal.valueOf(496)))
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideValidDataForMenuItemPriceUpdate() {
+        return Stream.of(
+                Arguments.of(1, new UpdateMenuItemPriceRequest(BigDecimal.valueOf(42))),
+                Arguments.of(2, new UpdateMenuItemPriceRequest(BigDecimal.valueOf(496))),
+                Arguments.of(3, new UpdateMenuItemPriceRequest(BigDecimal.valueOf(28))),
+                Arguments.of(4, new UpdateMenuItemPriceRequest(BigDecimal.valueOf(322))),
+                Arguments.of(5, new UpdateMenuItemPriceRequest(BigDecimal.valueOf(322)))
         );
     }
 
