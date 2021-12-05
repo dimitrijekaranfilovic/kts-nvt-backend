@@ -45,4 +45,13 @@ class MenuItemServiceTest {
         assertEquals(inventoryItemId, menuItem.getItem().getId());
     }
 
+    @ParameterizedTest
+    @ValueSource(ints = {1, 2, 3, 4})
+    void updateMenuItemPrice_calledWithValidArguments_isSuccess(Integer id) {
+        var price = BigDecimal.valueOf(42);
+        var menuItem = menuItemService.updateMenuItemPrice(price, id);
+        assertNotEquals(id, menuItem.getId());
+        assertEquals(0, price.compareTo(menuItem.getPrice()));
+    }
+
 }
