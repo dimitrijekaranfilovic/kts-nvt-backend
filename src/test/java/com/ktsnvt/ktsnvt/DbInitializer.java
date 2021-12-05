@@ -165,10 +165,17 @@ public class DbInitializer implements ApplicationRunner {
         item3.addMenuItem(menuItem3);
         var menuItem4 = new MenuItem(BigDecimal.valueOf(322.00), LocalDateTime.parse("2021-01-01 12:12", formatter), null, item4);
         item4.addMenuItem(menuItem4);
+        var menuItem5 = new MenuItem(BigDecimal.valueOf(496.00), LocalDateTime.parse("2021-01-01 12:12", formatter), null, item5);
+        item5.addMenuItem(menuItem5);
+        var menuItem6 = new MenuItem(BigDecimal.valueOf(496.00), LocalDateTime.parse("2021-01-01 12:12", formatter), LocalDateTime.parse("2021-01-03 12:12", formatter), item6);
+        var menuItem7 = new MenuItem(BigDecimal.valueOf(496.00), LocalDateTime.parse("2021-01-01 12:12", formatter), LocalDateTime.parse("2021-01-03 12:12", formatter), item7);
         menuItemRepo.save(menuItem1);
         menuItemRepo.save(menuItem2);
         menuItemRepo.save(menuItem3);
         menuItemRepo.save(menuItem4);
+        menuItemRepo.save(menuItem5);
+        menuItemRepo.save(menuItem6);
+        menuItemRepo.save(menuItem7);
 
         var groundFloor = new Section("Ground Floor");
         var firstFloor = new Section("1st Floor");

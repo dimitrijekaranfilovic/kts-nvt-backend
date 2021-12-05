@@ -1,6 +1,8 @@
 package com.ktsnvt.ktsnvt.integration.service;
 
+import com.ktsnvt.ktsnvt.exception.EntityAlreadyDeactivatedException;
 import com.ktsnvt.ktsnvt.exception.MenuItemNotFoundException;
+import com.ktsnvt.ktsnvt.exception.UsedMenuItemDeletionException;
 import com.ktsnvt.ktsnvt.service.impl.MenuItemServiceImpl;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -52,6 +54,24 @@ class MenuItemServiceTest {
         var menuItem = menuItemService.updateMenuItemPrice(price, id);
         assertNotEquals(id, menuItem.getId());
         assertEquals(0, price.compareTo(menuItem.getPrice()));
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {4, 5})
+    void deactivateMenuItem_calledWithActiveMenuItem_isSuccess(Integer id) {
+        assertDoesNotThrow(() -> menuItemService.deactivateMenuItem(id));
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {6, 7})
+    void deactivateMenuItem_calledWithDeactivateMenuItem_throwsException(Integer id) {
+        assertThrows(EntityAlreadyDeactivatedException.class, () -> menuItemService.deactivateMenuItem(id));
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 2, 3})
+    void deactivateMenuItem_calledWithMenuItemWithActiveOrders_throwsException(Integer id) {
+        assertThrows(UsedMenuItemDeletionException.class, () -> menuItemService.deactivateMenuItem(id));
     }
 
 }
