@@ -1,6 +1,8 @@
 package com.ktsnvt.ktsnvt.integration.service;
 
+import com.ktsnvt.ktsnvt.exception.InventoryItemHasNoActiveBasePrice;
 import com.ktsnvt.ktsnvt.exception.InventoryItemNotFoundException;
+import com.ktsnvt.ktsnvt.exception.UsedInventoryItemDeletionException;
 import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
 import com.ktsnvt.ktsnvt.service.impl.InventoryItemServiceImpl;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,8 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -52,22 +53,45 @@ class InventoryItemServiceTest {
         assertEquals(expectedTotalItems, returnedPage.getTotalElements());
     }
 
+    @ParameterizedTest
+    @ValueSource(ints = {4, 9, 10, 11, 12})
+    void delete_whenCalledWithValidId_isSuccess(Integer id) {
+        assertDoesNotThrow(() -> inventoryItemService.delete(id));
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {42, 28, -1})
+    void delete_whenCalledWithNonExistingId_throwsException(Integer id) {
+        assertThrows(InventoryItemNotFoundException.class, () -> inventoryItemService.delete(id));
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 2, 3})
+    void delete_whenCalledWithInventoryItemThatIsContainedInNonFinalizedOrder_throwsException(Integer id) {
+        assertThrows(UsedInventoryItemDeletionException.class, () -> inventoryItemService.delete(id));
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {5, 6, 7, 8})
+    void delete_whenCalledWithItemsWithNoBasePrice_throwsException(Integer id) {
+        assertThrows(InventoryItemHasNoActiveBasePrice.class, () -> inventoryItemService.delete(id));
+    }
+
     @SuppressWarnings("unused")
     private static Stream<Arguments> provideArgumentsAndExpectedValueForReadingPaginatedInventoryItems() {
         var pageable = PageRequest.of(0, 10, Sort.unsorted());
-        // TODO update expected total items after merging other tests because a few new inventory items were added
         return Stream.of(
-                Arguments.of("", null, null, null, pageable, 4),
+                Arguments.of("", null, null, null, pageable, 12),
                 Arguments.of("  ice", null, null, null, pageable, 2),
                 Arguments.of("ice  ", null, null, null, pageable, 2),
                 Arguments.of(" ice  ", null, null, null, pageable, 2),
                 Arguments.of("ICE", null, null, null, pageable, 2),
-                Arguments.of("", BigDecimal.valueOf(40), BigDecimal.valueOf(60), null, pageable, 2),
-                Arguments.of("", BigDecimal.valueOf(10), BigDecimal.valueOf(30), null, pageable, 1),
+                Arguments.of("", BigDecimal.valueOf(40), BigDecimal.valueOf(60), null, pageable, 3),
+                Arguments.of("", BigDecimal.valueOf(10), BigDecimal.valueOf(30), null, pageable, 3),
                 Arguments.of("", BigDecimal.valueOf(440), BigDecimal.valueOf(500), null, pageable, 1),
                 Arguments.of("", BigDecimal.valueOf(440), BigDecimal.valueOf(30), null, pageable, 0),
-                Arguments.of("", BigDecimal.valueOf(-10), BigDecimal.valueOf(500), null, pageable, 4),
-                Arguments.of("", null, null, ItemCategory.FOOD, pageable, 3),
+                Arguments.of("", BigDecimal.valueOf(-10), BigDecimal.valueOf(500), null, pageable, 12),
+                Arguments.of("", null, null, ItemCategory.FOOD, pageable, 7),
                 Arguments.of(" ice ", BigDecimal.valueOf(-100), BigDecimal.valueOf(1000),
                         ItemCategory.DRINK, pageable, 1)
         );
