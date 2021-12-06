@@ -2,7 +2,6 @@ package com.ktsnvt.ktsnvt.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktsnvt.ktsnvt.dto.createinventoryitem.CreateInventoryItemRequest;
-import com.ktsnvt.ktsnvt.dto.readinventoryitems.ReadInventoryItemsRequest;
 import com.ktsnvt.ktsnvt.dto.updateinventoryitem.UpdateInventoryItemRequest;
 import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
 import org.junit.jupiter.api.BeforeEach;
@@ -140,7 +139,6 @@ class InventoryItemControllerTest extends AuthorizingControllerMockMvcTestBase {
     void readInventoryItems_calledWithValidData_isSuccess(String query, BigDecimal basePriceFrom,
                                                           BigDecimal basePriceTo, ItemCategory itemCategory,
                                                           Pageable pageable, int expected) throws Exception {
-        var request = new ReadInventoryItemsRequest(query, basePriceFrom, basePriceTo, itemCategory);
         mockMvc.perform(get("/api/inventory-items")
                 .header("Authorization", "Bearer " + token)
                 .param("query", query)
