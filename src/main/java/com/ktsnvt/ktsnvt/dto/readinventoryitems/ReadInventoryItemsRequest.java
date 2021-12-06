@@ -1,7 +1,6 @@
 package com.ktsnvt.ktsnvt.dto.readinventoryitems;
 
 import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +9,6 @@ import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class ReadInventoryItemsRequest {
 
     private String query = "";

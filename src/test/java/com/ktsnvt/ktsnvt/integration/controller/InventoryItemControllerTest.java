@@ -92,7 +92,8 @@ class InventoryItemControllerTest extends AuthorizingControllerMockMvcTestBase {
 
     @ParameterizedTest
     @ValueSource(ints = {1, 2, 3})
-    void deleteInventoryItem_calledWithInventoryItemThatIsContainedInNonFinalizedOrder_isBadRequest(Integer id) throws Exception {
+    void deleteInventoryItem_calledWithInventoryItemThatIsContainedInNonFinalizedOrder_isBadRequest(Integer id)
+            throws Exception {
         mockMvc.perform(delete("/api/inventory-items/{id}", id)
                 .header("Authorization", "Bearer " + token))
                 .andExpectAll(
