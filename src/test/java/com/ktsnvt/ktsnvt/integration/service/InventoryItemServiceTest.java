@@ -34,22 +34,22 @@ class InventoryItemServiceTest {
 
     @ParameterizedTest
     @ValueSource(ints = {1, 2, 3, 4})
-    void readForUpdate_whenCalledWithValidId_isSuccess(Integer id) {
+    void readForUpdate_calledWithValidId_isSuccess(Integer id) {
         var inventoryItem = inventoryItemService.readForUpdate(id);
         assertEquals(id, inventoryItem.getId());
     }
 
     @ParameterizedTest
     @ValueSource(ints = {42, 28, -1})
-    void readForUpdate_whenCalledWithInvalidId_throwsException(Integer id) {
+    void readForUpdate_calledWithInvalidId_throwsException(Integer id) {
         assertThrows(InventoryItemNotFoundException.class, () -> inventoryItemService.readForUpdate(id));
     }
 
     @ParameterizedTest
     @MethodSource("provideArgumentsAndExpectedValueForReadingPaginatedInventoryItems")
-    void read_whenCalledWithValidPaginationArguments_isSuccess(String query, BigDecimal basePriceFrom,
-                                                               BigDecimal basePriceTo, ItemCategory itemCategory,
-                                                               Pageable pageable, int expectedTotalItems) {
+    void read_calledWithValidPaginationArguments_isSuccess(String query, BigDecimal basePriceFrom,
+                                                           BigDecimal basePriceTo, ItemCategory itemCategory,
+                                                           Pageable pageable, int expectedTotalItems) {
 
         var returnedPage = inventoryItemService.read(query, basePriceFrom, basePriceTo,
                 itemCategory, pageable);
@@ -58,31 +58,31 @@ class InventoryItemServiceTest {
 
     @ParameterizedTest
     @ValueSource(ints = {4, 9, 10, 11, 12})
-    void delete_whenCalledWithValidId_isSuccess(Integer id) {
+    void delete_calledWithValidId_isSuccess(Integer id) {
         assertDoesNotThrow(() -> inventoryItemService.delete(id));
     }
 
     @ParameterizedTest
     @ValueSource(ints = {42, 28, -1})
-    void delete_whenCalledWithNonExistingId_throwsException(Integer id) {
+    void delete_calledWithNonExistingId_throwsException(Integer id) {
         assertThrows(InventoryItemNotFoundException.class, () -> inventoryItemService.delete(id));
     }
 
     @ParameterizedTest
     @ValueSource(ints = {1, 2, 3})
-    void delete_whenCalledWithInventoryItemThatIsContainedInNonFinalizedOrder_throwsException(Integer id) {
+    void delete_calledWithInventoryItemThatIsContainedInNonFinalizedOrder_throwsException(Integer id) {
         assertThrows(UsedInventoryItemDeletionException.class, () -> inventoryItemService.delete(id));
     }
 
     @ParameterizedTest
     @ValueSource(ints = {5, 6, 7, 8})
-    void delete_whenCalledWithItemsWithNoBasePrice_throwsException(Integer id) {
+    void delete_calledWithItemsWithNoBasePrice_throwsException(Integer id) {
         assertThrows(InventoryItemHasNoActiveBasePrice.class, () -> inventoryItemService.delete(id));
     }
 
     @ParameterizedTest
     @EnumSource(ItemCategory.class)
-    void createInventoryItem_whenCalledWithValidId_isSuccess(ItemCategory itemCategory) {
+    void createInventoryItem_calledWithValidId_isSuccess(ItemCategory itemCategory) {
         var inventoryItem = new InventoryItem("unique name", "description",
                 "image", "allergies", itemCategory, Boolean.FALSE);
         var createdInventoryItem = inventoryItemService.createInventoryItem(inventoryItem);
@@ -92,7 +92,7 @@ class InventoryItemServiceTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"Ice cream", "Orange juice", "Pizza", "Steak", "Water", "Cake", "Wine"})
-    void createInventoryItem_whenCalledWithNonUniqueName_throwsException(String name) {
+    void createInventoryItem_calledWithNonUniqueName_throwsException(String name) {
         var inventoryItem = new InventoryItem(name, "description",
                 "image", "allergies", ItemCategory.FOOD, Boolean.FALSE);
         assertThrows(InventoryItemNameAlreadyExistsException.class,
@@ -101,18 +101,18 @@ class InventoryItemServiceTest {
 
     @ParameterizedTest
     @MethodSource("provideValidArgumentsForInventoryItemUpdate")
-    void update_whenCalledWithValidArguments_isSuccess(Integer id, String name, String description,
-                                                       String allergies, String image, ItemCategory category,
-                                                       BigDecimal basePrice) {
+    void update_calledWithValidArguments_isSuccess(Integer id, String name, String description,
+                                                   String allergies, String image, ItemCategory category,
+                                                   BigDecimal basePrice) {
         assertDoesNotThrow(
                 () -> inventoryItemService.update(id, name, description, allergies, image, category, basePrice));
     }
 
     @ParameterizedTest
     @MethodSource("provideTakenNameArgumentsForInventoryItemUpdate")
-    void update_whenCalledWithValidArguments_throwsException(Integer id, String name, String description,
-                                                             String allergies, String image, ItemCategory category,
-                                                             BigDecimal basePrice) {
+    void update_calledWithTakenName_throwsException(Integer id, String name, String description,
+                                                    String allergies, String image, ItemCategory category,
+                                                    BigDecimal basePrice) {
         assertThrows(InventoryItemNameAlreadyExistsException.class,
                 () -> inventoryItemService.update(id, name, description, allergies, image, category, basePrice));
     }

@@ -2,11 +2,13 @@ package com.ktsnvt.ktsnvt.dto.readinventoryitems;
 
 import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 
 @Data
+@NoArgsConstructor
 public class ReadInventoryItemsRequest {
 
     private String query = "";

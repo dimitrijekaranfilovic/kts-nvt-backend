@@ -72,7 +72,7 @@ public class InventoryItemController {
 
     @IsSuperUser
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     public void update(@PathVariable Integer id, @RequestBody @Valid UpdateInventoryItemRequest request) {
         inventoryItemService.update(id, request.getName(), request.getDescription(), request.getAllergies(),
                 request.getImage(), request.getCategory(), request.getBasePrice());
