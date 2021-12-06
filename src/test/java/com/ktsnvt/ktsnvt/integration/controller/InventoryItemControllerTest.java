@@ -2,6 +2,7 @@ package com.ktsnvt.ktsnvt.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktsnvt.ktsnvt.dto.createinventoryitem.CreateInventoryItemRequest;
+import com.ktsnvt.ktsnvt.dto.updateinventoryitem.UpdateInventoryItemRequest;
 import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,8 +20,7 @@ import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -107,6 +107,30 @@ class InventoryItemControllerTest extends AuthorizingControllerMockMvcTestBase {
                 );
     }
 
+    @ParameterizedTest
+    @MethodSource("provideValidDataForUpdatingInventoryItems")
+    void update_calledWithValidData_isSuccess(Integer id, UpdateInventoryItemRequest request) throws Exception {
+        mockMvc.perform(put("/api/inventory-items/{id}", id)
+                .header("Authorization", "Bearer " + token)
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().isOk()
+                );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideTakenNameArgumentsForInventoryItemUpdate")
+    void update_calledWithTakenName_isBadRequest(Integer id, UpdateInventoryItemRequest request) throws Exception {
+        mockMvc.perform(put("/api/inventory-items/{id}", id)
+                .header("Authorization", "Bearer " + token)
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().isBadRequest()
+                );
+    }
+
     @SuppressWarnings("unused")
     private static Stream<Arguments> provideValidDataForCreatingInventoryItems() {
         return Stream.of(
@@ -114,6 +138,36 @@ class InventoryItemControllerTest extends AuthorizingControllerMockMvcTestBase {
                         "new description", "new image", "new allergies", ItemCategory.DRINK)),
                 Arguments.of(new CreateInventoryItemRequest("new name1", BigDecimal.valueOf(322),
                         "new description", "new image", "new allergies", ItemCategory.FOOD))
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideValidDataForUpdatingInventoryItems() {
+        return Stream.of(
+                Arguments.of(1, new UpdateInventoryItemRequest("unique name", BigDecimal.valueOf(496),
+                        "new description", "new allergies", "new image", ItemCategory.DRINK)),
+                Arguments.of(1, new UpdateInventoryItemRequest("Ice cream", BigDecimal.valueOf(496),
+                        "new description", "new allergies", "new image", ItemCategory.DRINK)),
+                Arguments.of(1, new UpdateInventoryItemRequest("unique name", BigDecimal.valueOf(496),
+                        "new description", "new allergies", "new image", ItemCategory.FOOD)),
+                Arguments.of(1, new UpdateInventoryItemRequest("unique name", BigDecimal.valueOf(30),
+                        "new description", "new allergies", "new image", ItemCategory.FOOD)),
+                Arguments.of(10, new UpdateInventoryItemRequest("Whiskey", BigDecimal.valueOf(42),
+                        "new description", "new allergies", "new image", ItemCategory.FOOD))
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideTakenNameArgumentsForInventoryItemUpdate() {
+        return Stream.of(
+                Arguments.of(1, new UpdateInventoryItemRequest("Wine", BigDecimal.valueOf(496),
+                        "new description", "new allergies", "new image", ItemCategory.DRINK)),
+                Arguments.of(1, new UpdateInventoryItemRequest("Cake", BigDecimal.valueOf(496),
+                        "new description", "new allergies", "new image", ItemCategory.DRINK)),
+                Arguments.of(2, new UpdateInventoryItemRequest("Pizza", BigDecimal.valueOf(30),
+                        "new description", "new allergies", "new image", ItemCategory.FOOD)),
+                Arguments.of(10, new UpdateInventoryItemRequest("Ice cream", BigDecimal.valueOf(42),
+                        "new description", "new allergies", "new image", ItemCategory.FOOD))
         );
     }
 
