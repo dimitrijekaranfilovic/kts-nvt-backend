@@ -57,7 +57,8 @@ public class MenuItemController {
     @IsSuperUser
     @PostMapping("/{id}/price")
     @ResponseStatus(HttpStatus.CREATED)
-    public UpdateMenuItemPriceResponse updatePrice(@PathVariable Integer id, @RequestBody @Valid UpdateMenuItemPriceRequest request) {
+    public UpdateMenuItemPriceResponse updatePrice(@PathVariable Integer id,
+                                                   @RequestBody @Valid UpdateMenuItemPriceRequest request) {
         return menuItemToUpdateMenuItemPriceResponse
                 .convert(this.menuItemService.updateMenuItemPrice(request.getPrice(), id));
     }
