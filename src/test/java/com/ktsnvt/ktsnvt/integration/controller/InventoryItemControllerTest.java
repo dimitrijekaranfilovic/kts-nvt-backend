@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
@@ -18,11 +19,13 @@ import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest()
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureMockMvc
 @Transactional
 class InventoryItemControllerTest extends AuthorizingControllerMockMvcTestBase {
 
@@ -59,6 +62,46 @@ class InventoryItemControllerTest extends AuthorizingControllerMockMvcTestBase {
                 .header("Authorization", "Bearer " + token)
                 .contentType("application/json")
                 .content(mapper.writeValueAsString(request)))
+                .andExpectAll(
+                        status().isBadRequest()
+                );
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {4, 9, 10, 11, 12})
+    void deleteInventoryItem_calledWithValidId_isSuccess(Integer id) throws Exception {
+        mockMvc.perform(delete("/api/inventory-items/{id}", id)
+                .header("Authorization", "Bearer " + token))
+                .andExpectAll(
+                        status().isNoContent()
+                );
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {42, 28, -1})
+    void deleteInventoryItem_calledWithNonExistingId_isBadRequest(Integer id) throws Exception {
+        mockMvc.perform(delete("/api/inventory-items/{id}", id)
+                .header("Authorization", "Bearer " + token))
+                .andExpectAll(
+                        status().isBadRequest()
+                );
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 2, 3})
+    void deleteInventoryItem_calledWithInventoryItemThatIsContainedInNonFinalizedOrder_isBadRequest(Integer id) throws Exception {
+        mockMvc.perform(delete("/api/inventory-items/{id}", id)
+                .header("Authorization", "Bearer " + token))
+                .andExpectAll(
+                        status().isBadRequest()
+                );
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {5, 6, 7, 8})
+    void deleteInventoryItem_calledWithItemsWithNoBasePrice_isBadRequest(Integer id) throws Exception {
+        mockMvc.perform(delete("/api/inventory-items/{id}", id)
+                .header("Authorization", "Bearer " + token))
                 .andExpectAll(
                         status().isBadRequest()
                 );
