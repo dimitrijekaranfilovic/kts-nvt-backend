@@ -2,6 +2,7 @@ package com.ktsnvt.ktsnvt.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktsnvt.ktsnvt.dto.createinventoryitem.CreateInventoryItemRequest;
+import com.ktsnvt.ktsnvt.dto.readinventoryitems.ReadInventoryItemsRequest;
 import com.ktsnvt.ktsnvt.dto.updateinventoryitem.UpdateInventoryItemRequest;
 import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,14 +13,17 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 import java.util.stream.Stream;
 
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -131,6 +135,28 @@ class InventoryItemControllerTest extends AuthorizingControllerMockMvcTestBase {
                 );
     }
 
+    @ParameterizedTest
+    @MethodSource("provideArgumentsAndExpectedValueForReadingPaginatedInventoryItems")
+    void readInventoryItems_calledWithValidData_isSuccess(String query, BigDecimal basePriceFrom,
+                                                          BigDecimal basePriceTo, ItemCategory itemCategory,
+                                                          Pageable pageable, int expected) throws Exception {
+        var request = new ReadInventoryItemsRequest(query, basePriceFrom, basePriceTo, itemCategory);
+        mockMvc.perform(get("/api/inventory-items")
+                .header("Authorization", "Bearer " + token)
+                .param("query", query)
+                .param("basePriceLowerBound", Objects.requireNonNullElse(basePriceFrom, "").toString())
+                .param("basePriceUpperBound", Objects.requireNonNullElse(basePriceTo, "").toString())
+                .param("category", Objects.requireNonNullElse(itemCategory, "").toString())
+                .param("page", String.valueOf(pageable.getPageNumber()))
+                .param("size", String.valueOf(pageable.getPageSize())))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.totalElements", equalTo(expected)),
+                        jsonPath("$.totalPages", lessThanOrEqualTo(2)),
+                        jsonPath("$.content", hasSize(expected))
+                );
+    }
+
     @SuppressWarnings("unused")
     private static Stream<Arguments> provideValidDataForCreatingInventoryItems() {
         return Stream.of(
@@ -168,6 +194,26 @@ class InventoryItemControllerTest extends AuthorizingControllerMockMvcTestBase {
                         "new description", "new allergies", "new image", ItemCategory.FOOD)),
                 Arguments.of(10, new UpdateInventoryItemRequest("Ice cream", BigDecimal.valueOf(42),
                         "new description", "new allergies", "new image", ItemCategory.FOOD))
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideArgumentsAndExpectedValueForReadingPaginatedInventoryItems() {
+        var pageable = PageRequest.of(0, 20, Sort.unsorted());
+        return Stream.of(
+                Arguments.of("", null, null, null, pageable, 12),
+                Arguments.of("  ice", null, null, null, pageable, 2),
+                Arguments.of("ice  ", null, null, null, pageable, 2),
+                Arguments.of(" ice  ", null, null, null, pageable, 2),
+                Arguments.of("ICE", null, null, null, pageable, 2),
+                Arguments.of("", BigDecimal.valueOf(40), BigDecimal.valueOf(60), null, pageable, 3),
+                Arguments.of("", BigDecimal.valueOf(10), BigDecimal.valueOf(30), null, pageable, 3),
+                Arguments.of("", BigDecimal.valueOf(440), BigDecimal.valueOf(500), null, pageable, 1),
+                Arguments.of("", BigDecimal.valueOf(440), BigDecimal.valueOf(30), null, pageable, 0),
+                Arguments.of("", BigDecimal.valueOf(0), BigDecimal.valueOf(500), null, pageable, 12),
+                Arguments.of("", null, null, ItemCategory.FOOD, pageable, 7),
+                Arguments.of(" ice ", BigDecimal.valueOf(0), BigDecimal.valueOf(1000),
+                        ItemCategory.DRINK, pageable, 1)
         );
     }
 
