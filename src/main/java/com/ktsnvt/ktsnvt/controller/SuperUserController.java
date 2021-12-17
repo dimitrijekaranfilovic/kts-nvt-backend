@@ -123,12 +123,8 @@ public class SuperUserController {
 
         String token = tokenUtil.generateToken(authentication);
         String username = tokenUtil.extractUsernameFromToken(token);
-        try {
-            var user = this.superUserService.findByEmail(username);
-            var authorities = user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
-            return new AuthResponse(user.getId(), user.getName(), user.getSurname(), token, authorities);
-        } catch (Exception ex) {
-            throw new NotFoundException(ex.getMessage());
-        }
+        var user = this.superUserService.findByEmail(username);
+        var authorities = user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
+        return new AuthResponse(user.getId(), user.getName(), user.getSurname(), token, authorities);
     }
 }

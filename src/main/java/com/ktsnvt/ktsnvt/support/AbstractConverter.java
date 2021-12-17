@@ -11,14 +11,6 @@ public abstract class AbstractConverter<TFrom, TTo> implements EntityConverter<T
 
     private ModelMapper modelMapper;
 
-    public Stream<TTo> convert(Stream<TFrom> source) {
-        return source.map(this::convert);
-    }
-
-    public Collection<TTo> convert(Collection<TFrom> source) {
-        return this.convert(source.stream()).collect(Collectors.toList());
-    }
-
     public ModelMapper getModelMapper() {
         return modelMapper;
     }

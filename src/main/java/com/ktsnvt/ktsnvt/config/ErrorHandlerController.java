@@ -3,8 +3,6 @@ package com.ktsnvt.ktsnvt.config;
 
 import com.ktsnvt.ktsnvt.exception.*;
 import org.hibernate.QueryException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.dao.PessimisticLockingFailureException;
