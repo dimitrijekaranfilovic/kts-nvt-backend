@@ -205,11 +205,13 @@ public class DbInitializer implements ApplicationRunner {
         var orderItem6 = new OrderItem(1, orderGroup3, null, menuItem3, OrderItemStatus.DONE);
         var orderItem7 = new OrderItem(1, orderGroup3, null, menuItem3, OrderItemStatus.DONE);
 
-        var orderItem8 = new OrderItem(1, orderGroup4, null, menuItem1, OrderItemStatus.DONE);
+        var orderItem8 = new OrderItem(1, orderGroup4, null, menuItem1, OrderItemStatus.SENT);
         var orderItem9 = new OrderItem(1, orderGroup4, null, menuItem3, OrderItemStatus.DONE);
 
         var orderItem10 = new OrderItem(1, orderGroup3, null, menuItem3, OrderItemStatus.NEW);
 
+        var orderItem11 = new OrderItem(1, orderGroup1, employee1, menuItem1, OrderItemStatus.PREPARING);
+        var orderItem12 = new OrderItem(1, orderGroup1, employee2, menuItem3, OrderItemStatus.PREPARING);
 
         // orderItem1.setPreparedBy(employee2);
         orderGroup1.addItem(orderItem1);
@@ -220,6 +222,7 @@ public class DbInitializer implements ApplicationRunner {
         orderItem3.setSentAt(LocalDateTime.now());
         orderGroup1.addItem(orderItem4);
         orderItem4.setSentAt(LocalDateTime.now());
+        orderItem8.setSentAt(LocalDateTime.now());
 
         orderGroup3.addItem(orderItem5);
         orderGroup3.addItem(orderItem6);
@@ -227,6 +230,14 @@ public class DbInitializer implements ApplicationRunner {
 
         orderGroup4.addItem(orderItem8);
         orderGroup4.addItem(orderItem9);
+
+        orderGroup1.addItem(orderItem11);
+        orderItem11.setSentAt(LocalDateTime.of(2021, 1, 15, 12, 20));
+        orderItem11.setTakenAt(LocalDateTime.of(2021, 1, 15, 12, 20));
+
+        orderGroup1.addItem(orderItem12);
+        orderItem12.setSentAt(LocalDateTime.of(2021, 1, 15, 12, 20));
+        orderItem12.setTakenAt(LocalDateTime.of(2021, 1, 15, 12, 20));
 
         // for testing reports
         order4.setTotalCost(BigDecimal.valueOf(120));
