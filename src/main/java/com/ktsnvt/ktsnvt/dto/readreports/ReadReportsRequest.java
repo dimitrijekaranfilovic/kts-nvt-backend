@@ -2,31 +2,28 @@ package com.ktsnvt.ktsnvt.dto.readreports;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 @Data
 public class ReadReportsRequest {
 
-    @NotNull(message = "From date must be provided")
+    @NotBlank(message = "From date must be provided")
+    @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}")
     private String from;
 
-    @NotNull(message = "To date must be provided.")
+    @NotBlank(message = "To date must be provided.")
+    @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}")
     private String to;
 
     public LocalDate getFromLocalDate() {
-        if (from == null) {
-            return null;
-        }
         return LocalDate.parse(from, DateTimeFormatter.ISO_DATE);
     }
 
     public LocalDate getToLocalDate() {
-        if (to == null) {
-            return null;
-        }
         return LocalDate.parse(to, DateTimeFormatter.ISO_DATE);
     }
-
 }

@@ -48,10 +48,4 @@ public abstract class User extends BaseEntity {
         currentSalary = salary.getAmount();
         salary.setUser(this);
     }
-
-    public void removeSalary(Salary salary) {
-        salaries.remove(salary);
-        salary.setUser(null);
-    }
-
 }

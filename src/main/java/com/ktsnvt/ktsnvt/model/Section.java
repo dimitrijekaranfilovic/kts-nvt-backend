@@ -33,9 +33,4 @@ public class Section extends BaseEntity {
         restaurantTable.setSection(this);
     }
 
-    public void removeTable(RestaurantTable restaurantTable) {
-        restaurantTables.remove(restaurantTable);
-        restaurantTable.setSection(null);
-    }
-
 }

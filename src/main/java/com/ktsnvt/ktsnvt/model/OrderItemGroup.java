@@ -47,9 +47,4 @@ public class OrderItemGroup extends BaseEntity {
         orderItems.add(item);
         item.setOrderItemGroup(this);
     }
-
-    public void removeItem(OrderItem item){
-        orderItems.remove(item);
-        item.setOrderItemGroup(null);
-    }
 }
