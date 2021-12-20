@@ -211,7 +211,7 @@ public class DbInitializer implements ApplicationRunner {
         var orderItem10 = new OrderItem(1, orderGroup3, null, menuItem3, OrderItemStatus.NEW);
 
         var orderItem11 = new OrderItem(1, orderGroup1, employee1, menuItem1, OrderItemStatus.PREPARING);
-        var orderItem12 = new OrderItem(1, orderGroup1, employee2, menuItem3, OrderItemStatus.PREPARING);
+        var orderItem12 = new OrderItem(1, orderGroup1, employee1, menuItem3, OrderItemStatus.PREPARING);
 
         var orderItem13 = new OrderItem(2, orderGroup2, null, menuItem2, OrderItemStatus.NEW);
 
