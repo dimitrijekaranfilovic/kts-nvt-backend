@@ -7,6 +7,8 @@ import lombok.Data;
 public class ReadSectionTablesResponse {
     private Integer id;
 
+    private Integer number;
+
     private Integer x;
 
     private Integer y;
