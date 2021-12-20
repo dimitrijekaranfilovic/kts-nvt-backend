@@ -21,6 +21,6 @@ public interface SectionRepository extends JpaRepository<Section, Integer> {
     Collection<Section> findAllActive();
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select s from Section s join fetch s.restaurantTables where s.id = :id and s.isActive = true")
+    @Query("select s from Section s where s.id = :id and s.isActive = true")
     Optional<Section> findByIdWithTablesForUpdate(Integer id);
 }
