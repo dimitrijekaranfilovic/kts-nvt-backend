@@ -168,7 +168,7 @@ public class DbInitializer implements ApplicationRunner {
         tableRepo.save(restaurantTable9);
         tableRepo.save(restaurantTable10);
 
-        var order1 = new Order(CHARGED, LocalDateTime.parse("2021-01-01 12:12", formatter), LocalDateTime.parse("2021-01-01 12:15", formatter), restaurantTable1, employee3);
+        var order1 = new Order(IN_PROGRESS, LocalDateTime.parse("2021-01-01 12:12", formatter), null, restaurantTable1, employee3);
         var order2 = new Order(CREATED, LocalDateTime.now(), null, restaurantTable1, employee3);
         var order3 = new Order(IN_PROGRESS, LocalDateTime.now(), null, restaurantTable1, employee3);
         var order4 = new Order(CHARGED, LocalDateTime.parse("2021-11-14 12:12", formatter), LocalDateTime.parse("2021-11-14 13:15", formatter), restaurantTable1, employee3);
