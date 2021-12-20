@@ -14,6 +14,7 @@ public class AuthResponse {
     private Integer id;
     private String name;
     private String surname;
+    private String email;
     private String jwt;
     List<String> authorities;
 }

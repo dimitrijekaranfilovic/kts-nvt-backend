@@ -168,11 +168,11 @@ public class DbInitializer implements ApplicationRunner {
         tableRepo.save(restaurantTable9);
         tableRepo.save(restaurantTable10);
 
-        var order1 = new Order(CHARGED, LocalDateTime.parse("2021-01-01 12:12", formatter), LocalDateTime.parse("2021-01-01 12:15", formatter), restaurantTable1, employee3);
+        var order1 = new Order(IN_PROGRESS, LocalDateTime.parse("2021-01-01 12:12", formatter), null, restaurantTable1, employee3);
         var order2 = new Order(CREATED, LocalDateTime.now(), null, restaurantTable1, employee3);
         var order3 = new Order(IN_PROGRESS, LocalDateTime.now(), null, restaurantTable1, employee3);
         var order4 = new Order(CHARGED, LocalDateTime.parse("2021-11-14 12:12", formatter), LocalDateTime.parse("2021-11-14 13:15", formatter), restaurantTable1, employee3);
-        var order5 = new Order(CHARGED, LocalDateTime.parse("2021-11-13 13:12", formatter), LocalDateTime.parse("2021-11-14 14:15", formatter), restaurantTable2, employee3);
+        var order5 = new Order(CHARGED, LocalDateTime.parse("2021-11-13 13:12", formatter), LocalDateTime.parse("2021-11-13 14:15", formatter), restaurantTable2, employee3);
         orderRepo.save(order1);
         orderRepo.save(order2);
         orderRepo.save(order3);
@@ -211,7 +211,9 @@ public class DbInitializer implements ApplicationRunner {
         var orderItem10 = new OrderItem(1, orderGroup3, null, menuItem3, OrderItemStatus.NEW);
 
         var orderItem11 = new OrderItem(1, orderGroup1, employee1, menuItem1, OrderItemStatus.PREPARING);
-        var orderItem12 = new OrderItem(1, orderGroup1, employee2, menuItem3, OrderItemStatus.PREPARING);
+        var orderItem12 = new OrderItem(1, orderGroup1, employee1, menuItem3, OrderItemStatus.PREPARING);
+
+        var orderItem13 = new OrderItem(2, orderGroup2, null, menuItem2, OrderItemStatus.NEW);
 
         // orderItem1.setPreparedBy(employee2);
         orderGroup1.addItem(orderItem1);
@@ -223,6 +225,8 @@ public class DbInitializer implements ApplicationRunner {
         orderGroup1.addItem(orderItem4);
         orderItem4.setSentAt(LocalDateTime.now());
         orderItem8.setSentAt(LocalDateTime.now());
+
+        orderGroup2.addItem(orderItem13);
 
         orderGroup3.addItem(orderItem5);
         orderGroup3.addItem(orderItem6);

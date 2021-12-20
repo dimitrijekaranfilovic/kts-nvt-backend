@@ -7,6 +7,7 @@ import lombok.Data;
 public class AddOrderItemResponse {
     private Integer id;
     private Integer amount;
-    private String itemName;
+    private Integer itemPrice;
+    private String itemItemName;
 
 }

@@ -125,6 +125,6 @@ public class SuperUserController {
         String username = tokenUtil.extractUsernameFromToken(token);
         var user = this.superUserService.findByEmail(username);
         var authorities = user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
-        return new AuthResponse(user.getId(), user.getName(), user.getSurname(), token, authorities);
+        return new AuthResponse(user.getId(), user.getName(), user.getSurname(), user.getEmail(), token, authorities);
     }
 }

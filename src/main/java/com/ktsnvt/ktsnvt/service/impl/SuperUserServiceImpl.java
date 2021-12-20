@@ -98,7 +98,7 @@ public class SuperUserServiceImpl extends TransactionalServiceBase implements Su
         var superUserWithSameEmail = superUserRepository.findByEmail(email);
         superUserWithSameEmail.ifPresent(sameEmail -> {
             if (!sameEmail.getId().equals(user.getId())) {
-                throw new EmailAlreadyExistsException(user.getEmail());
+                throw new EmailAlreadyExistsException(email);
             }
         });
         user.setName(name);
