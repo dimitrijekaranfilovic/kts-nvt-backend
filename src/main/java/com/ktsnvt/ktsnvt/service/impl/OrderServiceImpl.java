@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -67,6 +68,7 @@ public class OrderServiceImpl extends TransactionalServiceBase implements OrderS
         table.setAvailable(false);
         return orderRepository.save(order);
     }
+
 
     @Override
     public Optional<OrderItemGroup> getOrderItemGroup(Integer orderId, String groupName) {
@@ -124,6 +126,11 @@ public class OrderServiceImpl extends TransactionalServiceBase implements OrderS
     }
 
     @Override
+    public Integer getOrderIdForTable(Integer tableId) {
+        return this.orderRepository.getOrderIdForTableId(tableId, Arrays.asList(OrderStatus.CANCELLED, OrderStatus.CHARGED));
+    }
+
+    @Override
     public void chargeOrder(Integer id, String pin) {
         var order = getOrder(id);
         employeeOrderService.throwIfWaiterNotResponsible(pin, order.getWaiter().getId());
@@ -163,7 +170,6 @@ public class OrderServiceImpl extends TransactionalServiceBase implements OrderS
     }
 
     @Override
-    //TODO: test
     public OrderItemGroup createGroupForOrder(Integer orderId, String groupName, String pin) {
         var order = this.getOrder(orderId);
         if (order.getStatus() != OrderStatus.CREATED && order.getStatus() != OrderStatus.IN_PROGRESS)

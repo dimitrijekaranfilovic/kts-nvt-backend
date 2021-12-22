@@ -156,7 +156,17 @@ public class DbInitializer implements ApplicationRunner {
         var restaurantTable8 = new RestaurantTable(2, 460, 200, 5, terrace);
         var restaurantTable9 = new RestaurantTable(3, 550, 270, 5, terrace);
         var restaurantTable10 = new RestaurantTable(3, 550, 340, 5, secondFloor);
-        restaurantTable10.setAvailable(false);
+        //restaurantTable10.setAvailable(false);
+
+        var order1 = new Order(IN_PROGRESS, LocalDateTime.parse("2021-01-01 12:12", formatter), null, restaurantTable1, employee3);
+        restaurantTable1.setAvailable(false);
+        var order2 = new Order(CREATED, LocalDateTime.now(), null, restaurantTable2, employee3);
+        restaurantTable2.setAvailable(false);
+        var order3 = new Order(IN_PROGRESS, LocalDateTime.now(), null, restaurantTable3, employee3);
+        restaurantTable3.setAvailable(false);
+        var order4 = new Order(CHARGED, LocalDateTime.parse("2021-11-14 12:12", formatter), LocalDateTime.parse("2021-11-14 13:15", formatter), restaurantTable1, employee3);
+        var order5 = new Order(CHARGED, LocalDateTime.parse("2021-11-13 13:12", formatter), LocalDateTime.parse("2021-11-13 14:15", formatter), restaurantTable2, employee3);
+
         tableRepo.save(restaurantTable1);
         tableRepo.save(restaurantTable2);
         tableRepo.save(restaurantTable3);
@@ -168,11 +178,6 @@ public class DbInitializer implements ApplicationRunner {
         tableRepo.save(restaurantTable9);
         tableRepo.save(restaurantTable10);
 
-        var order1 = new Order(IN_PROGRESS, LocalDateTime.parse("2021-01-01 12:12", formatter), null, restaurantTable1, employee3);
-        var order2 = new Order(CREATED, LocalDateTime.now(), null, restaurantTable1, employee3);
-        var order3 = new Order(IN_PROGRESS, LocalDateTime.now(), null, restaurantTable1, employee3);
-        var order4 = new Order(CHARGED, LocalDateTime.parse("2021-11-14 12:12", formatter), LocalDateTime.parse("2021-11-14 13:15", formatter), restaurantTable1, employee3);
-        var order5 = new Order(CHARGED, LocalDateTime.parse("2021-11-13 13:12", formatter), LocalDateTime.parse("2021-11-13 14:15", formatter), restaurantTable2, employee3);
         orderRepo.save(order1);
         orderRepo.save(order2);
         orderRepo.save(order3);

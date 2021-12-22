@@ -33,4 +33,6 @@ public interface OrderService {
     void deleteOrderItemGroup(Integer orderId, Integer groupId, String pin);
 
     Stream<Order> streamChargedOrdersInTimeRange(LocalDate from, LocalDate to);
+
+    Integer getOrderIdForTable(Integer tableId);
 }

@@ -50,6 +50,11 @@ public class OrderController {
         return orderToCreateOrder.convert(result);
     }
 
+    @GetMapping("/for-table")
+    public Integer getOrderIdForTableId(@RequestParam("tableId") Integer tableId){
+        return this.orderService.getOrderIdForTable(tableId);
+    }
+
     @PutMapping("/{id}/charge")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void chargeOrder(@PathVariable Integer id, @RequestBody @Valid ChargeOrderRequest request) {
