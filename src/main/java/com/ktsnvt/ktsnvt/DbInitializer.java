@@ -146,16 +146,16 @@ public class DbInitializer implements ApplicationRunner {
         sectionRepo.save(terrace);
         sectionRepo.save(secondFloor);
 
-        var restaurantTable1 = new RestaurantTable(1, 20, 20, 5, groundFloor);
-        var restaurantTable2 = new RestaurantTable(2, 0, 0, 5, groundFloor);
-        var restaurantTable3 = new RestaurantTable(3, 80, 80, 5, groundFloor);
-        var restaurantTable4 = new RestaurantTable(1, 0, 0, 5, firstFloor);
-        var restaurantTable5 = new RestaurantTable(2, 0, 0, 5, firstFloor);
-        var restaurantTable6 = new RestaurantTable(3, 0, 0, 5, firstFloor);
-        var restaurantTable7 = new RestaurantTable(1, 0, 0, 5, terrace);
-        var restaurantTable8 = new RestaurantTable(2, 0, 0, 5, terrace);
-        var restaurantTable9 = new RestaurantTable(3, 0, 0, 5, terrace);
-        var restaurantTable10 = new RestaurantTable(3, 0, 0, 5, secondFloor);
+        var restaurantTable1 = new RestaurantTable(1, 120, 120, 50, groundFloor);
+        var restaurantTable2 = new RestaurantTable(2, 500, 500, 50, groundFloor);
+        var restaurantTable3 = new RestaurantTable(3, 700, 650, 50, groundFloor);
+        var restaurantTable4 = new RestaurantTable(1, 200, 200, 5, firstFloor);
+        var restaurantTable5 = new RestaurantTable(2, 280, 270, 5, firstFloor);
+        var restaurantTable6 = new RestaurantTable(3, 500, 340, 5, firstFloor);
+        var restaurantTable7 = new RestaurantTable(1, 400, 410, 5, terrace);
+        var restaurantTable8 = new RestaurantTable(2, 460, 200, 5, terrace);
+        var restaurantTable9 = new RestaurantTable(3, 550, 270, 5, terrace);
+        var restaurantTable10 = new RestaurantTable(3, 550, 340, 5, secondFloor);
         restaurantTable10.setAvailable(false);
         tableRepo.save(restaurantTable1);
         tableRepo.save(restaurantTable2);
