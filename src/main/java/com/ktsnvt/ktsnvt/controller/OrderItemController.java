@@ -40,16 +40,16 @@ public class OrderItemController {
         return orderItemService.getAllItemRequests(pageable, status, category).map(orderItemToReadFoodAndDrinkRequest::convert);
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     @PutMapping(value ="take")
-    public void takeItem(@RequestBody @Valid UpdateOrderItemRequestsRequest request) {
+    public Integer takeItem(@RequestBody @Valid UpdateOrderItemRequestsRequest request) {
         if (request.getAction().equals("PREPARE")) {
             orderItemService.takeItemRequest(request.getItemId(), request.getEmployeePin());
         } else if (request.getAction().equals("FINISH")) {
-            orderItemService.finishItemRequest(request.getItemId(), request.getEmployeePin());
+            return orderItemService.finishItemRequest(request.getItemId(), request.getEmployeePin());
         }
+        return -1;
     }
-
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping

@@ -90,6 +90,12 @@ public class OrderItemServiceTest {
         orderItem.setId(1);
         OrderItemGroup group = new OrderItemGroup();
         group.addItem(orderItem);
+        orderItem.setOrderItemGroup(group);
+        Order order = new Order();
+        group.setOrder(order);
+        RestaurantTable table = new RestaurantTable();
+        table.setId(1);
+        order.setRestaurantTable(table);
 
         // WHEN
         doReturn(employee).when(employeeQueryService).findByPin(employee.getPin());
@@ -122,6 +128,12 @@ public class OrderItemServiceTest {
         orderItem.setPreparedBy(employee);
         OrderItemGroup group = new OrderItemGroup();
         group.addItem(orderItem);
+        orderItem.setOrderItemGroup(group);
+        Order order = new Order();
+        group.setOrder(order);
+        RestaurantTable table = new RestaurantTable();
+        table.setId(1);
+        order.setRestaurantTable(table);
 
         // WHEN
         doReturn(employee).when(employeeQueryService).findByPin(employee.getPin());

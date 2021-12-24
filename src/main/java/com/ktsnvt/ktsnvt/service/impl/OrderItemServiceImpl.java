@@ -67,7 +67,7 @@ public class OrderItemServiceImpl extends TransactionalServiceBase implements Or
     }
 
     @Override
-    public void finishItemRequest(Integer itemId, String employeePin) {
+    public Integer finishItemRequest(Integer itemId, String employeePin) {
         var employeeCurrent = employeeQueryService.findByPin(employeePin);
         var item = orderItemRepository
                 .findOneInProgressByIdWithItemReference(itemId)
@@ -90,8 +90,9 @@ public class OrderItemServiceImpl extends TransactionalServiceBase implements Or
         if (allFromGroup.size() > 0 && allFromGroup.stream().allMatch(oi -> oi.getStatus() == OrderItemStatus.DONE)) {
             item.getOrderItemGroup().setStatus(OrderItemGroupStatus.DONE);
             orderItemGroupRepository.save(item.getOrderItemGroup());
-            // NOTIFIKACIJA, ovo ovdje moze i sa fronta mozda
+            return item.getOrderItemGroup().getOrder().getRestaurantTable().getId();
         }
+        return 0;
     }
 
     @Override

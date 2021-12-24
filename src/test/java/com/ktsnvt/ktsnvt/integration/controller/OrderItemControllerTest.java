@@ -264,7 +264,7 @@ class OrderItemControllerTest {
         headers.setContentType(MediaType.APPLICATION_JSON);
         var response = restTemplate.exchange("/api/order-items/take", HttpMethod.PUT, new HttpEntity<>(request, headers), Void.class);
 
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     @ParameterizedTest
