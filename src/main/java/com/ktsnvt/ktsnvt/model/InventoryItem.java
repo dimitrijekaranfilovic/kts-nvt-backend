@@ -21,7 +21,7 @@ public class InventoryItem extends BaseEntity {
     @Column(name = "description", nullable = false)
     private String description;
 
-    @Column(name = "image", nullable = false)
+    @Column(name = "image", nullable = false, length=10485760)
     private String image;
 
     @Column(name = "allergies", nullable = false)
