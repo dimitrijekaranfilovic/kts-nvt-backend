@@ -5,6 +5,8 @@ import com.ktsnvt.ktsnvt.annotations.IsSuperUser;
 import com.ktsnvt.ktsnvt.dto.createmenuitem.CreateMenuItemRequest;
 import com.ktsnvt.ktsnvt.dto.createmenuitem.CreateMenuItemResponse;
 import com.ktsnvt.ktsnvt.dto.displaypaginatedmenuitems.DisplayMenuItemResponse;
+import com.ktsnvt.ktsnvt.dto.readmenuitems.ReadMenuItemsRequest;
+import com.ktsnvt.ktsnvt.dto.readmenuitems.ReadMenuItemsResponse;
 import com.ktsnvt.ktsnvt.dto.updatemenuitemprice.UpdateMenuItemPriceRequest;
 import com.ktsnvt.ktsnvt.dto.updatemenuitemprice.UpdateMenuItemPriceResponse;
 import com.ktsnvt.ktsnvt.model.MenuItem;
@@ -28,22 +30,35 @@ public class MenuItemController {
     private final EntityConverter<MenuItem, DisplayMenuItemResponse> menuItemToDisplayMenuItemResponse;
     private final EntityConverter<MenuItem, CreateMenuItemResponse> menuItemToCreateMenuItemResponse;
     private final EntityConverter<MenuItem, UpdateMenuItemPriceResponse> menuItemToUpdateMenuItemPriceResponse;
+    private final EntityConverter<MenuItem, ReadMenuItemsResponse> menuItemToReadMenuItemResponse;
 
     @Autowired
     public MenuItemController(MenuItemService menuItemService,
                               MenuItemToDisplayMenuItemResponse menuItemToDisplayMenuItemResponse,
                               EntityConverter<MenuItem, CreateMenuItemResponse> menuItemToCreateMenuItemResponse,
-                              EntityConverter<MenuItem, UpdateMenuItemPriceResponse> menuItemToUpdateMenuItemPriceResponse) {
+                              EntityConverter<MenuItem, UpdateMenuItemPriceResponse> menuItemToUpdateMenuItemPriceResponse,
+                              EntityConverter<MenuItem, ReadMenuItemsResponse> menuItemToReadMenuItemResponse) {
         this.menuItemService = menuItemService;
         this.menuItemToDisplayMenuItemResponse = menuItemToDisplayMenuItemResponse;
         this.menuItemToCreateMenuItemResponse = menuItemToCreateMenuItemResponse;
         this.menuItemToUpdateMenuItemPriceResponse = menuItemToUpdateMenuItemPriceResponse;
+        this.menuItemToReadMenuItemResponse = menuItemToReadMenuItemResponse;
     }
 
 
     @GetMapping
     public Page<DisplayMenuItemResponse> getPaginatedMenuItems(@RequestParam("name") String name, @PageableDefault Pageable pageable) {
         return this.menuItemService.getMenuItems(name, pageable).map(menuItemToDisplayMenuItemResponse::convert);
+    }
+
+    @IsSuperUser
+    @GetMapping("/search")
+    @ResponseStatus(HttpStatus.OK)
+    public Page<ReadMenuItemsResponse> readMenuItems(@Valid ReadMenuItemsRequest request,
+                                                     @PageableDefault Pageable pageable) {
+        var page = menuItemService.read(request.getQuery(), request.getPriceLowerBound(),
+                request.getPriceUpperBound(), request.getCategory(), pageable);
+        return page.map(menuItemToReadMenuItemResponse::convert);
     }
 
     @IsSuperUser

@@ -1,6 +1,7 @@
 package com.ktsnvt.ktsnvt.service;
 
 import com.ktsnvt.ktsnvt.model.MenuItem;
+import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -14,6 +15,9 @@ public interface MenuItemService {
     MenuItem createMenuItem(BigDecimal price, Integer inventoryItemId);
 
     void removeActiveMenuItemForInventoryItem(Integer inventoryItemId);
+
+    Page<MenuItem> read(String query, BigDecimal priceFrom, BigDecimal priceTo,
+                        ItemCategory itemCategory, Pageable pageable);
 
     void deactivateMenuItem(Integer id);
 
