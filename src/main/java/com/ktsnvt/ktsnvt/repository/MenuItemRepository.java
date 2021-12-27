@@ -43,8 +43,8 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, Integer> {
             "where ((lower(i.item.name) like concat('%', :query, '%'))" +
             " or lower(i.item.description) like concat('%', :query, '%')" +
             " or lower(i.item.allergies) like concat('%', :query, '%'))" +
-            " and (:basePriceFrom is null or i.price >= :priceFrom) " +
-            " and (:basePriceTo is null or i.price <= :priceTo)" +
+            " and (:priceFrom is null or i.price >= :priceFrom) " +
+            " and (:priceTo is null or i.price <= :priceTo)" +
             " and (:itemCategory is null or i.item.category = :itemCategory)" +
             " and i.isActive = true")
     Page<MenuItem> findAll(String query, BigDecimal priceFrom, BigDecimal priceTo,
