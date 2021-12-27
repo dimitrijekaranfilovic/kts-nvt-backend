@@ -4,6 +4,7 @@ import com.ktsnvt.ktsnvt.exception.EntityAlreadyDeactivatedException;
 import com.ktsnvt.ktsnvt.exception.MenuItemNotFoundException;
 import com.ktsnvt.ktsnvt.exception.UsedMenuItemDeletionException;
 import com.ktsnvt.ktsnvt.model.MenuItem;
+import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
 import com.ktsnvt.ktsnvt.repository.MenuItemRepository;
 import com.ktsnvt.ktsnvt.service.InventoryItemService;
 import com.ktsnvt.ktsnvt.service.LocalDateTimeService;
@@ -44,6 +45,12 @@ public class MenuItemServiceImpl extends TransactionalServiceBase implements Men
         menuItemRepository
                 .findActiveForInventoryItem(inventoryItemId)
                 .ifPresent(menuItem -> menuItem.deactivateMenuItem(localDateTimeService.currentTime()));
+    }
+
+    @Override
+    public Page<MenuItem> read(String query, BigDecimal priceFrom, BigDecimal priceTo, ItemCategory itemCategory, Pageable pageable) {
+        return menuItemRepository.findAll(query.trim().toLowerCase(), priceFrom,
+                priceTo, itemCategory, pageable);
     }
 
     @Override
