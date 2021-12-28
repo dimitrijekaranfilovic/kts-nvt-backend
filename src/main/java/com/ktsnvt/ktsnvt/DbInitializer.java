@@ -3,17 +3,22 @@ package com.ktsnvt.ktsnvt;
 import com.ktsnvt.ktsnvt.model.*;
 import com.ktsnvt.ktsnvt.model.enums.*;
 import com.ktsnvt.ktsnvt.repository.*;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 
 import static com.ktsnvt.ktsnvt.model.enums.OrderStatus.*;
 
@@ -32,6 +37,7 @@ public class DbInitializer implements ApplicationRunner {
     private final RestaurantTableRepository tableRepo;
     private final BasePriceRepository basePriceRepo;
     private final PasswordEncoder passwordEncoder;
+    private final ResourceLoader resourceLoader;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
@@ -41,7 +47,7 @@ public class DbInitializer implements ApplicationRunner {
                          OrderItemGroupRepository orderItemGroupRepo,
                          OrderItemRepository orderItemRepo, OrderRepository orderRepo, SalaryRepository salaryRepo,
                          SectionRepository sectionRepo, SuperUserRepository superUserRepo,
-                         RestaurantTableRepository tableRepo, BasePriceRepository basePriceRepo, PasswordEncoder passwordEncoder) {
+                         RestaurantTableRepository tableRepo, BasePriceRepository basePriceRepo, PasswordEncoder passwordEncoder, ResourceLoader resourceLoader) {
         this.authorityRepo = authorityRepo;
         this.employeeRepo = employeeRepo;
         this.inventoryItemRepo = inventoryItemRepo;
@@ -55,6 +61,7 @@ public class DbInitializer implements ApplicationRunner {
         this.tableRepo = tableRepo;
         this.basePriceRepo = basePriceRepo;
         this.passwordEncoder = passwordEncoder;
+        this.resourceLoader = resourceLoader;
     }
 
     @Override
@@ -111,13 +118,13 @@ public class DbInitializer implements ApplicationRunner {
         basePriceRepo.save(basePrice3);
         basePriceRepo.save(basePrice4);
 
-        var item1 = new InventoryItem("Ice cream", "Description", "image", "Allergies", ItemCategory.FOOD);
+        var item1 = new InventoryItem("Ice cream", "Description", encodeAsBase64("ice-cream.jpg"), "Allergies", ItemCategory.FOOD);
         item1.addBasePrice(basePrice1);
-        var item2 = new InventoryItem("T-bone steak", "Description", "image", "Allergies", ItemCategory.FOOD);
+        var item2 = new InventoryItem("T-bone steak", "Description", encodeAsBase64("t-bone-steak.jpg"), "Allergies", ItemCategory.FOOD);
         item2.addBasePrice(basePrice2);
-        var item3 = new InventoryItem("Orange juice", "Description", "image", "Allergies", ItemCategory.DRINK);
+        var item3 = new InventoryItem("Orange juice", "Description", encodeAsBase64("orange-juice.jpg"), "Allergies", ItemCategory.DRINK);
         item3.addBasePrice(basePrice3);
-        var item4 = new InventoryItem("Pizza", "Description", "image", "Allergies", ItemCategory.FOOD);
+        var item4 = new InventoryItem("Pizza", "Description", encodeAsBase64("pizza.jpg"), "Allergies", ItemCategory.FOOD);
         item4.addBasePrice(basePrice4);
         inventoryItemRepo.save(item1);
         inventoryItemRepo.save(item2);
@@ -267,5 +274,11 @@ public class DbInitializer implements ApplicationRunner {
         orderItemRepo.save(orderItem10);
 
 
+    }
+
+    public String encodeAsBase64(String imageName) throws IOException {
+        var resource = this.resourceLoader.getResource(String.format("classpath:images/%s", imageName));
+        byte[] fileContent = FileUtils.readFileToByteArray(resource.getFile());
+        return Base64.getEncoder().encodeToString(fileContent);
     }
 }
