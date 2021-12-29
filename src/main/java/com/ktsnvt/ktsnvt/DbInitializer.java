@@ -279,6 +279,6 @@ public class DbInitializer implements ApplicationRunner {
     public String encodeAsBase64(String imageName) throws IOException {
         var resource = this.resourceLoader.getResource(String.format("classpath:images/%s", imageName));
         byte[] fileContent = FileUtils.readFileToByteArray(resource.getFile());
-        return Base64.getEncoder().encodeToString(fileContent);
+        return "data:image/jpg;base64,".concat(Base64.getEncoder().encodeToString(fileContent));
     }
 }
