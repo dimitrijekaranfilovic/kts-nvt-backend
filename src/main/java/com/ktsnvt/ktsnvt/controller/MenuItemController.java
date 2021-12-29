@@ -47,7 +47,8 @@ public class MenuItemController {
 
 
     @GetMapping
-    public Page<DisplayMenuItemResponse> getPaginatedMenuItems(@RequestParam("name") String name, @PageableDefault Pageable pageable) {
+    public Page<DisplayMenuItemResponse> getPaginatedMenuItems(@RequestParam("name") String name,
+                                                               @PageableDefault Pageable pageable) {
         return this.menuItemService.getMenuItems(name, pageable).map(menuItemToDisplayMenuItemResponse::convert);
     }
 
