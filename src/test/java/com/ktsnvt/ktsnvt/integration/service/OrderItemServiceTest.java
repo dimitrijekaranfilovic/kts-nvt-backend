@@ -116,6 +116,11 @@ public class OrderItemServiceTest {
     }
 
     @Test
+    void addOrderItem_whenGroupIsNotActive_throwsException(){
+        assertThrows(NotFoundException.class, () -> orderItemService.addOrderItem(8, 1, 2, "4321"));
+    }
+
+    @Test
     void addOrderItem_whenGroupDoesNotExist_throwsException(){
         assertThrows(NotFoundException.class, () -> orderItemService.addOrderItem(2222, 1, 2, "4321"));
     }
