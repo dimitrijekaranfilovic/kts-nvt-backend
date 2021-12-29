@@ -3,14 +3,21 @@ package com.ktsnvt.ktsnvt.integration.service;
 import com.ktsnvt.ktsnvt.exception.EntityAlreadyDeactivatedException;
 import com.ktsnvt.ktsnvt.exception.MenuItemNotFoundException;
 import com.ktsnvt.ktsnvt.exception.UsedMenuItemDeletionException;
+import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
 import com.ktsnvt.ktsnvt.service.impl.MenuItemServiceImpl;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Locale;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -72,6 +79,42 @@ class MenuItemServiceTest {
     @ValueSource(ints = {1, 2, 3})
     void deactivateMenuItem_calledWithMenuItemWithActiveOrders_throwsException(Integer id) {
         assertThrows(UsedMenuItemDeletionException.class, () -> menuItemService.deactivateMenuItem(id));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideReadArguments")
+    void read_calledWithValidArguments_isSuccess(String query, BigDecimal priceFrom, BigDecimal priceTo,
+                                                 ItemCategory itemCategory, Pageable pageable, int expectedResults) {
+        var processedQuery = query.trim().toLowerCase();
+        var retVal = menuItemService.read(query, priceFrom, priceTo, itemCategory, pageable);
+        assertEquals(expectedResults, retVal.getTotalElements());
+        assertTrue(retVal.stream().parallel().allMatch(menuItem ->
+                menuItem.getItem().getName().trim().toLowerCase(Locale.ROOT).contains(processedQuery)
+                        || menuItem.getItem().getAllergies().trim().toLowerCase(Locale.ROOT).contains(processedQuery)
+                        || menuItem.getItem().getDescription().trim().toLowerCase(Locale.ROOT).contains(processedQuery))
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideReadArguments() {
+        return Stream.of(
+                Arguments.of(" iCe ", BigDecimal.valueOf(0), BigDecimal.valueOf(500),
+                        ItemCategory.DRINK, PageRequest.of(1, 10), 1),
+                Arguments.of(" iCe ", null, null,
+                        null, PageRequest.of(1, 10), 2),
+                Arguments.of("ice", BigDecimal.valueOf(496), BigDecimal.valueOf(500),
+                        null, PageRequest.of(1, 10), 0),
+                Arguments.of(" iCe ", BigDecimal.valueOf(0), BigDecimal.valueOf(42),
+                        null, PageRequest.of(1, 10), 0),
+                Arguments.of("ice", BigDecimal.valueOf(0), BigDecimal.valueOf(500),
+                        null, PageRequest.of(1, 1), 2),
+                Arguments.of("ice", BigDecimal.valueOf(0), BigDecimal.valueOf(500),
+                        null, PageRequest.of(1, 10), 2),
+                Arguments.of(" aK ", BigDecimal.valueOf(0), BigDecimal.valueOf(1000),
+                        ItemCategory.FOOD, PageRequest.of(1, 10), 3),
+                Arguments.of("non existing string", BigDecimal.valueOf(0), BigDecimal.valueOf(1000),
+                        ItemCategory.FOOD, PageRequest.of(1, 10), 0)
+        );
     }
 
 }
