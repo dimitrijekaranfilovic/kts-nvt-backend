@@ -99,21 +99,21 @@ class MenuItemServiceTest {
     private static Stream<Arguments> provideReadArguments() {
         return Stream.of(
                 Arguments.of(" iCe ", BigDecimal.valueOf(0), BigDecimal.valueOf(500),
-                        ItemCategory.DRINK, PageRequest.of(1, 10), 1),
+                        ItemCategory.DRINK, PageRequest.of(0, 10), 1),
                 Arguments.of(" iCe ", null, null,
-                        null, PageRequest.of(1, 10), 2),
-                Arguments.of("ice", BigDecimal.valueOf(496), BigDecimal.valueOf(500),
-                        null, PageRequest.of(1, 10), 0),
+                        null, PageRequest.of(0, 10), 2),
+                Arguments.of("ice", BigDecimal.valueOf(1000), BigDecimal.valueOf(2000),
+                        null, PageRequest.of(0, 10), 0),
                 Arguments.of(" iCe ", BigDecimal.valueOf(0), BigDecimal.valueOf(42),
-                        null, PageRequest.of(1, 10), 0),
+                        null, PageRequest.of(0, 10), 0),
                 Arguments.of("ice", BigDecimal.valueOf(0), BigDecimal.valueOf(500),
-                        null, PageRequest.of(1, 1), 2),
+                        null, PageRequest.of(0, 1), 2),
                 Arguments.of("ice", BigDecimal.valueOf(0), BigDecimal.valueOf(500),
-                        null, PageRequest.of(1, 10), 2),
+                        null, PageRequest.of(0, 10), 2),
                 Arguments.of(" aK ", BigDecimal.valueOf(0), BigDecimal.valueOf(1000),
-                        ItemCategory.FOOD, PageRequest.of(1, 10), 3),
+                        ItemCategory.FOOD, PageRequest.of(0, 10), 3),
                 Arguments.of("non existing string", BigDecimal.valueOf(0), BigDecimal.valueOf(1000),
-                        ItemCategory.FOOD, PageRequest.of(1, 10), 0)
+                        ItemCategory.FOOD, PageRequest.of(0, 10), 0)
         );
     }
 

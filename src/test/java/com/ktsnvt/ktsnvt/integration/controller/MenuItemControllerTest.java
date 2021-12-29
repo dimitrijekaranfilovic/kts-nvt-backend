@@ -4,6 +4,7 @@ package com.ktsnvt.ktsnvt.integration.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktsnvt.ktsnvt.dto.createmenuitem.CreateMenuItemRequest;
 import com.ktsnvt.ktsnvt.dto.updatemenuitemprice.UpdateMenuItemPriceRequest;
+import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,18 +16,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 import java.util.stream.Stream;
 
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -170,6 +172,28 @@ class MenuItemControllerTest extends AuthorizingControllerMockMvcTestBase {
                 );
     }
 
+
+    @ParameterizedTest
+    @MethodSource("provideArgumentsAndExpectedValueForReadingPaginatedMenuItems")
+    void readMenuItems_calledWithValidArguments_isSuccess(String query, BigDecimal basePriceFrom,
+                                                          BigDecimal basePriceTo, ItemCategory itemCategory,
+                                                          Pageable pageable, int expected) throws Exception {
+        mockMvc.perform(get("/api/menu-items/search")
+                .header("Authorization", "Bearer" + token)
+                .param("query", query)
+                .param("priceLowerBound", Objects.requireNonNullElse(basePriceFrom, "").toString())
+                .param("priceUpperBound", Objects.requireNonNullElse(basePriceTo, "").toString())
+                .param("category", Objects.requireNonNullElse(itemCategory, "").toString())
+                .param("page", String.valueOf(pageable.getPageNumber()))
+                .param("size", String.valueOf(pageable.getPageSize())))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.totalElements", equalTo(expected)),
+                        jsonPath("$.totalPages", lessThanOrEqualTo(2)),
+                        jsonPath("$.content", hasSize(expected))
+                );
+    }
+
     @SuppressWarnings("unused")
     private static Stream<Arguments> provideValidCreateMenuItemRequests() {
         return Stream.of(
@@ -196,6 +220,30 @@ class MenuItemControllerTest extends AuthorizingControllerMockMvcTestBase {
                 Arguments.of(3, new UpdateMenuItemPriceRequest(BigDecimal.valueOf(28))),
                 Arguments.of(4, new UpdateMenuItemPriceRequest(BigDecimal.valueOf(322))),
                 Arguments.of(5, new UpdateMenuItemPriceRequest(BigDecimal.valueOf(322)))
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideArgumentsAndExpectedValueForReadingPaginatedMenuItems() {
+        return Stream.of(
+                Arguments.of("", null, null,
+                        null, PageRequest.of(0, 20), 7),
+                Arguments.of(" iCe ", BigDecimal.valueOf(0), BigDecimal.valueOf(500),
+                        "DRINK", PageRequest.of(0, 10), 1),
+                Arguments.of(" iCe ", null, null,
+                        null, PageRequest.of(0, 10), 2),
+                Arguments.of("ice", BigDecimal.valueOf(1000), BigDecimal.valueOf(2000),
+                        null, PageRequest.of(0, 10), 0),
+                Arguments.of(" iCe ", BigDecimal.valueOf(0), BigDecimal.valueOf(42),
+                        null, PageRequest.of(0, 10), 0),
+                Arguments.of("ice", BigDecimal.valueOf(0), BigDecimal.valueOf(500),
+                        null, PageRequest.of(0, 5), 2),
+                Arguments.of("ice", BigDecimal.valueOf(0), BigDecimal.valueOf(500),
+                        null, PageRequest.of(0, 10), 2),
+                Arguments.of(" aK ", BigDecimal.valueOf(0), BigDecimal.valueOf(1000),
+                        ItemCategory.FOOD, PageRequest.of(0, 10), 3),
+                Arguments.of("non existing string", BigDecimal.valueOf(0), BigDecimal.valueOf(1000),
+                        ItemCategory.FOOD, PageRequest.of(0, 10), 0)
         );
     }
 
