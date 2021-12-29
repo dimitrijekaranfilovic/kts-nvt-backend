@@ -48,7 +48,8 @@ public class MenuItemServiceImpl extends TransactionalServiceBase implements Men
     }
 
     @Override
-    public Page<MenuItem> read(String query, BigDecimal priceFrom, BigDecimal priceTo, ItemCategory itemCategory, Pageable pageable) {
+    public Page<MenuItem> read(String query, BigDecimal priceFrom, BigDecimal priceTo,
+                               ItemCategory itemCategory, Pageable pageable) {
         return menuItemRepository.findAll(query.trim().toLowerCase(), priceFrom,
                 priceTo, itemCategory, pageable);
     }

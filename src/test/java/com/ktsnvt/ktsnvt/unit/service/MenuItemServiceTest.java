@@ -5,6 +5,7 @@ import com.ktsnvt.ktsnvt.exception.MenuItemNotFoundException;
 import com.ktsnvt.ktsnvt.exception.UsedMenuItemDeletionException;
 import com.ktsnvt.ktsnvt.model.InventoryItem;
 import com.ktsnvt.ktsnvt.model.MenuItem;
+import com.ktsnvt.ktsnvt.model.enums.ItemCategory;
 import com.ktsnvt.ktsnvt.repository.MenuItemRepository;
 import com.ktsnvt.ktsnvt.service.InventoryItemService;
 import com.ktsnvt.ktsnvt.service.LocalDateTimeService;
@@ -14,9 +15,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -231,6 +235,22 @@ class MenuItemServiceTest {
         verify(menuItemServiceSpy, times(1)).readForUpdate(id);
         verify(orderItemService, times(1)).hasActiveOrderItems(menuItem);
         verifyNoInteractions(localDateTimeService);
+    }
+
+    @Test
+    void read_calledWithValidArguments_isSuccess() {
+        // GIVEN
+        String query = " Mixed Case With spaces ";
+        String processedQuery = "mixed case with spaces";
+
+        doReturn(new PageImpl<MenuItem>(new ArrayList<>())).when(this.menuItemRepository)
+                .findAll(eq(processedQuery), any(), any(), any(), any());
+        // WHEN
+        var retVal = this.menuItemService.read(query, new BigDecimal(42), new BigDecimal(496),
+                ItemCategory.DRINK, PageRequest.of(2, 3));
+        // THEN
+        assertNotNull(retVal);
+        verify(this.menuItemRepository).findAll(eq(processedQuery), any(), any(), any(), any());
     }
 
 }
