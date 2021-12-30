@@ -52,9 +52,12 @@ public class OrderServiceImpl extends TransactionalServiceBase implements OrderS
 
     @Override
     public Order getOrder(Integer id) {
-        return this.orderRepository
+        var order =  this.orderRepository
                 .findById(id)
                 .orElseThrow(() -> new OrderNotFoundException(String.format("Order with id %d not found.", id)));
+        if (Boolean.FALSE.equals(order.getIsActive()))
+            throw new OrderNotFoundException(String.format("Order with id %d not found.", id));
+        return order;
     }
 
     @Override
