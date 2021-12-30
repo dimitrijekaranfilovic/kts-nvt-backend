@@ -116,6 +116,9 @@ public class OrderItemServiceImpl extends TransactionalServiceBase implements Or
                 findById(orderGroupId)
                 .orElseThrow(() -> new NotFoundException(String.format("Order item group with id %d does not exist.", orderGroupId)));
 
+        if (Boolean.FALSE.equals(orderGroup.getIsActive()))
+            throw new NotFoundException(String.format("Order item group with id %d does not exist.", orderGroupId));
+
         if (orderGroup.getStatus() != OrderItemGroupStatus.NEW)
             throw new OrderItemGroupInvalidStatusException(String.format("Items cannot be added to order item group with id %d because its status is not NEW.", orderGroupId));
 

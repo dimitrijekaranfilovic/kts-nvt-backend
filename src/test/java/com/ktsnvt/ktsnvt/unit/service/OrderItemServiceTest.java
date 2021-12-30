@@ -217,6 +217,7 @@ public class OrderItemServiceTest {
         order.setWaiter(waiter);
 
         var orderItemGroup = new OrderItemGroup();
+        orderItemGroup.setIsActive(true);
         orderItemGroup.setId(1);
         orderItemGroup.setName("group 1");
         orderItemGroup.setStatus(OrderItemGroupStatus.NEW);
@@ -244,6 +245,52 @@ public class OrderItemServiceTest {
 
         Assertions.assertDoesNotThrow(() -> orderItemService.addOrderItem(order.getId(), menuItem.getId(), 1, waiter.getPin()));
     }
+    @Test
+    void addOrderItem_whenGroupIsNotActive_throwsException(){
+        //data setup
+        var order = new Order();
+        order.setId(1);
+
+        var waiter = new Employee();
+        waiter.setType(EmployeeType.WAITER);
+        waiter.setId(1);
+        waiter.setPin("1234");
+
+        order.setWaiter(waiter);
+
+        var orderItemGroup = new OrderItemGroup();
+        orderItemGroup.setIsActive(false);
+        orderItemGroup.setId(1);
+        orderItemGroup.setName("group 1");
+        orderItemGroup.setStatus(OrderItemGroupStatus.NEW);
+        orderItemGroup.setOrder(order);
+
+        var menuItem = new MenuItem();
+        menuItem.setId(1);
+        menuItem.setPrice(BigDecimal.ZERO);
+
+        var inventoryItem = new InventoryItem();
+        inventoryItem.setId(1);
+        inventoryItem.setCurrentBasePrice(BigDecimal.ZERO);
+
+        menuItem.setItem(inventoryItem);
+
+        var orderItem = new OrderItem();
+        orderItem.setOrderItemGroup(orderItemGroup);
+        orderItem.setId(1);
+
+        //set up mock and spy objects behaviour
+        Mockito.doReturn(Optional.of(orderItemGroup)).when(orderItemGroupRepository).findById(1);
+        Mockito.doReturn(orderItem).when(orderItemRepository).save(orderItem);
+        Mockito.doReturn(Optional.of(menuItem)).when(menuItemRepository).findById(1);
+
+        Assertions.assertThrows(NotFoundException.class, ()->orderItemService.addOrderItem(order.getId(), menuItem.getId(), 1, waiter.getPin()));
+        //Assertions.assertDoesNotThrow(() -> orderItemService.addOrderItem(order.getId(), menuItem.getId(), 1, waiter.getPin()));
+    }
+
+
+
+
 
 
     @Test
