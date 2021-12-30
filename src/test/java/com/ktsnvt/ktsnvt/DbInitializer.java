@@ -218,6 +218,7 @@ public class DbInitializer implements ApplicationRunner {
         var order6 = new Order(IN_PROGRESS, LocalDateTime.parse("2021-02-03 16:16", formatter), null, restaurantTable1, employee3);
         var order7 = new Order(CANCELLED, LocalDateTime.parse("2021-02-03 16:16", formatter), null, restaurantTable1, employee3);
         var order8 = new Order(CREATED, LocalDateTime.parse("2021-02-03 16:16", formatter), null, restaurantTable1, employee3);
+        var order9 = new Order(IN_PROGRESS, LocalDateTime.parse("2021-02-03 16:16", formatter), null, restaurantTable2, employee3);
         orderRepo.save(order1);
         orderRepo.save(order2);
         orderRepo.save(order3);
@@ -226,6 +227,7 @@ public class DbInitializer implements ApplicationRunner {
         orderRepo.save(order6);
         orderRepo.save(order7);
         orderRepo.save(order8);
+        orderRepo.save(order9);
 
         var orderGroup1 = new OrderItemGroup("Group 1", OrderItemGroupStatus.SENT, null);
         order1.addOrderItemGroup(orderGroup1);

@@ -275,6 +275,25 @@ class OrderControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
+
+    @Test
+    void getOrderIdForTable_withValidData_isSuccess() throws Exception{
+        Integer tableId = 2;
+        String url = String.format("http://localhost:%d/api/orders/for-table?tableId=%d", this.port, tableId);
+        this.mockMvc.perform(MockMvcRequestBuilders.get(url))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").value(9));
+    }
+
+    @Test
+    void getOrderIdForTable_whenOrderDoesNotExist_returnsMinusOne() throws Exception{
+        Integer tableId = 25;
+        String url = String.format("http://localhost:%d/api/orders/for-table?tableId=%d", this.port, tableId);
+        this.mockMvc.perform(MockMvcRequestBuilders.get(url))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").value(-1));
+    }
+
     @SuppressWarnings("unused")
     private static Stream<Arguments> provideInvalidCreateOrderRequests() {
         return Stream.of(

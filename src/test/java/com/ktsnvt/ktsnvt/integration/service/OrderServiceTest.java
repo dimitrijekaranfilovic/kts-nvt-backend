@@ -147,5 +147,18 @@ class OrderServiceTest {
         Assertions.assertThrows(InvalidEmployeeTypeException.class, () -> orderService.sendOrderItemGroup(1, 2, "1234"));
     }
 
+    @Test
+    void getOrderIdForTable_withValidData_isSuccess(){
+        Assertions.assertEquals(9, orderService.getOrderIdForTable(2));
+    }
+
+    @Test
+    void getOrderIdForTable_whenOrderDoesNotExist_returnsMinusOne() {
+        Assertions.assertNull(orderService.getOrderIdForTable(800));
+    }
+
+
+
+
 
 }

@@ -30,6 +30,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.Optional;
 
 @SpringBootTest
@@ -623,6 +624,21 @@ class OrderServiceTest {
         Assertions.assertThrows(IllegalOrderStateException.class, ()->orderServiceSpy.createGroupForOrder(order.getId(), "group 1", waiter.getPin()));
 
     }
+
+
+    @Test
+    void getOrderIdForTable_withValidData_isSuccess(){
+        Mockito.doReturn(1).when(orderRepository).getOrderIdForTableId(1, Arrays.asList(OrderStatus.CANCELLED, OrderStatus.CHARGED));
+        Assertions.assertEquals(1, orderService.getOrderIdForTable(1));
+    }
+
+    @Test
+    void getOrderIdForTable_whenOrderDoesNotExist_returnsNull() {
+        Mockito.doReturn(null).when(orderRepository).getOrderIdForTableId(1, Arrays.asList(OrderStatus.CANCELLED, OrderStatus.CHARGED));
+        Assertions.assertNull(orderService.getOrderIdForTable(1));
+    }
+
+
 
 
 

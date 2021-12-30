@@ -52,7 +52,8 @@ public class OrderController {
 
     @GetMapping("/for-table")
     public Integer getOrderIdForTableId(@RequestParam("tableId") Integer tableId){
-        return this.orderService.getOrderIdForTable(tableId);
+        var result =  this.orderService.getOrderIdForTable(tableId);
+        return result == null ? -1 : result;
     }
 
     @PutMapping("/{id}/charge")
