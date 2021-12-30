@@ -30,32 +30,29 @@ public class ChefPageTest {
         navbar.navigateChef();
         assertTrue(Utilities.checkUrl(driver, "http://localhost:4200/chef"));
 
-        assertEquals(3, chefPage.getNewRequestCount());
-        assertEquals(1, chefPage.getRequestsInPreparationCount());
+        assertTrue(chefPage.checkNewTableRows(3));
+        assertTrue(chefPage.checkPreparingTableRows(1));
 
         chefPage.clickFinishOldestNew();
         chefPage.setPin("1234");
         chefPage.clickConfirmPin();
 
-        Thread.sleep(1000);
-        assertEquals(2, chefPage.getNewRequestCount());
-        assertEquals(1, chefPage.getRequestsInPreparationCount());
+        assertTrue(chefPage.checkNewTableRows(2));
+        assertTrue(chefPage.checkPreparingTableRows(1));
 
         chefPage.clickPrepareOldestNew();
         chefPage.setPin("1234");
         chefPage.clickConfirmPin();
 
-        Thread.sleep(1000);
-        assertEquals(1, chefPage.getNewRequestCount());
-        assertEquals(2, chefPage.getRequestsInPreparationCount());
+        assertTrue(chefPage.checkNewTableRows(1));
+        assertTrue(chefPage.checkPreparingTableRows(2));
 
         chefPage.clickFinishOldestPreparing();
         chefPage.setPin("1234");
         chefPage.clickConfirmPin();
 
-        Thread.sleep(1000);
-        assertEquals(1, chefPage.getNewRequestCount());
-        assertEquals(1, chefPage.getRequestsInPreparationCount());
+        assertTrue(chefPage.checkNewTableRows(1));
+        assertTrue(chefPage.checkPreparingTableRows(1));
         driver.close();
     }
 }

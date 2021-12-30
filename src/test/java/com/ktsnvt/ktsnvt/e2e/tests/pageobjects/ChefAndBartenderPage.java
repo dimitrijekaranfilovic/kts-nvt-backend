@@ -1,5 +1,7 @@
 package com.ktsnvt.ktsnvt.e2e.tests.pageobjects;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -37,29 +39,39 @@ public class ChefAndBartenderPage {
         this.driver = driver;
     }
 
-    public int getNewRequestCount() {
-        List<WebElement> elements = new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfAllElements(newRequests));
-        return elements.size();
-    }
-
-    public int getRequestsInPreparationCount() {
-        List<WebElement> elements = new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfAllElements(requestsInPreparation));
-        return elements.size();
-    }
-
     public void clickFinishOldestNew() {
         List<WebElement> elements = new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfAllElements(finishNewButtons));
         elements.get(0).click();
     }
 
+    public boolean checkNewTableRows(int number) {
+        try {
+            List<WebElement> elements = (new WebDriverWait(driver, 10).until(ExpectedConditions.numberOfElementsToBe(By.cssSelector("div[name='left'] tbody tr"), number)));
+            return number == elements.size();
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
+    public boolean checkPreparingTableRows(int number) {
+        try {
+            List<WebElement> elements = (new WebDriverWait(driver, 10).until(ExpectedConditions.numberOfElementsToBe(By.cssSelector("div[name='right'] tbody tr"), number)));
+            return number == elements.size();
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
     public void clickFinishOldestPreparing() {
+        prepareButtons = driver.findElements(By.cssSelector("div[name='right'] button.mat-raised-button[color='accent']"));
         List<WebElement> elements = new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfAllElements(finishPreparingButtons));
-        elements.get(1).click();
+        elements.get(0).click();
     }
 
     public void clickPrepareOldestNew() {
+        prepareButtons = driver.findElements(By.cssSelector("div[name='left'] button.mat-raised-button[color='primary']"));
         List<WebElement> elements = new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfAllElements(prepareButtons));
-        elements.get(1).click();
+        elements.get(0).click();
     }
 
     public void setPin(String keys) {
