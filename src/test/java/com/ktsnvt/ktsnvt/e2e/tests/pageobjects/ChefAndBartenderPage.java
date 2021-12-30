@@ -40,6 +40,7 @@ public class ChefAndBartenderPage {
     }
 
     public void clickFinishOldestNew() {
+        finishNewButtons = driver.findElements(By.cssSelector("div[name='left'] button.mat-raised-button[color='accent']"));
         List<WebElement> elements = new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfAllElements(finishNewButtons));
         elements.get(0).click();
     }

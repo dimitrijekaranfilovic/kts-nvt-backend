@@ -1,6 +1,7 @@
 package com.ktsnvt.ktsnvt.e2e.tests;
 
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.openqa.selenium.By;
@@ -70,6 +71,7 @@ class ExampleTest {
         el6.click();
 
         List<WebElement> elss = new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("div.cart-item-container")));
+        Assertions.assertEquals(3, elss.size());
         driver.quit();
     }
 

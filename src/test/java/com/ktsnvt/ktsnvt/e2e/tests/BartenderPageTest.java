@@ -9,15 +9,13 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.PageFactory;
 
-import java.util.concurrent.TimeUnit;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ChefPageTest {
+public class BartenderPageTest {
 
     @Test
-    public void chefPage_happyFlow() {
+    public void bartenderTest_happyFlow() {
         System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver.exe");
         WebDriver driver = new ChromeDriver();
 
@@ -27,31 +25,31 @@ public class ChefPageTest {
         driver.manage().window().maximize();
         driver.get("http://localhost:4200/");
 
-        navbar.navigateChef();
-        assertTrue(Utilities.checkUrl(driver, "http://localhost:4200/chef"));
-
-        assertTrue(chefPage.checkNewTableRows(3));
-        assertTrue(chefPage.checkPreparingTableRows(1));
-
-        chefPage.clickFinishOldestNew();
-        chefPage.setPin("1234");
-        chefPage.clickConfirmPin();
+        navbar.navigateBartender();
+        assertTrue(Utilities.checkUrl(driver, "http://localhost:4200/bartender"));
 
         assertTrue(chefPage.checkNewTableRows(2));
         assertTrue(chefPage.checkPreparingTableRows(1));
 
-        chefPage.clickPrepareOldestNew();
-        chefPage.setPin("1234");
+        chefPage.clickFinishOldestNew();
+        chefPage.setPin("5678");
         chefPage.clickConfirmPin();
 
         assertTrue(chefPage.checkNewTableRows(1));
+        assertTrue(chefPage.checkPreparingTableRows(1));
+
+        chefPage.clickPrepareOldestNew();
+        chefPage.setPin("5678");
+        chefPage.clickConfirmPin();
+
+        assertTrue(chefPage.checkNewTableRows(0));
         assertTrue(chefPage.checkPreparingTableRows(2));
 
         chefPage.clickFinishOldestPreparing();
-        chefPage.setPin("1234");
+        chefPage.setPin("5678");
         chefPage.clickConfirmPin();
 
-        assertTrue(chefPage.checkNewTableRows(1));
+        assertTrue(chefPage.checkNewTableRows(0));
         assertTrue(chefPage.checkPreparingTableRows(1));
         driver.close();
     }
