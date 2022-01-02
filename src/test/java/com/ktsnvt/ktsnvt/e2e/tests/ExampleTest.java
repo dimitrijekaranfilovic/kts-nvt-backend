@@ -62,7 +62,7 @@ class ExampleTest {
         jse.executeScript("arguments[0].click()", el3);
 
         el4 = new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(By.cssSelector("button.white")));
-        el4.click();
+        jse.executeScript("arguments[0].click()", el4);
 
         WebElement el5 = new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(By.cssSelector("span.cart")));
         el5.click();
