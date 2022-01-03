@@ -155,13 +155,13 @@ public class DbInitializer implements ApplicationRunner {
         var restaurantTable1 = new RestaurantTable(1, 120, 120, 50, groundFloor);
         var restaurantTable2 = new RestaurantTable(2, 500, 500, 50, groundFloor);
         var restaurantTable3 = new RestaurantTable(3, 700, 650, 50, groundFloor);
-        var restaurantTable4 = new RestaurantTable(1, 200, 200, 5, firstFloor);
-        var restaurantTable5 = new RestaurantTable(2, 280, 270, 5, firstFloor);
-        var restaurantTable6 = new RestaurantTable(3, 500, 340, 5, firstFloor);
-        var restaurantTable7 = new RestaurantTable(1, 400, 410, 5, terrace);
-        var restaurantTable8 = new RestaurantTable(2, 460, 200, 5, terrace);
-        var restaurantTable9 = new RestaurantTable(3, 550, 270, 5, terrace);
-        var restaurantTable10 = new RestaurantTable(3, 550, 340, 5, secondFloor);
+        var restaurantTable4 = new RestaurantTable(1, 200, 200, 50, firstFloor);
+        var restaurantTable5 = new RestaurantTable(2, 280, 270, 50, firstFloor);
+        var restaurantTable6 = new RestaurantTable(3, 500, 340, 50, firstFloor);
+        var restaurantTable7 = new RestaurantTable(1, 400, 410, 50, terrace);
+        var restaurantTable8 = new RestaurantTable(2, 460, 200, 50, terrace);
+        var restaurantTable9 = new RestaurantTable(3, 550, 270, 50, terrace);
+        var restaurantTable10 = new RestaurantTable(3, 550, 340, 50, secondFloor);
         //restaurantTable10.setAvailable(false);
 
         var order1 = new Order(IN_PROGRESS, LocalDateTime.parse("2021-01-01 12:12", formatter), null, restaurantTable1, employee3);
