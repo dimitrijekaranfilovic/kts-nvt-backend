@@ -115,6 +115,9 @@ class OrderServiceTest {
         var waiter = new Employee("name", "surname", new Authority("WAITER"), waiterPin, EmployeeType.WAITER);
         waiter.setId(waiterId);
         order.setWaiter(waiter);
+        var table = new RestaurantTable();
+        table.setAvailable(false);
+        order.setRestaurantTable(table);
         var og1 = new OrderItemGroup("first", OrderItemGroupStatus.NEW);
         var og2 = new OrderItemGroup("second", OrderItemGroupStatus.NEW);
         order.getItemGroups().add(og1); order.getItemGroups().add(og2);
@@ -126,6 +129,7 @@ class OrderServiceTest {
         orderServiceSpy.cancelOrder(orderId, waiterPin);
 
         // THEN
+        assertTrue(table.getAvailable());
         assertEquals(OrderStatus.CANCELLED, order.getStatus());
         assertFalse(og1.getIsActive());
         assertFalse(og2.getIsActive());
@@ -143,6 +147,9 @@ class OrderServiceTest {
         var waiter = new Employee("name", "surname", new Authority("WAITER"), waiterPin, EmployeeType.WAITER);
         waiter.setId(waiterId);
         order.setWaiter(waiter);
+        var table = new RestaurantTable();
+        table.setAvailable(false);
+        order.setRestaurantTable(table);
         OrderService orderServiceSpy = spy(orderService);
         doNothing().when(employeeOrderService).throwIfWaiterNotResponsible(waiterPin, waiterId);
         doReturn(order).when(orderServiceSpy).getOrder(orderId);
@@ -151,6 +158,7 @@ class OrderServiceTest {
         orderServiceSpy.cancelOrder(orderId, waiterPin);
 
         // THEN
+        assertTrue(table.getAvailable());
         assertEquals(OrderStatus.CANCELLED, order.getStatus());
         verifyNoInteractions(orderRepository);
     }
@@ -166,6 +174,9 @@ class OrderServiceTest {
         var waiter = new Employee("name", "surname", new Authority("WAITER"), waiterPin, EmployeeType.WAITER);
         waiter.setId(waiterId);
         order.setWaiter(waiter);
+        var table = new RestaurantTable();
+        table.setAvailable(false);
+        order.setRestaurantTable(table);
         var og1 = new OrderItemGroup("first", OrderItemGroupStatus.SENT);
         var og2 = new OrderItemGroup("second", OrderItemGroupStatus.DONE);
         order.getItemGroups().add(og1); order.getItemGroups().add(og2);
@@ -177,6 +188,7 @@ class OrderServiceTest {
         assertThrows(IllegalOrderStateException.class, () -> orderServiceSpy.cancelOrder(orderId, waiterPin));
 
         // THEN
+        assertFalse(table.getAvailable());
         assertEquals(OrderStatus.IN_PROGRESS, order.getStatus());
         assertEquals(OrderItemGroupStatus.SENT, og1.getStatus());
         assertEquals(OrderItemGroupStatus.DONE, og2.getStatus());
@@ -194,6 +206,9 @@ class OrderServiceTest {
         var waiter = new Employee("name", "surname", new Authority("WAITER"), waiterPin, EmployeeType.WAITER);
         waiter.setId(waiterId);
         order.setWaiter(waiter);
+        var table = new RestaurantTable();
+        table.setAvailable(false);
+        order.setRestaurantTable(table);
         OrderService orderServiceSpy = spy(orderService);
         doNothing().when(employeeOrderService).throwIfWaiterNotResponsible(waiterPin, waiterId);
         doReturn(order).when(orderServiceSpy).getOrder(orderId);
@@ -202,6 +217,7 @@ class OrderServiceTest {
         assertThrows(IllegalOrderStateException.class, () -> orderServiceSpy.cancelOrder(orderId, waiterPin));
 
         // THEN
+        assertFalse(table.getAvailable());
         assertEquals(OrderStatus.CHARGED, order.getStatus());
         verifyNoInteractions(orderRepository);
     }

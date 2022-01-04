@@ -169,6 +169,7 @@ public class OrderServiceImpl extends TransactionalServiceBase implements OrderS
             throw new IllegalOrderStateException("Order has already been sent to the kitchen / bar");
         }
         order.getItemGroups().forEach(ig -> ig.setIsActive(false));
+        order.getRestaurantTable().freeTable();
         order.setStatus(OrderStatus.CANCELLED);
     }
 
