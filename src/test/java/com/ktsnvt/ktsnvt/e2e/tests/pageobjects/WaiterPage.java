@@ -11,9 +11,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
 
-public class WaiterPage {
-
-    private WebDriver driver;
+public class WaiterPage extends BasePage {
 
     @FindBy(css = "div[role='tab']")
     private List<WebElement> tabs;
@@ -22,7 +20,7 @@ public class WaiterPage {
     private List<WebElement> canvases;
 
     public WaiterPage(WebDriver driver) {
-        this.driver = driver;
+        super(driver);
     }
 
     public void clickTab(int tabIndex) {
@@ -49,6 +47,6 @@ public class WaiterPage {
         int x = location.getX();
         int y = location.getY();
 
-        new Actions(driver).moveByOffset(x, y).moveByOffset(tableX - 20, tableY - 20).click().build().perform();
+        new Actions(driver).moveByOffset(x, y).moveByOffset(tableX, tableY).click().build().perform();
     }
 }

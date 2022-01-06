@@ -6,9 +6,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class Navbar {
-
-    private WebDriver driver;
+public class Navbar extends BasePage {
 
     @FindBy(css = "a[routerlink='/chef']")
     private WebElement linkChef;
@@ -22,8 +20,11 @@ public class Navbar {
     @FindBy(css = "a[routerlink='/auth/login']")
     private WebElement linkLogin;
 
+    @FindBy(css = "a[routerlink='/sections/manage']")
+    private WebElement linkSections;
+
     public Navbar(WebDriver driver) {
-        this.driver = driver;
+        super(driver);
     }
 
     public void navigateChef() {
@@ -40,5 +41,9 @@ public class Navbar {
 
     public void navigateLogin() {
         (new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(linkLogin))).click();
+    }
+
+    public void navigateSectionsAdmin() {
+        (new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(linkSections))).click();
     }
 }

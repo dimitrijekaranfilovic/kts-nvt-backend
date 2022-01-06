@@ -7,9 +7,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
 
-public class ChefAndBartenderPage {
-
-    private WebDriver driver;
+public class ChefAndBartenderPage extends BasePage {
 
     @FindBy(css = "div[name='left'] tr.mat-row")
     private List<WebElement> newRequests;
@@ -33,7 +31,7 @@ public class ChefAndBartenderPage {
     private WebElement confirmPinButton;
 
     public ChefAndBartenderPage(WebDriver driver) {
-        this.driver = driver;
+        super(driver);
     }
 
     public void clickFinishOldestNew() {
