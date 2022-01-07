@@ -12,21 +12,16 @@ import org.openqa.selenium.support.PageFactory;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class BartenderPageTest {
+public class BartenderPageTest extends BaseE2ETest {
 
     @Test
     public void bartenderTest_happyFlow() {
-        System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver.exe");
-        WebDriver driver = new ChromeDriver();
-
+        var driver = initDriver();
         Navbar navbar = PageFactory.initElements(driver, Navbar.class);
         ChefAndBartenderPage chefPage = PageFactory.initElements(driver, ChefAndBartenderPage.class);
 
-        driver.manage().window().maximize();
-        driver.get("http://localhost:4200/");
-
         navbar.navigateBartender();
-        assertTrue(Utilities.checkUrl(driver, "http://localhost:4200/bartender"));
+        assertTrue(Utilities.checkUrl(driver, "/bartender"));
 
         assertTrue(chefPage.checkNewTableRows(2));
         assertTrue(chefPage.checkPreparingTableRows(1));

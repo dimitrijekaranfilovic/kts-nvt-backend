@@ -7,8 +7,12 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class Utilities {
 
+    public static String baseUrl = "http://localhost:4200";
+
     public static boolean checkUrl(WebDriver driver, String url) {
-        return (new WebDriverWait(driver, 10).until(ExpectedConditions.urlToBe(url)));
+        var formatString = url.startsWith("/") ? "%s%s" : "%s/%s";
+        var newUrl = String.format(formatString, baseUrl, url);
+        return (new WebDriverWait(driver, 10).until(ExpectedConditions.urlToBe(newUrl)));
     }
 
     public static boolean checkIfButtonIsEnabled(WebDriver driver, By selector) {

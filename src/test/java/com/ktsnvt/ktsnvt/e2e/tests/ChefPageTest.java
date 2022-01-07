@@ -14,21 +14,16 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ChefPageTest {
+public class ChefPageTest extends BaseE2ETest {
 
     @Test
     public void chefPage_happyFlow() {
-        System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver.exe");
-        WebDriver driver = new ChromeDriver();
-
+        var driver = initDriver();
         Navbar navbar = PageFactory.initElements(driver, Navbar.class);
         ChefAndBartenderPage chefPage = PageFactory.initElements(driver, ChefAndBartenderPage.class);
 
-        driver.manage().window().maximize();
-        driver.get("http://localhost:4200/");
-
         navbar.navigateChef();
-        assertTrue(Utilities.checkUrl(driver, "http://localhost:4200/chef"));
+        assertTrue(Utilities.checkUrl(driver, "/chef"));
 
         assertTrue(chefPage.checkNewTableRows(3));
         assertTrue(chefPage.checkPreparingTableRows(1));

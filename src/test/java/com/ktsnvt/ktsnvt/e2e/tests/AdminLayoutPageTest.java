@@ -15,16 +15,11 @@ import org.openqa.selenium.support.PageFactory;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class AdminLayoutPageTest {
+public class AdminLayoutPageTest extends BaseE2ETest {
 
     @Test
     public void adminLayoutPage_happyFlow() throws InterruptedException {
-        System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver.exe");
-        WebDriver driver = new ChromeDriver();
-
-        driver.manage().window().maximize();
-        driver.get("http://localhost:4200/");
-
+        var driver = initDriver();
         Navbar nav = PageFactory.initElements(driver, Navbar.class);
         LoginPage loginPage = PageFactory.initElements(driver, LoginPage.class);
         AdminSectionsPage sectionsPage = PageFactory.initElements(driver, AdminSectionsPage.class);
@@ -35,15 +30,15 @@ public class AdminLayoutPageTest {
         loginPage.setPassword("password");
         loginPage.clickLogin();
 
-        assertTrue(Utilities.checkUrl(driver, "http://localhost:4200/employees"));
+        assertTrue(Utilities.checkUrl(driver, "/employees"));
 
         nav.navigateSectionsAdmin();
 
-        assertTrue(Utilities.checkUrl(driver, "http://localhost:4200/sections/manage"));
+        assertTrue(Utilities.checkUrl(driver, "/sections/manage"));
 
         sectionsPage.clickLayoutButton(1);
 
-        assertTrue(Utilities.checkUrl(driver, "http://localhost:4200/sections/2/layout"));
+        assertTrue(Utilities.checkUrl(driver, "/sections/2/layout"));
 
         layoutPage.insertNewTable("11", "10", "10");
 

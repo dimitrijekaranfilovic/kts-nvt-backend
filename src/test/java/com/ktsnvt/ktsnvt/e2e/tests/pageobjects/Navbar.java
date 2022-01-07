@@ -23,27 +23,39 @@ public class Navbar extends BasePage {
     @FindBy(css = "a[routerlink='/sections/manage']")
     private WebElement linkSections;
 
+    @FindBy(css = "button[id='profileButton']")
+    private WebElement profileButton;
+
+    @FindBy(css = "button[id='logout']")
+    private WebElement logoutButton;
+
     public Navbar(WebDriver driver) {
         super(driver);
     }
 
     public void navigateChef() {
-        (new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(linkChef))).click();
+        click(linkChef);
     }
 
     public void navigateBartender() {
-        (new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(linkBartender))).click();
+        click(linkBartender);
     }
 
     public void navigateWaiter() {
-        (new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(linkWaiter))).click();
+        click(linkWaiter);
     }
 
     public void navigateLogin() {
-        (new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(linkLogin))).click();
+        click(linkLogin);
     }
 
     public void navigateSectionsAdmin() {
-        (new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(linkSections))).click();
+        click(linkSections);
+    }
+
+    public void clickLogout() throws InterruptedException {
+        click(profileButton);
+        Thread.sleep(200);
+        click(logoutButton);
     }
 }
