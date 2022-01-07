@@ -32,6 +32,9 @@ public class Navbar extends BasePage {
     @FindBy(css = "a[routerlink='/super-users/profile']")
     private WebElement linkUpdateProfile;
 
+    @FindBy(css = "a[routerlink='/super-users/password']")
+    private WebElement linkChangePassword;
+
     public Navbar(WebDriver driver) {
         super(driver);
     }
@@ -68,7 +71,13 @@ public class Navbar extends BasePage {
         click(linkUpdateProfile);
     }
 
-    public String getProfileNamae() throws InterruptedException {
+    public void clickChangePassword() throws InterruptedException {
+        click(profileButton);
+        Thread.sleep(200);
+        click(linkChangePassword);
+    }
+
+    public String getProfileName() throws InterruptedException {
         return profileButton.getText();
     }
 }
