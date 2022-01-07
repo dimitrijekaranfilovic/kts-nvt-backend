@@ -3,8 +3,6 @@ package com.ktsnvt.ktsnvt.e2e.tests.pageobjects;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class Navbar extends BasePage {
 
@@ -59,25 +57,22 @@ public class Navbar extends BasePage {
         click(linkSections);
     }
 
-    public void clickLogout() throws InterruptedException {
+    public void clickLogout() {
         click(profileButton);
-        Thread.sleep(200);
         click(logoutButton);
     }
 
-    public void clickUpdateProfile() throws InterruptedException {
+    public void clickUpdateProfile() {
         click(profileButton);
-        Thread.sleep(200);
         click(linkUpdateProfile);
     }
 
-    public void clickChangePassword() throws InterruptedException {
+    public void clickChangePassword() {
         click(profileButton);
-        Thread.sleep(200);
         click(linkChangePassword);
     }
 
-    public String getProfileName() throws InterruptedException {
+    public String getProfileName() {
         return profileButton.getText();
     }
 }

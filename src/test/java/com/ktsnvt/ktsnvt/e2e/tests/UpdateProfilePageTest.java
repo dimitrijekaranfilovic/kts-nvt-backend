@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class UpdateProfilePageTest extends BaseE2ETest {
 
     @Test
-    void updateProfile_happyFlow() throws InterruptedException {
+    void updateProfile_happyFlow() {
         var driver = initDriver();
         var loginPage = PageFactory.initElements(driver, LoginPage.class);
         var navbar = PageFactory.initElements(driver, Navbar.class);

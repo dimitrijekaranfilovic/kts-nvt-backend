@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class LoginPageTest extends BaseE2ETest {
 
     @Test
-    void loginPage_happyFlow() throws InterruptedException {
+    void loginPage_happyFlow() {
         var driver = initDriver();
         var loginPage = PageFactory.initElements(driver, LoginPage.class);
         var navbar = PageFactory.initElements(driver, Navbar.class);

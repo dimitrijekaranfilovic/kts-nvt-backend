@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ChangePasswordPageTest extends BaseE2ETest {
 
     @Test
-    void changePassword_happyFlow() throws InterruptedException {
+    void changePassword_happyFlow() {
         var driver = initDriver();
         var loginPage = PageFactory.initElements(driver, LoginPage.class);
         var navbar = PageFactory.initElements(driver, Navbar.class);
@@ -32,6 +32,23 @@ public class ChangePasswordPageTest extends BaseE2ETest {
         changePasswordPage.setOldPassword("password");
         changePasswordPage.setNewPassword("test123");
         changePasswordPage.setConfirmPassword("test123");
+        changePasswordPage.clickChangePassword();
+
+        assertTrue(Utilities.checkUrl(driver, "/employees"));
+
+        navbar.clickLogout();
+
+        loginPage.setEmail("email1@email.com");
+        loginPage.setPassword("test123");
+        loginPage.clickLogin();
+
+        assertTrue(Utilities.checkUrl(driver, "/employees"));
+
+        navbar.clickChangePassword();
+
+        changePasswordPage.setOldPassword("test123");
+        changePasswordPage.setNewPassword("password");
+        changePasswordPage.setConfirmPassword("password");
         changePasswordPage.clickChangePassword();
 
         assertTrue(Utilities.checkUrl(driver, "/employees"));
