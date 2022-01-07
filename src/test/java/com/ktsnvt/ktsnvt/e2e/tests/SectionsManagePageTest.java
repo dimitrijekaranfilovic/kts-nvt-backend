@@ -43,8 +43,9 @@ public class SectionsManagePageTest extends BaseE2ETest {
         assertTrue(sectionsManagePage.checkSectionTableRows(5));
         assertEquals("Izmenjena sekcija", sectionsManagePage.getLastSectionName());
 
+        var id = sectionsManagePage.getLastSectionId();
         sectionsManagePage.clickViewSeatingLayoutLastSection();
-        Utilities.checkUrl(driver, String.format("/sections/%d/layout", 5));
+        Utilities.checkUrl(driver, String.format("/sections/%s/layout", id));
         navbar.navigateSectionsAdmin();
         assertTrue(Utilities.checkUrl(driver, "/sections/manage"));
 

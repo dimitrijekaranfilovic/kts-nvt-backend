@@ -7,7 +7,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class EmployeesPage extends BasePage {
+public class EmployeesPage extends BaseCRUDPage {
 
     @FindBy(css = "input[formcontrolname='query']")
     private WebElement queryInput;
@@ -114,37 +114,22 @@ public class EmployeesPage extends BasePage {
     }
 
     public String getLastEmployeeName() {
-        var lastTableRow = getLastTableRow();
-        var tds = lastTableRow.findElements(By.cssSelector("td"));
-        return tds.get(0).getText();
+        return getLastTableRowField(0);
     }
 
     public String getLastEmployeeSalary() {
-        var lastTableRow = getLastTableRow();
-        var tds = lastTableRow.findElements(By.cssSelector("td"));
-        return tds.get(4).getText();
+        return getLastTableRowField(4);
     }
 
     public void clickUpdateLastEmployee() {
-        performLastEmployeeAction(0);
+        performLastTableRowAction(0);
     }
 
     public void clickUpdateLastEmployeeSalary() {
-        performLastEmployeeAction(1);
+        performLastTableRowAction(1);
     }
 
     public void clickDeleteLastEmployee() {
-        performLastEmployeeAction(2);
-    }
-
-    private void performLastEmployeeAction(int index) {
-        var lastTableRow = getLastTableRow();
-        var actions = lastTableRow.findElements(By.cssSelector("button"));
-        click(actions.get(index));
-    }
-
-    private WebElement getLastTableRow() {
-        return  (new WebDriverWait(driver, 10))
-                .until(ExpectedConditions.visibilityOfElementLocated(By.xpath("(//table[1]/tbody/tr)[last()]")));
+        performLastTableRowAction(2);
     }
 }

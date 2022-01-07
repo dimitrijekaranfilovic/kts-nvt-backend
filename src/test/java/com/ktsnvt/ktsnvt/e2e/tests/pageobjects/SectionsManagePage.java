@@ -7,7 +7,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class SectionsManagePage extends BasePage {
+public class SectionsManagePage extends BaseCRUDPage {
     @FindBy(css = "button[id='createSection']")
     private WebElement createSectionButton;
 
@@ -47,31 +47,22 @@ public class SectionsManagePage extends BasePage {
     }
 
     public String getLastSectionName() {
-        var lastTableRow = getLastTableRow();
-        var tds = lastTableRow.findElements(By.cssSelector("td"));
-        return tds.get(1).getText();
+        return getLastTableRowField(1);
+    }
+
+    public String getLastSectionId() {
+        return getLastTableRowField(0);
     }
 
     public void clickUpdateLastSection() {
-        performLastSectionAction(0);
+        performLastTableRowAction(0);
     }
 
     public void clickViewSeatingLayoutLastSection() {
-        performLastSectionAction(1);
+        performLastTableRowAction(1);
     }
 
     public void clickDeleteLastSection() {
-        performLastSectionAction(2);
-    }
-
-    private void performLastSectionAction(int index) {
-        var lastTableRow = getLastTableRow();
-        var actions = lastTableRow.findElements(By.cssSelector("button"));
-        click(actions.get(index));
-    }
-
-    private WebElement getLastTableRow() {
-        return  (new WebDriverWait(driver, 10))
-                .until(ExpectedConditions.visibilityOfElementLocated(By.xpath("(//table[1]/tbody/tr)[last()]")));
+        performLastTableRowAction(2);
     }
 }
