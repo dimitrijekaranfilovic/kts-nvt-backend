@@ -33,6 +33,9 @@ public class Navbar extends BasePage {
     @FindBy(css = "a[routerlink='/super-users/password']")
     private WebElement linkChangePassword;
 
+    @FindBy(css = "a[routerlink='/super-users']")
+    private WebElement linkSuperUsers;
+
     public Navbar(WebDriver driver) {
         super(driver);
     }
@@ -74,5 +77,9 @@ public class Navbar extends BasePage {
 
     public String getProfileName() {
         return profileButton.getText();
+    }
+
+    public void navigateSuperUser() {
+        click(linkSuperUsers);
     }
 }

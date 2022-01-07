@@ -5,10 +5,12 @@ import com.ktsnvt.ktsnvt.e2e.tests.pageobjects.LoginPage;
 import com.ktsnvt.ktsnvt.e2e.tests.pageobjects.Navbar;
 import com.ktsnvt.ktsnvt.e2e.tests.utilities.Utilities;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.openqa.selenium.support.PageFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class EmployeesPageTest extends BaseE2ETest {
 
     @Test
@@ -63,7 +65,5 @@ public class EmployeesPageTest extends BaseE2ETest {
         employeesPage.clickDeleteLastEmployee();
         employeesPage.clickYesButton();
         assertTrue(employeesPage.checkEmployeeTableRows(3));
-
     }
-
 }
