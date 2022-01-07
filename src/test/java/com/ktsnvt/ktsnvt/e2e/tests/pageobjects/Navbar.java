@@ -29,6 +29,9 @@ public class Navbar extends BasePage {
     @FindBy(css = "button[id='logout']")
     private WebElement logoutButton;
 
+    @FindBy(css = "a[routerlink='/super-users/profile']")
+    private WebElement linkUpdateProfile;
+
     public Navbar(WebDriver driver) {
         super(driver);
     }
@@ -57,5 +60,15 @@ public class Navbar extends BasePage {
         click(profileButton);
         Thread.sleep(200);
         click(logoutButton);
+    }
+
+    public void clickUpdateProfile() throws InterruptedException {
+        click(profileButton);
+        Thread.sleep(200);
+        click(linkUpdateProfile);
+    }
+
+    public String getProfileNamae() throws InterruptedException {
+        return profileButton.getText();
     }
 }
