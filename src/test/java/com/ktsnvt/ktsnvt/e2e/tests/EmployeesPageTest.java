@@ -65,5 +65,7 @@ public class EmployeesPageTest extends BaseE2ETest {
         employeesPage.clickDeleteLastEmployee();
         employeesPage.clickYesButton();
         assertTrue(employeesPage.checkEmployeeTableRows(3));
+
+        driver.quit();
     }
 }

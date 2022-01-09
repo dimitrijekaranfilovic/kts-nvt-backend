@@ -64,5 +64,7 @@ public class SuperUsersPageTest extends BaseE2ETest {
         superUsersPage.clickDeleteLastSuperUser();
         superUsersPage.clickYesButton();
         assertTrue(superUsersPage.checkSuperUsersTableRows(2));
+
+        driver.quit();
     }
 }

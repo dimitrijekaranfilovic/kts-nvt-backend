@@ -28,6 +28,8 @@ public class LoginPageTest extends BaseE2ETest {
         navbar.clickLogout();
 
         assertTrue(Utilities.checkUrl(driver, "/auth/login"));
+
+        driver.quit();
     }
 
 }

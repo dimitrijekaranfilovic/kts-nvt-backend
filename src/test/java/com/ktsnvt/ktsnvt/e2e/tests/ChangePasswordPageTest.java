@@ -52,6 +52,8 @@ public class ChangePasswordPageTest extends BaseE2ETest {
         changePasswordPage.clickChangePassword();
 
         assertTrue(Utilities.checkUrl(driver, "/employees"));
+
+        driver.quit();
     }
 
 }

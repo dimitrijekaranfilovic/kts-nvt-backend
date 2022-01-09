@@ -37,6 +37,8 @@ public class UpdateProfilePageTest extends BaseE2ETest {
 
         assertTrue(Utilities.checkUrl(driver, "/employees"));
         assertTrue(navbar.getProfileName().contains("pera peric"));
+
+        driver.quit();
     }
 
 }

@@ -52,5 +52,7 @@ public class SectionsManagePageTest extends BaseE2ETest {
         sectionsManagePage.clickDeleteLastSection();
         sectionsManagePage.clickYesButton();
         assertTrue(sectionsManagePage.checkSectionTableRows(4));
+
+        driver.quit();
     }
 }
