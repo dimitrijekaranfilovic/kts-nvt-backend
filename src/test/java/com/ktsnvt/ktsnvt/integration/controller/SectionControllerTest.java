@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
-public class SectionControllerTest {
+class SectionControllerTest {
 
     @Autowired
     private TestRestTemplate restTemplate;

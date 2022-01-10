@@ -6,13 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class ReportStatistics<TLabel, TValue> {
+public class ReportStatistics<L, V> {
 
-    private List<TLabel> labels = new ArrayList<>();
+    private List<L> labels = new ArrayList<>();
 
-    private List<TValue> values = new ArrayList<>();
+    private List<V> values = new ArrayList<>();
 
-    public void addSample(TLabel label, TValue value) {
+    public void addSample(L label, V value) {
         labels.add(label);
         values.add(value);
     }

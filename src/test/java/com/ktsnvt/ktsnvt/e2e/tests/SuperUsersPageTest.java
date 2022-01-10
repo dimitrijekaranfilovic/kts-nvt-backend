@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class SuperUsersPageTest extends BaseE2ETest {
+class SuperUsersPageTest extends BaseE2ETest {
 
     @Test
     void superUsersPage_happyFlow() throws InterruptedException {

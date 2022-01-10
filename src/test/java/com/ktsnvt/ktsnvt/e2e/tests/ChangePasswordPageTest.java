@@ -9,7 +9,7 @@ import org.openqa.selenium.support.PageFactory;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ChangePasswordPageTest extends BaseE2ETest {
+class ChangePasswordPageTest extends BaseE2ETest {
 
     @Test
     void changePassword_happyFlow() {

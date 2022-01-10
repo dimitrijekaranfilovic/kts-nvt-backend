@@ -12,10 +12,10 @@ import org.openqa.selenium.support.PageFactory;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class BartenderPageTest extends BaseE2ETest {
+class BartenderPageTest extends BaseE2ETest {
 
     @Test
-    public void bartenderTest_happyFlow() {
+    void bartenderTest_happyFlow() {
         var driver = initDriver();
         Navbar navbar = PageFactory.initElements(driver, Navbar.class);
         ChefAndBartenderPage chefPage = PageFactory.initElements(driver, ChefAndBartenderPage.class);

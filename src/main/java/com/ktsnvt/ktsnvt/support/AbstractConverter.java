@@ -3,11 +3,8 @@ package com.ktsnvt.ktsnvt.support;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Collection;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-public abstract class AbstractConverter<TFrom, TTo> implements EntityConverter<TFrom, TTo> {
+public abstract class AbstractConverter<F, T> implements EntityConverter<F, T> {
 
     private ModelMapper modelMapper;
 

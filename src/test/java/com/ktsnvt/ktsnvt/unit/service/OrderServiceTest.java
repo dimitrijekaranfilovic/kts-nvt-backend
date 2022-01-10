@@ -356,18 +356,21 @@ class OrderServiceTest {
     @Test
     void sendOrderItemGroup_whenGroupStatusIsNotNew_throwsException(){
         //data setup
+        var waiterPin = "1234";
         var waiter = new Employee();
         waiter.setType(EmployeeType.WAITER);
         waiter.setId(1);
-        waiter.setPin("1234");
+        waiter.setPin(waiterPin);
 
+        var orderId = 1;
         var order = new Order();
-        order.setId(1);
+        order.setId(orderId);
         order.setWaiter(waiter);
         order.setStatus(OrderStatus.IN_PROGRESS);
 
+        var orderItemGroupId = 1;
         var orderItemGroup = new OrderItemGroup();
-        orderItemGroup.setId(1);
+        orderItemGroup.setId(orderItemGroupId);
         orderItemGroup.setName("group 1");
         orderItemGroup.setOrder(order);
         orderItemGroup.setStatus(OrderItemGroupStatus.SENT);
@@ -378,7 +381,7 @@ class OrderServiceTest {
 
 
         //call the method to be tested
-        Assertions.assertThrows(OrderItemGroupInvalidStatusException.class, ()-> orderServiceSpy.sendOrderItemGroup(order.getId(), orderItemGroup.getId(), waiter.getPin()));
+        Assertions.assertThrows(OrderItemGroupInvalidStatusException.class, ()-> orderServiceSpy.sendOrderItemGroup(orderId, orderItemGroupId, waiterPin));
 
     }
 
@@ -391,13 +394,15 @@ class OrderServiceTest {
         waiter.setId(1);
         waiter.setPin("1234");
 
+        var orderId = 1;
         var order = new Order();
-        order.setId(1);
+        order.setId(orderId);
         order.setWaiter(waiter);
         order.setStatus(OrderStatus.IN_PROGRESS);
 
+        var orderItemGroupId = 1;
         var orderItemGroup = new OrderItemGroup();
-        orderItemGroup.setId(1);
+        orderItemGroup.setId(orderItemGroupId);
         orderItemGroup.setName("group 1");
         orderItemGroup.setOrder(order);
         orderItemGroup.setStatus(OrderItemGroupStatus.NEW);
@@ -412,7 +417,7 @@ class OrderServiceTest {
 
 
         //call the method to be tested
-        Assertions.assertThrows(InvalidEmployeeTypeException.class, ()-> orderServiceSpy.sendOrderItemGroup(order.getId(), orderItemGroup.getId(), invalidWaiterPin));
+        Assertions.assertThrows(InvalidEmployeeTypeException.class, ()-> orderServiceSpy.sendOrderItemGroup(orderId, orderItemGroupId, invalidWaiterPin));
 
 
     }
@@ -455,18 +460,21 @@ class OrderServiceTest {
     @Test
     void deleteOrderItemGroup_whenGroupStatusIsNotNew_throwsException(){
         //data setup
+        var waiterPin = "1234";
         var waiter = new Employee();
         waiter.setType(EmployeeType.WAITER);
         waiter.setId(1);
-        waiter.setPin("1234");
+        waiter.setPin(waiterPin);
 
+        var orderId = 1;
         var order = new Order();
-        order.setId(1);
+        order.setId(orderId);
         order.setWaiter(waiter);
         order.setStatus(OrderStatus.IN_PROGRESS);
 
+        var orderItemGroupId = 1;
         var orderItemGroup = new OrderItemGroup();
-        orderItemGroup.setId(1);
+        orderItemGroup.setId(orderItemGroupId);
         orderItemGroup.setName("group 1");
         orderItemGroup.setOrder(order);
         orderItemGroup.setStatus(OrderItemGroupStatus.SENT);
@@ -476,7 +484,7 @@ class OrderServiceTest {
         var orderServiceSpy = Mockito.spy(orderService);
         Mockito.doReturn(orderItemGroup).when(orderServiceSpy).getOrderItemGroup(1, 1);
 
-        Assertions.assertThrows(OrderItemGroupInvalidStatusException.class, ()->orderServiceSpy.deleteOrderItemGroup(order.getId(), orderItemGroup.getId(), waiter.getPin()));
+        Assertions.assertThrows(OrderItemGroupInvalidStatusException.class, ()->orderServiceSpy.deleteOrderItemGroup(orderId, orderItemGroupId, waiterPin));
     }
 
 
@@ -488,13 +496,15 @@ class OrderServiceTest {
         waiter.setId(1);
         waiter.setPin("1234");
 
+        var orderId = 1;
         var order = new Order();
-        order.setId(1);
+        order.setId(orderId);
         order.setWaiter(waiter);
         order.setStatus(OrderStatus.IN_PROGRESS);
 
+        var orderItemGroupId = 1;
         var orderItemGroup = new OrderItemGroup();
-        orderItemGroup.setId(1);
+        orderItemGroup.setId(orderItemGroupId);
         orderItemGroup.setName("group 1");
         orderItemGroup.setOrder(order);
         orderItemGroup.setStatus(OrderItemGroupStatus.NEW);
@@ -506,7 +516,7 @@ class OrderServiceTest {
         Mockito.doReturn(orderItemGroup).when(orderServiceSpy).getOrderItemGroup(1, 1);
         Mockito.doThrow(new InvalidEmployeeTypeException(invalidEmployeePin)).when(employeeOrderService).throwIfWaiterNotResponsible(invalidEmployeePin, waiter.getId());
 
-        Assertions.assertThrows(InvalidEmployeeTypeException.class, ()->orderServiceSpy.deleteOrderItemGroup(order.getId(), orderItemGroup.getId(), invalidEmployeePin));
+        Assertions.assertThrows(InvalidEmployeeTypeException.class, ()->orderServiceSpy.deleteOrderItemGroup(orderId, orderItemGroupId, invalidEmployeePin));
 
 
     }
@@ -549,13 +559,15 @@ class OrderServiceTest {
     @Test
     void createGroupForOrder_whenGroupNameExists_throwsException(){
         //data setup
+        var waiterPin = "1234";
         var waiter = new Employee();
         waiter.setType(EmployeeType.WAITER);
         waiter.setId(1);
-        waiter.setPin("1234");
+        waiter.setPin(waiterPin);
 
+        var orderId = 1;
         var order = new Order();
-        order.setId(1);
+        order.setId(orderId);
         order.setWaiter(waiter);
         order.setStatus(OrderStatus.IN_PROGRESS);
 
@@ -569,7 +581,7 @@ class OrderServiceTest {
         Mockito.doReturn(order).when(orderServiceSpy).getOrder(1);
         Mockito.doReturn(Optional.of(orderItemGroup)).when(orderServiceSpy).getOrderItemGroup(1, "group 1");
 
-        Assertions.assertThrows(OrderItemGroupInvalidStatusException.class, ()->orderServiceSpy.createGroupForOrder(order.getId(), "group 1", waiter.getPin()));
+        Assertions.assertThrows(OrderItemGroupInvalidStatusException.class, ()->orderServiceSpy.createGroupForOrder(orderId, "group 1", waiterPin));
 
     }
 
@@ -582,8 +594,9 @@ class OrderServiceTest {
         waiter.setId(1);
         waiter.setPin("1234");
 
+        var orderId = 1;
         var order = new Order();
-        order.setId(1);
+        order.setId(orderId);
         order.setWaiter(waiter);
         order.setStatus(OrderStatus.IN_PROGRESS);
 
@@ -601,7 +614,7 @@ class OrderServiceTest {
         Mockito.doReturn(Optional.empty()).when(orderServiceSpy).getOrderItemGroup(1, "group 1");
         Mockito.doThrow(new InvalidEmployeeTypeException(invalidPin)).when(employeeOrderService).throwIfWaiterNotResponsible(invalidPin, waiter.getId());
 
-        Assertions.assertThrows(InvalidEmployeeTypeException.class, ()->orderServiceSpy.createGroupForOrder(order.getId(), "group 1", invalidPin));
+        Assertions.assertThrows(InvalidEmployeeTypeException.class, ()->orderServiceSpy.createGroupForOrder(orderId, "group 1", invalidPin));
 
 
     }
@@ -617,13 +630,15 @@ class OrderServiceTest {
     @Test
     void createGroupForOrder_whenOrderStatusIsChargedOrCancelled_throwsException(){
         //data setup
+        var waiterPin = "1234";
         var waiter = new Employee();
         waiter.setType(EmployeeType.WAITER);
         waiter.setId(1);
-        waiter.setPin("1234");
+        waiter.setPin(waiterPin);
 
+        var orderId = 1;
         var order = new Order();
-        order.setId(1);
+        order.setId(orderId);
         order.setWaiter(waiter);
         order.setStatus(OrderStatus.CHARGED);
 
@@ -637,7 +652,7 @@ class OrderServiceTest {
         Mockito.doReturn(order).when(orderServiceSpy).getOrder(1);
         Mockito.doReturn(Optional.of(orderItemGroup)).when(orderServiceSpy).getOrderItemGroup(1, "group 1");
 
-        Assertions.assertThrows(IllegalOrderStateException.class, ()->orderServiceSpy.createGroupForOrder(order.getId(), "group 1", waiter.getPin()));
+        Assertions.assertThrows(IllegalOrderStateException.class, ()->orderServiceSpy.createGroupForOrder(orderId, "group 1", waiterPin));
 
     }
 

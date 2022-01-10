@@ -34,7 +34,7 @@ import java.util.stream.Stream;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @Transactional
-public class EmployeeControllerTest extends AuthorizingControllerMockMvcTestBase {
+class EmployeeControllerTest extends AuthorizingControllerMockMvcTestBase {
 
     @Autowired
     protected EmployeeControllerTest(WebApplicationContext webApplicationContext, ObjectMapper mapper) {

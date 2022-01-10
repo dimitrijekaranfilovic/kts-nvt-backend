@@ -192,8 +192,9 @@ class RestaurantTableServiceTest {
     @Test
     void create_whenIntersectsWithOtherTable_throwsTableIntersectionException() {
         // GIVEN
+        var sectionId = 1;
         Section section = new Section();
-        section.setId(1);
+        section.setId(sectionId);
         RestaurantTable newTable = new RestaurantTable(2, 1, 1, 1, section);
         newTable.setId(2);
 
@@ -202,14 +203,15 @@ class RestaurantTableServiceTest {
         doReturn(newTable).when(restaurantTableRepository).findByNumberInSection(section.getId(), newTable.getNumber());
 
         // THEN
-        assertThrows(TableIntersectionException.class, () -> restaurantTableService.createRestaurantTable(newTable, section.getId()));
+        assertThrows(TableIntersectionException.class, () -> restaurantTableService.createRestaurantTable(newTable, sectionId));
     }
 
     @Test
     void create_whenHasNumberAsOtherTable_throwsDuplicateTableNumberException() {
         // GIVEN
+        var sectionId = 1;
         Section section = new Section();
-        section.setId(1);
+        section.setId(sectionId);
         RestaurantTable newTable = new RestaurantTable(1, 1, 1, 0, section);
         newTable.setId(2);
 
@@ -218,6 +220,6 @@ class RestaurantTableServiceTest {
         doReturn(newTable).when(restaurantTableRepository).findByNumberInSection(section.getId(), newTable.getNumber());
 
         // THEN
-        assertThrows(DuplicateTableNumberException.class, () -> restaurantTableService.createRestaurantTable(newTable, section.getId()));
+        assertThrows(DuplicateTableNumberException.class, () -> restaurantTableService.createRestaurantTable(newTable, sectionId));
     }
 }
