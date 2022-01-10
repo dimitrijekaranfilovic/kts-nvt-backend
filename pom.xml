@@ -24,20 +24,6 @@
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
 		<sonar.junit.reportsPath>target/surefire-reports</sonar.junit.reportsPath>
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-<!--		<sonar.coverage.jacoco.xmlReportPaths>-->
-<!--			target/surefire-reports/TEST-com.ktsnvt.ktsnvt.e2e.tests.AdminLayoutPageTest.xml,-->
-<!--			target/surefire-reports/TEST-com.ktsnvt.ktsnvt.e2e.tests.BartenderPageTest.xml,-->
-<!--			target/surefire-reports/TEST-com.ktsnvt.ktsnvt.e2e.tests.ChangePasswordPageTest.xml,-->
-<!--			target/surefire-reports/TEST-com.ktsnvt.ktsnvt.e2e.tests.ChefPageTest.xml,-->
-<!--			target/surefire-reports/TEST-com.ktsnvt.ktsnvt.e2e.tests.EmployeesPageTest.xml,-->
-<!--			target/surefire-reports/TEST-com.ktsnvt.ktsnvt.e2e.tests.LoginPageTest.xml,-->
-<!--			target/surefire-reports/TEST-com.ktsnvt.ktsnvt.e2e.tests.SectionsManagePageTest.xml,-->
-<!--			target/surefire-reports/TEST-com.ktsnvt.ktsnvt.e2e.tests.SuperUsersPageTest.xml,-->
-<!--			target/surefire-reports/TEST-com.ktsnvt.ktsnvt.e2e.tests.UpdateProfilePageTest.xml,-->
-<!--			target/surefire-reports/TEST-com.ktsnvt.ktsnvt.e2e.tests.WaiterPageTest.xml,-->
-<!--			target/surefire-reports/TEST-com.ktsnvt.ktsnvt.integration.controller.EmployeeControllerTest.xml-->
-
-<!--		</sonar.coverage.jacoco.xmlReportPaths>-->
 	</properties>
 	<dependencies>
 		<dependency>
@@ -199,12 +185,6 @@
 									<goal>report</goal>
 								</goals>
 							</execution>
-<!--							<execution>-->
-<!--								<id>default-check</id>-->
-<!--								<goals>-->
-<!--									<goal>check</goal>-->
-<!--								</goals>-->
-<!--							</execution>-->
 						</executions>
 					</plugin>
 				</plugins>
