@@ -7,7 +7,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 public abstract class BaseE2ETest {
 
     protected WebDriver initDriver() {
-        System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver-97.exe");
+        System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver.exe");
         WebDriver driver = new ChromeDriver();
         driver.manage().window().maximize();
         driver.get(Utilities.baseUrl);
