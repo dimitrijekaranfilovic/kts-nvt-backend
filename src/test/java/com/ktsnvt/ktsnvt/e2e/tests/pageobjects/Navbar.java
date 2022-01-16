@@ -36,6 +36,9 @@ public class Navbar extends BasePage {
     @FindBy(css = "a[routerlink='/super-users']")
     private WebElement linkSuperUsers;
 
+    @FindBy(css = "a[routerlink='/inventory-items']")
+    private WebElement linkInventoryItems;
+
     public Navbar(WebDriver driver) {
         super(driver);
     }
@@ -59,6 +62,8 @@ public class Navbar extends BasePage {
     public void navigateSectionsAdmin() {
         click(linkSections);
     }
+
+    public void navigateInventoryItems() {click(linkInventoryItems);}
 
     public void clickLogout() {
         click(profileButton);

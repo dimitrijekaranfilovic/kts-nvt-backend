@@ -163,7 +163,7 @@ class MenuItemControllerTest extends AuthorizingControllerMockMvcTestBase {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {1, 2, 3})
+    @ValueSource(ints = {1, 3})
     void deactivateMenuItem_calledWithMenuItemWithActiveOrdersId_isBadRequest(Integer id) throws Exception {
         mockMvc.perform(delete("/api/menu-items/{id}", id)
                 .header("Authorization", "Bearer " + token))
