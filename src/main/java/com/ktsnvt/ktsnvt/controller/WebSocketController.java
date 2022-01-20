@@ -1,16 +1,20 @@
 package com.ktsnvt.ktsnvt.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ktsnvt.ktsnvt.dto.sendnotification.NotificationMessageDTO;
 import com.ktsnvt.ktsnvt.exception.InvalidMessageFormatException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 @Controller
+@Slf4j
 public class WebSocketController {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
@@ -24,27 +28,14 @@ public class WebSocketController {
      * WebSocket endpoint
      * Message is sent to all clients subscribed on /socket-publisher topic.
      */
-    @MessageMapping("send/message")
-    public Map<String, String> broadcastNotification(String notificationJSON) {
-        Map<String, String> convertedMessage = parseMessage(notificationJSON);
+    @MessageMapping({"send/message"})
+    public NotificationMessageDTO broadcastNotification(NotificationMessageDTO notification) {
+        Map<String, String> message = new HashMap<>();
+        message.put("fromId", notification.getFromId());
+        message.put("message", notification.getMessage());
 
-        this.simpMessagingTemplate.convertAndSend("/socket-publisher", convertedMessage);
+        this.simpMessagingTemplate.convertAndSend("/socket-publisher", message);
 
-        return convertedMessage;
-    }
-
-    @SuppressWarnings("unchecked")
-    // because we are parsing a JSON object into Map<String, String> cast is always possible
-    private Map<String, String> parseMessage(String message) {
-        var mapper = new ObjectMapper();
-        Map<String, String> parsedMessage;
-
-        try {
-            parsedMessage = mapper.readValue(message, Map.class);
-        } catch (IOException e) {
-            throw new InvalidMessageFormatException("Message format is invalid.");
-        }
-
-        return parsedMessage;
+        return notification;
     }
 }
