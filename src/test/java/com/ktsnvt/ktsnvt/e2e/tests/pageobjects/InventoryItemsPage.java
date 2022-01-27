@@ -67,12 +67,10 @@ public class InventoryItemsPage extends BaseCRUDPage {
         sendKeys(basePriceLowerBoundInput, priceLowerBound.toString());
         sendKeys(basePriceUpperBoundInput, priceUpperbound.toString());
         click(searchButton);
-        Thread.sleep(300);
     }
 
     public void resetSearchForm() throws InterruptedException {
         click(resetButton);
-        Thread.sleep(200);
     }
 
     public void clickCreateInventoryItem() {
