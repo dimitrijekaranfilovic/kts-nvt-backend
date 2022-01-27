@@ -109,7 +109,6 @@ public class InventoryItemsPage extends BaseCRUDPage {
 
     public String getLastInventoryItemBasePrice() {
         return getLastTableRowField(4);
-
     }
 
     public String getLastInventoryItemAllergy() {
