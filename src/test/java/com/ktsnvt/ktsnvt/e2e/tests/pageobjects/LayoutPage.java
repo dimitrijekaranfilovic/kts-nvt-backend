@@ -25,8 +25,11 @@ public class LayoutPage extends BasePage {
     @FindBy(css = "input[formcontrolname='y']")
     private WebElement tableYInput;
 
-    private Integer lastX;
-    private Integer lastY;
+    @FindBy(id = "deleteTable")
+    private WebElement deleteTableButton;
+
+    @FindBy(id = "yes")
+    private WebElement confirmButton;
 
     public LayoutPage(WebDriver driver) {
         super(driver);
@@ -57,23 +60,46 @@ public class LayoutPage extends BasePage {
             Point location = elements.get(0).getLocation();
             int x = location.getX();
             int y = location.getY();
-            lastX = x;
-            lastY = y;
-
             new Actions(driver).moveByOffset(x, y).moveByOffset(tableX, tableY).click().build().perform();
         } catch (StaleElementReferenceException e) {
             Point location = driver.findElements(By.cssSelector("canvas")).get(0).getLocation();
             int x = location.getX();
             int y = location.getY();
-            new Actions(driver).moveByOffset(x, y).moveByOffset(10, 10).click().build().perform();
+            new Actions(driver).moveByOffset(x, y).moveByOffset(tableX, tableY).click().build().perform();
         }
 
     }
 
     public void deleteSelectedTable() {
-        WebElement deleteTableBtnElement = new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(By.id("deleteTable")));
-        deleteTableBtnElement.click();
-        WebElement confirmDeleteBtnElement = new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[mat-dialog-close='true']")));
-        confirmDeleteBtnElement.click();
+        click(deleteTableButton);
+        click(confirmButton);
+    }
+
+    public void dragTable(int x, int y, int newX, int newY) throws InterruptedException {
+        List<WebElement> elements = new WebDriverWait(driver, 10).until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("canvas"))));
+        Thread.sleep(200); // wait for animation to finish
+        int canvasX, canvasY;
+        try {
+            Point location = elements.get(0).getLocation();
+            canvasX = location.getX();
+            canvasY = location.getY();
+        } catch (StaleElementReferenceException e) {
+            Point location = driver.findElements(By.cssSelector("canvas")).get(0).getLocation();
+            canvasX = location.getX();
+            canvasY = location.getY();
+        }
+        new Actions(driver)
+                .moveByOffset(canvasX, canvasY)
+                .moveByOffset(x, y)
+                .clickAndHold()
+                .moveByOffset(newX - x, newY - y)
+                .release()
+                .click()
+                .build()
+                .perform();
+    }
+
+    public boolean canDeleteTable() {
+        return deleteTableButton.isEnabled();
     }
 }

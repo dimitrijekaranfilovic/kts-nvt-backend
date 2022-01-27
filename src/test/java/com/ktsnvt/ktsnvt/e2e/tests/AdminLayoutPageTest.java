@@ -7,12 +7,10 @@ import com.ktsnvt.ktsnvt.e2e.tests.pageobjects.Navbar;
 import com.ktsnvt.ktsnvt.e2e.tests.utilities.Utilities;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.PageFactory;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class AdminLayoutPageTest extends BaseE2ETest {
@@ -42,13 +40,15 @@ public class AdminLayoutPageTest extends BaseE2ETest {
 
         layoutPage.insertNewTable("11", "10", "10");
 
-        layoutPage.clickOnTable(10, 10);
+        layoutPage.dragTable(10, 10, 50, 50);
+
+        layoutPage.clickOnTable(50, 50);
 
         layoutPage.deleteSelectedTable();
 
-        layoutPage.clickOnTable(10, 10);
+        layoutPage.clickOnTable(50, 50);
 
-        assertFalse(Utilities.checkIfButtonIsEnabled(driver, By.id("deleteTable")));
+        assertFalse(layoutPage.canDeleteTable());
 
         driver.quit();
     }
