@@ -34,7 +34,7 @@ class MenuItemsPageTest extends BaseE2ETest {
         var numOfItemsAndPages = menuItemsPage.getPaginationInformation();
 
         menuItemsPage.search("ice", 10d, 100d);
-        assertTrue(menuItemsPage.checkQuerySearchResults("ice"));
+        assertTrue(menuItemsPage.checkSearchQueryResultsOnAllPages("ice"));
         assertTrue(menuItemsPage.checkPriceBound(v -> (v >= 10d)));
         assertTrue(menuItemsPage.checkPriceBound(v -> (v <= 100d)));
 
@@ -42,26 +42,27 @@ class MenuItemsPageTest extends BaseE2ETest {
         assertTrue(menuItemsPage.checkEmptyResultsPage());
 
         menuItemsPage.search("all", 100d, 10000d);
-        assertTrue(menuItemsPage.checkQuerySearchResults("all"));
+        assertTrue(menuItemsPage.checkSearchQueryResultsOnAllPages("all"));
         assertTrue(menuItemsPage.checkPriceBound(v -> (v >= 100d)));
         assertTrue(menuItemsPage.checkPriceBound(v -> (v <= 10000d)));
 
         menuItemsPage.search("all", 100d, 10000d);
-        assertTrue(menuItemsPage.checkQuerySearchResults("all"));
+        assertTrue(menuItemsPage.checkSearchQueryResultsOnAllPages("all"));
         assertTrue(menuItemsPage.checkPriceBound(v -> (v >= 100d)));
         assertTrue(menuItemsPage.checkPriceBound(v -> (v <= 10000d)));
 
         menuItemsPage.search("all", 0d, 322d);
-        assertTrue(menuItemsPage.checkQuerySearchResults("all"));
+        assertTrue(menuItemsPage.checkSearchQueryResultsOnAllPages("all"));
         assertTrue(menuItemsPage.checkPriceBound(v -> (v >= 0d)));
         assertTrue(menuItemsPage.checkPriceBound(v -> (v <= 322d)));
 
         menuItemsPage.search("all", 42d, 440d);
-        assertTrue(menuItemsPage.checkQuerySearchResults("all"));
+        assertTrue(menuItemsPage.checkSearchQueryResultsOnAllPages("all"));
         assertTrue(menuItemsPage.checkPriceBound(v -> (v >= 42d)));
         assertTrue(menuItemsPage.checkPriceBound(v -> (v <= 440d)));
 
         menuItemsPage.resetSearchForm();
+
         assertTrue(menuItemsPage.checkPaginationInformationMatching(numOfItemsAndPages));
 
 //        driver.close();

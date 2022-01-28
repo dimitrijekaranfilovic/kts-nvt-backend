@@ -61,6 +61,9 @@ public class MenuItemsPage extends BaseCRUDPage {
     @FindBy(css = "[class='mat-paginator-range-label']")
     private WebElement paginationItemAndPageNumbers;
 
+    @FindBy(xpath = "//button[@ng-reflect-message='Next page']")
+    private WebElement nextPageButton;
+
     public MenuItemsPage(WebDriver driver) {
         super(driver);
     }
@@ -114,9 +117,9 @@ public class MenuItemsPage extends BaseCRUDPage {
     }
 
     public boolean checkPaginationInformationMatching(String previousPaginationInformation) {
-        var currentPaginationInformation = new WebDriverWait(driver, 10)
-                .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOf(paginationItemAndPageNumbers)));
-        return currentPaginationInformation.getText().compareToIgnoreCase(previousPaginationInformation) == 0;
+        return (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.textToBePresentInElement(paginationItemAndPageNumbers, previousPaginationInformation));
+
     }
 
     public boolean checkQuerySearchResults(String query) {
@@ -139,6 +142,7 @@ public class MenuItemsPage extends BaseCRUDPage {
     }
 
     public boolean checkPriceBound(Predicate<Double> comparator) {
+        waitForElementToBeRefreshedAndVisible(driver, menuItemTableRows);
         var prices = (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(menuItemPrices)));
         return prices.stream().map(WebElement::getText).map(Double::parseDouble).allMatch(comparator);
@@ -147,6 +151,23 @@ public class MenuItemsPage extends BaseCRUDPage {
     public boolean checkEmptyResultsPage() {
         return (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.refreshed(ExpectedConditions.invisibilityOfAllElements(menuItemPrices)));
+    }
+
+    public void clickNextPageButton() {
+        click(nextPageButton);
+    }
+
+    public boolean checkSearchQueryResultsOnAllPages(String query) {
+        do {
+            var satisfied = checkQuerySearchResults(query);
+            if (!satisfied) {
+                return false;
+            }
+            if (nextPageButton.getAttribute("ng-reflect-disabled").equals("false")) {
+                clickNextPageButton();
+            }
+        } while (nextPageButton.getAttribute("ng-reflect-disabled").equals("false"));
+        return true;
     }
 
 }
