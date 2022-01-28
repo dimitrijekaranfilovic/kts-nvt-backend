@@ -74,12 +74,10 @@ public class MenuItemsPage extends BaseCRUDPage {
         sendKeys(priceLowerBoundInput, priceLowerBound.toString());
         sendKeys(priceUpperBoundInput, priceUpperbound.toString());
         click(searchButton);
-        waitForElementToBeRefreshedAndVisible(driver, menuItemTableRows);
     }
 
     public void resetSearchForm() throws InterruptedException {
         click(resetButton);
-        waitForElementToBeRefreshedAndVisible(driver, menuItemTableRows);
     }
 
     public void setUpdatePriceField(Double updatePrice) {
@@ -107,12 +105,13 @@ public class MenuItemsPage extends BaseCRUDPage {
     }
 
     public boolean checkQuerySearchResults(String query) {
+//        waitForElementToBeRefreshedAndVisible(driver, menuItemTableRows);
         var names = (new WebDriverWait(driver, 10))
-                .until(ExpectedConditions.visibilityOfAllElements(menuItemTableNames));
+                .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(menuItemTableNames)));
         var descriptions = (new WebDriverWait(driver, 10))
-                .until(ExpectedConditions.visibilityOfAllElements(menuItemTableDescriptions));
+                .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(menuItemTableDescriptions)));
         var allergies = (new WebDriverWait(driver, 10))
-                .until(ExpectedConditions.visibilityOfAllElements(menuItemTableAllergies));
+                .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(menuItemTableAllergies)));
         for (int i = 0; i < menuItemTableNames.size(); ++i) {
             if (!names.get(i).getText().toLowerCase(Locale.ROOT).contains(query.trim().toLowerCase(Locale.ROOT))
                     && !descriptions.get(i).getText().toLowerCase(Locale.ROOT).contains(query.trim().toLowerCase(Locale.ROOT))
@@ -124,10 +123,16 @@ public class MenuItemsPage extends BaseCRUDPage {
         return true;
     }
 
-    public boolean checkPriceBound(Predicate<Double> comparator){
+    public boolean checkPriceBound(Predicate<Double> comparator) {
         var prices = (new WebDriverWait(driver, 10))
-                .until(ExpectedConditions.visibilityOfAllElements(menuItemPrices));
+                .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(menuItemPrices)));
         return prices.stream().map(WebElement::getText).map(Double::parseDouble).allMatch(comparator);
+    }
+
+    public boolean checkEmptyResultsPage() {
+        var prices = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.refreshed(ExpectedConditions.invisibilityOfAllElements(menuItemPrices)));
+        return true;
     }
 
 }
