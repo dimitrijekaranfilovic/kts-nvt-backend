@@ -54,6 +54,9 @@ public class MenuItemsPage extends BaseCRUDPage {
     @FindBy(css = "[name='menuItemAllergies']")
     private List<WebElement> menuItemTableAllergies;
 
+    @FindBy(css = "[name='menuItemPrice']")
+    private List<WebElement> menuItemPrices;
+
     public MenuItemsPage(WebDriver driver) {
         super(driver);
     }
@@ -103,7 +106,6 @@ public class MenuItemsPage extends BaseCRUDPage {
     }
 
     public boolean checkQuerySearchResults(String query) {
-        waitForElementToBeRefreshedAndVisible(driver, menuItemTableRows);
         var names = (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.visibilityOfAllElements(menuItemTableNames));
         var descriptions = (new WebDriverWait(driver, 10))
@@ -118,6 +120,21 @@ public class MenuItemsPage extends BaseCRUDPage {
                 return false;
             }
         }
+        return true;
+    }
+
+    public boolean checkPriceUpperBound(double thresholdPrice){
+        var prices = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.visibilityOfAllElements(menuItemPrices));
+
+        for (var price:
+             prices) {
+            System.out.println(price.getText());
+            if (Double.parseDouble(price.getText()) > thresholdPrice){
+                return false;
+            }
+        }
+
         return true;
     }
 

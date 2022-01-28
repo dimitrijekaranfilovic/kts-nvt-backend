@@ -35,8 +35,10 @@ class MenuItemsPageTest extends BaseE2ETest {
 
         menuItemsPage.search("ice", 10d, 100d);
         assertTrue(menuItemsPage.checkQuerySearchResults("ice"));
+        assertTrue(menuItemsPage.checkPriceUpperBound(100d));
 
-        driver.close();
+
+//        driver.close();
     }
 
 }
