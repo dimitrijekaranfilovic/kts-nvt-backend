@@ -116,4 +116,16 @@ public class OrderPage extends BasePage {
         return items.size() == itemNum;
     }
 
+    public int countGroups(){
+        var wait = new WebDriverWait(driver, 10);
+        var groups = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector(".order-item-group")));
+        return groups.size();
+    }
+
+    public int countItems(){
+        var wait = new WebDriverWait(driver, 10);
+        var items = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector(".order-group-item")));
+        return items.size();
+    }
+
 }

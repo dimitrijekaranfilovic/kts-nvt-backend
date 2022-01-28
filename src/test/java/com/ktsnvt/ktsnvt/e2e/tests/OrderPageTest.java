@@ -18,6 +18,9 @@ class OrderPageTest extends BaseE2ETest{
 
         driver.get(Utilities.baseUrl + "/order/3");
 
+        int initialGroups = orderPage.countGroups();
+        int initialItems = orderPage.countItems();
+
         orderPage.clickAddMenuItemButton(0);
         orderPage.clickAddMenuItemToNewGroupButton();
         orderPage.enterNewGroupPin("4321");
@@ -25,20 +28,20 @@ class OrderPageTest extends BaseE2ETest{
         orderPage.enterNewGroupName("some group");
         orderPage.clickConfirmNewGroupButton();
 
-        Assertions.assertTrue(orderPage.checkGroupsNumber(2));
-        Assertions.assertTrue(orderPage.checkOrderItemNumber(5));
+        Assertions.assertTrue(orderPage.checkGroupsNumber(initialGroups + 1));
+        Assertions.assertTrue(orderPage.checkOrderItemNumber(initialItems + 1));
 
         orderPage.clickDeleteOrderItemButton(0);
         orderPage.enterChargeCancelPin("4321");
         orderPage.clickConfirmChargeCancelPin();
 
-        Assertions.assertTrue(orderPage.checkOrderItemNumber(4));
+        Assertions.assertTrue(orderPage.checkOrderItemNumber(initialItems));
 
         orderPage.clickDeleteGroupButton(1);
         orderPage.enterChargeCancelPin("4321");
         orderPage.clickConfirmChargeCancelPin();
 
-        Assertions.assertTrue(orderPage.checkGroupsNumber(1));
+        Assertions.assertTrue(orderPage.checkGroupsNumber(initialGroups));
 
         orderPage.clickChargeButton();
         orderPage.enterChargeCancelPin("4321");
