@@ -9,6 +9,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Predicate;
 
 public class MenuItemsPage extends BaseCRUDPage {
 
@@ -123,19 +124,10 @@ public class MenuItemsPage extends BaseCRUDPage {
         return true;
     }
 
-    public boolean checkPriceUpperBound(double thresholdPrice){
+    public boolean checkPriceBound(Predicate<Double> comparator){
         var prices = (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.visibilityOfAllElements(menuItemPrices));
-
-        for (var price:
-             prices) {
-            System.out.println(price.getText());
-            if (Double.parseDouble(price.getText()) > thresholdPrice){
-                return false;
-            }
-        }
-
-        return true;
+        return prices.stream().map(WebElement::getText).map(Double::parseDouble).allMatch(comparator);
     }
 
 }
