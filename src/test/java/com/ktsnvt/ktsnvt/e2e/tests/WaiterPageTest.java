@@ -11,10 +11,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class WaiterPageTest extends BaseE2ETest {
+class WaiterPageTest extends BaseE2ETest {
 
     @Test
-    public void waiterPage_happyTest() throws InterruptedException {
+    void waiterPage_happyTest() throws InterruptedException {
         var driver = initDriver();
         Navbar navbar = PageFactory.initElements(driver, Navbar.class);
         WaiterPage waiterPage = PageFactory.initElements(driver, WaiterPage.class);

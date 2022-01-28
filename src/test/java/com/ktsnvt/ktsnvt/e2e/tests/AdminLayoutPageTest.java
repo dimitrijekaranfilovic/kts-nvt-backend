@@ -13,10 +13,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class AdminLayoutPageTest extends BaseE2ETest {
+class AdminLayoutPageTest extends BaseE2ETest {
 
     @Test
-    public void adminLayoutPage_happyFlow() throws InterruptedException {
+    void adminLayoutPage_happyFlow() throws InterruptedException {
         var driver = initDriver();
         Navbar nav = PageFactory.initElements(driver, Navbar.class);
         LoginPage loginPage = PageFactory.initElements(driver, LoginPage.class);

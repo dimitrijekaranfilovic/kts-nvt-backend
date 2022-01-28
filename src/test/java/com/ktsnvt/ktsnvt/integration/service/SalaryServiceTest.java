@@ -46,9 +46,10 @@ class SalaryServiceTest {
 
     @Test
     void updateUserSalary_whenCalledWithUserWithNoActiveSalary_throwsException() {
-        var user = makeUser(6);
+        var userId = 6;
+        var user = makeUser(userId);
         var salary = new Salary(LocalDate.of(2021, 11, 30), null, BigDecimal.valueOf(123), user);
-        assertThrows(UserHasNoActiveSalaryException.class, () -> salaryService.updateUserSalary(user.getId(), salary));
+        assertThrows(UserHasNoActiveSalaryException.class, () -> salaryService.updateUserSalary(userId, salary));
     }
 
     @ParameterizedTest

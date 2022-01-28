@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-public class OrderItemServiceTest {
+class OrderItemServiceTest {
 
     @Mock
     private OrderItemRepository orderItemRepository;
@@ -55,7 +55,7 @@ public class OrderItemServiceTest {
     private OrderItemServiceImpl orderItemService;
 
     @Test
-    public void takeItemRequest_calledWithValidParams_isSuccess() {
+    void takeItemRequest_calledWithValidParams_isSuccess() {
         // GIVEN
         Employee employee = new Employee();
         employee.setId(1);
@@ -80,7 +80,7 @@ public class OrderItemServiceTest {
     }
 
     @Test
-    public void finishItemRequest_calledOnSentItem_IsSuccess() {
+    void finishItemRequest_calledOnSentItem_IsSuccess() {
         //GIVEN
         LocalDateTime takenAt = LocalDateTime.of(2021, 1, 1, 1, 1);
         Employee employee = new Employee();
@@ -117,7 +117,7 @@ public class OrderItemServiceTest {
     }
 
     @Test
-    public void finishItemRequest_calledOnTakenItem_IsSuccess() {
+    void finishItemRequest_calledOnTakenItem_IsSuccess() {
         // GIVEN
         LocalDateTime takenAt = LocalDateTime.of(2021, 1, 1, 1, 1);
         Employee employee = new Employee();
@@ -154,7 +154,7 @@ public class OrderItemServiceTest {
     }
 
     @Test
-    public void finishItemRequest_calledAsNotLastInGroup_DoesNotUpdateGroup() {
+    void finishItemRequest_calledAsNotLastInGroup_DoesNotUpdateGroup() {
         // GIVEN
         LocalDateTime takenAt = LocalDateTime.of(2021, 1, 1, 1, 1);
         Employee employee = new Employee();
@@ -182,15 +182,18 @@ public class OrderItemServiceTest {
     }
 
     @Test
-    public void finishItemRequest_takenByOtherEmployee_throwsInvalidEmployeeTypeException() {
+    void finishItemRequest_takenByOtherEmployee_throwsInvalidEmployeeTypeException() {
         // GIVEN
+        var employee1Pin = "0000";
         Employee employee1 = new Employee();
         employee1.setId(1);
-        employee1.setPin("0000");
+        employee1.setPin(employee1Pin);
         Employee employee2 = new Employee();
         employee2.setId(2);
+
+        var orderItemId = 1;
         OrderItem orderItem = new OrderItem();
-        orderItem.setId(1);
+        orderItem.setId(orderItemId);
         orderItem.setPreparedBy(employee2);
 
         // WHEN
@@ -198,7 +201,7 @@ public class OrderItemServiceTest {
         doReturn(Optional.of(orderItem)).when(orderItemRepository).findOneInProgressByIdWithItemReference(orderItem.getId());
 
         // THEN
-        assertThrows(InvalidEmployeeTypeException.class, () -> orderItemService.finishItemRequest(orderItem.getId(), employee1.getPin()));
+        assertThrows(InvalidEmployeeTypeException.class, () -> orderItemService.finishItemRequest(orderItemId, employee1Pin));
 
     }
 
@@ -248,13 +251,15 @@ public class OrderItemServiceTest {
     @Test
     void addOrderItem_whenGroupIsNotActive_throwsException(){
         //data setup
+        var orderId = 1;
         var order = new Order();
-        order.setId(1);
+        order.setId(orderId);
 
+        var waiterPin = "1234";
         var waiter = new Employee();
         waiter.setType(EmployeeType.WAITER);
         waiter.setId(1);
-        waiter.setPin("1234");
+        waiter.setPin(waiterPin);
 
         order.setWaiter(waiter);
 
@@ -265,8 +270,9 @@ public class OrderItemServiceTest {
         orderItemGroup.setStatus(OrderItemGroupStatus.NEW);
         orderItemGroup.setOrder(order);
 
+        var menuItemId = 1;
         var menuItem = new MenuItem();
-        menuItem.setId(1);
+        menuItem.setId(menuItemId);
         menuItem.setPrice(BigDecimal.ZERO);
 
         var inventoryItem = new InventoryItem();
@@ -284,25 +290,23 @@ public class OrderItemServiceTest {
         Mockito.doReturn(orderItem).when(orderItemRepository).save(orderItem);
         Mockito.doReturn(Optional.of(menuItem)).when(menuItemRepository).findById(1);
 
-        Assertions.assertThrows(NotFoundException.class, ()->orderItemService.addOrderItem(order.getId(), menuItem.getId(), 1, waiter.getPin()));
-        //Assertions.assertDoesNotThrow(() -> orderItemService.addOrderItem(order.getId(), menuItem.getId(), 1, waiter.getPin()));
+        Assertions.assertThrows(NotFoundException.class, ()->orderItemService.addOrderItem(orderId, menuItemId, 1, waiterPin));
     }
-
-
-
-
 
 
     @Test
     void addOrderItem_whenGroupDoesNotExist_throwsException(){
         //data setup
+        var orderId = 1;
         var order = new Order();
-        order.setId(1);
+        order.setId(orderId);
 
+
+        var waiterPin = "1234";
         var waiter = new Employee();
         waiter.setType(EmployeeType.WAITER);
         waiter.setId(1);
-        waiter.setPin("1234");
+        waiter.setPin(waiterPin);
 
         order.setWaiter(waiter);
 
@@ -312,8 +316,9 @@ public class OrderItemServiceTest {
         orderItemGroup.setStatus(OrderItemGroupStatus.NEW);
         orderItemGroup.setOrder(order);
 
+        var menuItemId = 1;
         var menuItem = new MenuItem();
-        menuItem.setId(1);
+        menuItem.setId(menuItemId);
         menuItem.setPrice(BigDecimal.ZERO);
 
         var inventoryItem = new InventoryItem();
@@ -331,20 +336,22 @@ public class OrderItemServiceTest {
         Mockito.doReturn(orderItem).when(orderItemRepository).save(orderItem);
         Mockito.doReturn(Optional.of(menuItem)).when(menuItemRepository).findById(1);
 
-        Assertions.assertThrows(NotFoundException.class, () -> orderItemService.addOrderItem(order.getId(), menuItem.getId(), 1, waiter.getPin()));
+        Assertions.assertThrows(NotFoundException.class, () -> orderItemService.addOrderItem(orderId, menuItemId, 1, waiterPin));
     }
 
 
     @Test
     void addOrderItem_whenMenuItemDoesNotExist_throwsException(){
         //data setup
+        var orderId = 1;
         var order = new Order();
-        order.setId(1);
+        order.setId(orderId);
 
+        var waiterPin = "1234";
         var waiter = new Employee();
         waiter.setType(EmployeeType.WAITER);
         waiter.setId(1);
-        waiter.setPin("1234");
+        waiter.setPin(waiterPin);
 
         order.setWaiter(waiter);
 
@@ -354,8 +361,9 @@ public class OrderItemServiceTest {
         orderItemGroup.setStatus(OrderItemGroupStatus.NEW);
         orderItemGroup.setOrder(order);
 
+        var menuItemId = 1;
         var menuItem = new MenuItem();
-        menuItem.setId(1);
+        menuItem.setId(menuItemId);
         menuItem.setPrice(BigDecimal.ZERO);
 
         var inventoryItem = new InventoryItem();
@@ -373,7 +381,7 @@ public class OrderItemServiceTest {
         Mockito.doReturn(orderItem).when(orderItemRepository).save(orderItem);
         Mockito.doReturn(Optional.empty()).when(menuItemRepository).findById(1);
 
-        Assertions.assertThrows(NotFoundException.class, () -> orderItemService.addOrderItem(order.getId(), menuItem.getId(), 1, waiter.getPin()));
+        Assertions.assertThrows(NotFoundException.class, () -> orderItemService.addOrderItem(orderId, menuItemId, 1, waiterPin));
 
     }
 
@@ -381,13 +389,15 @@ public class OrderItemServiceTest {
     @Test
     void addOrderItem_whenAmountIsNotPositive_throwsException(){
         //data setup
+        var orderId = 1;
         var order = new Order();
-        order.setId(1);
+        order.setId(orderId);
 
+        var waiterPin = "1234";
         var waiter = new Employee();
         waiter.setType(EmployeeType.WAITER);
         waiter.setId(1);
-        waiter.setPin("1234");
+        waiter.setPin(waiterPin);
 
         order.setWaiter(waiter);
 
@@ -397,8 +407,9 @@ public class OrderItemServiceTest {
         orderItemGroup.setStatus(OrderItemGroupStatus.NEW);
         orderItemGroup.setOrder(order);
 
+        var menuItemId = 1;
         var menuItem = new MenuItem();
-        menuItem.setId(1);
+        menuItem.setId(menuItemId);
         menuItem.setPrice(BigDecimal.ZERO);
 
         var inventoryItem = new InventoryItem();
@@ -418,20 +429,22 @@ public class OrderItemServiceTest {
         Mockito.doReturn(orderItem).when(orderItemRepository).save(orderItem);
         Mockito.doReturn(Optional.of(menuItem)).when(menuItemRepository).findById(1);
 
-        Assertions.assertThrows(IllegalAmountException.class, () -> orderItemService.addOrderItem(order.getId(), menuItem.getId(), invalidAmount, waiter.getPin()));
+        Assertions.assertThrows(IllegalAmountException.class, () -> orderItemService.addOrderItem(orderId, menuItemId, invalidAmount, waiterPin));
     }
 
 
     @Test
     void addOrderItem_whenNotResponsibleEmployeeTriesToAdd_throwsException(){
         //data setup
+        var orderId = 1;
         var order = new Order();
-        order.setId(1);
+        order.setId(orderId);
 
+        var employeePin = "1234";
         var waiter = new Employee();
         waiter.setType(EmployeeType.WAITER);
         waiter.setId(1);
-        waiter.setPin("1234");
+        waiter.setPin(employeePin);
 
         order.setWaiter(waiter);
 
@@ -441,8 +454,9 @@ public class OrderItemServiceTest {
         orderItemGroup.setStatus(OrderItemGroupStatus.NEW);
         orderItemGroup.setOrder(order);
 
+        var menuItemId = 1;
         var menuItem = new MenuItem();
-        menuItem.setId(1);
+        menuItem.setId(menuItemId);
         menuItem.setPrice(BigDecimal.ZERO);
 
         var inventoryItem = new InventoryItem();
@@ -463,7 +477,7 @@ public class OrderItemServiceTest {
         Mockito.doReturn(Optional.of(menuItem)).when(menuItemRepository).findById(1);
         Mockito.doThrow(new InvalidEmployeeTypeException(invalidPin)).when(employeeOrderService).throwIfWaiterNotResponsible(invalidPin, waiter.getId());
 
-        Assertions.assertThrows(InvalidEmployeeTypeException.class, () -> orderItemService.addOrderItem(order.getId(), menuItem.getId(), 1, invalidPin));
+        Assertions.assertThrows(InvalidEmployeeTypeException.class, () -> orderItemService.addOrderItem(orderId, menuItemId, 1, invalidPin));
     }
 
 
@@ -503,12 +517,14 @@ public class OrderItemServiceTest {
     @Test
     void updateOrderItem_whenOrderItemDoesNotExist_throwsException(){
         //data setup
+        var waiterPin = "1234";
         var waiter = new Employee();
-        waiter.setPin("1234");
+        waiter.setPin(waiterPin);
         waiter.setType(EmployeeType.WAITER);
 
+        var orderId = 1;
         var order = new Order();
-        order.setId(1);
+        order.setId(orderId);
         order.setWaiter(waiter);
 
         var orderItemGroup = new OrderItemGroup();
@@ -516,9 +532,9 @@ public class OrderItemServiceTest {
         orderItemGroup.setId(1);
 
 
-
+        var orderItemId = 1;
         var orderItem = new OrderItem();
-        orderItem.setId(1);
+        orderItem.setId(orderItemId);
         orderItem.setStatus(OrderItemStatus.NEW);
         orderItem.setAmount(1);
         orderItem.setOrderItemGroup(orderItemGroup);
@@ -527,14 +543,15 @@ public class OrderItemServiceTest {
         Mockito.doReturn(Optional.empty()).when(orderItemRepository).findById(1);
 
         //method call and assertion
-        assertThrows(NotFoundException.class, () -> orderItemService.updateOrderItem(orderItem.getId(), 2, waiter.getPin()));
+        assertThrows(NotFoundException.class, () -> orderItemService.updateOrderItem(orderItemId, 2, waiterPin));
     }
 
     @Test
     void updateOrderItem_whenItemStatusIsNotNew_throwsException(){
         //data setup
+        var waiterPin = "1234";
         var waiter = new Employee();
-        waiter.setPin("1234");
+        waiter.setPin(waiterPin);
         waiter.setType(EmployeeType.WAITER);
 
         var order = new Order();
@@ -545,8 +562,9 @@ public class OrderItemServiceTest {
         orderItemGroup.setOrder(order);
         orderItemGroup.setId(1);
 
+        var orderItemId = 1;
         var orderItem = new OrderItem();
-        orderItem.setId(1);
+        orderItem.setId(orderItemId);
         orderItem.setStatus(OrderItemStatus.SENT);
         orderItem.setAmount(1);
         orderItem.setOrderItemGroup(orderItemGroup);
@@ -555,7 +573,7 @@ public class OrderItemServiceTest {
         Mockito.doReturn(Optional.of(orderItem)).when(orderItemRepository).findById(1);
 
         //method call and assertion
-        assertThrows(OrderItemInvalidStatusException.class, () -> orderItemService.updateOrderItem(orderItem.getId(), 2, waiter.getPin()));
+        assertThrows(OrderItemInvalidStatusException.class, () -> orderItemService.updateOrderItem(orderItemId, 2, waiterPin));
     }
 
     @Test
@@ -573,8 +591,9 @@ public class OrderItemServiceTest {
         orderItemGroup.setOrder(order);
         orderItemGroup.setId(1);
 
+        var orderItemId = 1;
         var orderItem = new OrderItem();
-        orderItem.setId(1);
+        orderItem.setId(orderItemId);
         orderItem.setStatus(OrderItemStatus.NEW);
         orderItem.setAmount(1);
         orderItem.setOrderItemGroup(orderItemGroup);
@@ -586,7 +605,7 @@ public class OrderItemServiceTest {
         Mockito.doThrow(new InvalidEmployeeTypeException(invalidPin)).when(employeeOrderService).throwIfWaiterNotResponsible(invalidPin, waiter.getId());
 
         //method call and assertion
-        assertThrows(InvalidEmployeeTypeException.class, () -> orderItemService.updateOrderItem(orderItem.getId(), 2,invalidPin));
+        assertThrows(InvalidEmployeeTypeException.class, () -> orderItemService.updateOrderItem(orderItemId, 2,invalidPin));
 
     }
 
@@ -595,8 +614,9 @@ public class OrderItemServiceTest {
     @Test
     void updateOrderItem_whenAmountIsNotPositive_throwsException(){
         //data setup
+        var waiterPin = "1234";
         var waiter = new Employee();
-        waiter.setPin("1234");
+        waiter.setPin(waiterPin);
         waiter.setType(EmployeeType.WAITER);
 
         var order = new Order();
@@ -607,8 +627,9 @@ public class OrderItemServiceTest {
         orderItemGroup.setOrder(order);
         orderItemGroup.setId(1);
 
+        var orderItemId = 1;
         var orderItem = new OrderItem();
-        orderItem.setId(1);
+        orderItem.setId(orderItemId);
         orderItem.setStatus(OrderItemStatus.NEW);
         orderItem.setAmount(1);
         orderItem.setOrderItemGroup(orderItemGroup);
@@ -617,7 +638,7 @@ public class OrderItemServiceTest {
         Mockito.doReturn(Optional.of(orderItem)).when(orderItemRepository).findById(1);
 
         //method call and assertion
-        assertThrows(IllegalAmountException.class, () -> orderItemService.updateOrderItem(orderItem.getId(), -2, waiter.getPin()));
+        assertThrows(IllegalAmountException.class, () -> orderItemService.updateOrderItem(orderItemId, -2, waiterPin));
 
     }
 
@@ -654,8 +675,9 @@ public class OrderItemServiceTest {
     @Test
     void deleteOrderItem_whenItemStatusIsNotNew_throwsException(){
         //data setup
+        var waiterPin = "1234";
         var waiter = new Employee();
-        waiter.setPin("1234");
+        waiter.setPin(waiterPin);
         waiter.setType(EmployeeType.WAITER);
 
         var order = new Order();
@@ -666,8 +688,9 @@ public class OrderItemServiceTest {
         orderItemGroup.setOrder(order);
         orderItemGroup.setId(1);
 
+        var orderItemId = 1;
         var orderItem = new OrderItem();
-        orderItem.setId(1);
+        orderItem.setId(orderItemId);
         orderItem.setStatus(OrderItemStatus.SENT);
         orderItem.setAmount(1);
         orderItem.setOrderItemGroup(orderItemGroup);
@@ -676,7 +699,7 @@ public class OrderItemServiceTest {
         Mockito.doReturn(Optional.of(orderItem)).when(orderItemRepository).findById(1);
 
         //method call and assertion
-        assertThrows(OrderItemInvalidStatusException.class, () -> orderItemService.deleteOrderItem(orderItem.getId(), waiter.getPin()));
+        assertThrows(OrderItemInvalidStatusException.class, () -> orderItemService.deleteOrderItem(orderItemId, waiterPin));
 
     }
 
@@ -684,8 +707,9 @@ public class OrderItemServiceTest {
     @Test
     void deleteOrderItem_whenItemDoesNotExist_throwsException(){
         //data setup
+        var waiterPin = "1234";
         var waiter = new Employee();
-        waiter.setPin("1234");
+        waiter.setPin(waiterPin);
         waiter.setType(EmployeeType.WAITER);
 
         var order = new Order();
@@ -696,8 +720,9 @@ public class OrderItemServiceTest {
         orderItemGroup.setOrder(order);
         orderItemGroup.setId(1);
 
+        var orderItemId = 1;
         var orderItem = new OrderItem();
-        orderItem.setId(1);
+        orderItem.setId(orderItemId);
         orderItem.setStatus(OrderItemStatus.SENT);
         orderItem.setAmount(1);
         orderItem.setOrderItemGroup(orderItemGroup);
@@ -706,7 +731,7 @@ public class OrderItemServiceTest {
         Mockito.doReturn(Optional.empty()).when(orderItemRepository).findById(1);
 
         //method call and assertion
-        assertThrows(NotFoundException.class, () -> orderItemService.deleteOrderItem(orderItem.getId(), waiter.getPin()));
+        assertThrows(NotFoundException.class, () -> orderItemService.deleteOrderItem(orderItemId, waiterPin));
 
     }
 
@@ -726,8 +751,9 @@ public class OrderItemServiceTest {
         orderItemGroup.setOrder(order);
         orderItemGroup.setId(1);
 
+        var orderItemId = 1;
         var orderItem = new OrderItem();
-        orderItem.setId(1);
+        orderItem.setId(orderItemId);
         orderItem.setStatus(OrderItemStatus.NEW);
         orderItem.setAmount(1);
         orderItem.setOrderItemGroup(orderItemGroup);
@@ -739,7 +765,7 @@ public class OrderItemServiceTest {
         Mockito.doThrow(new InvalidEmployeeTypeException(invalidPin)).when(employeeOrderService).throwIfWaiterNotResponsible(invalidPin, waiter.getId());
 
         //method call and assertion
-        assertThrows(InvalidEmployeeTypeException.class, () -> orderItemService.deleteOrderItem(orderItem.getId(), invalidPin));
+        assertThrows(InvalidEmployeeTypeException.class, () -> orderItemService.deleteOrderItem(orderItemId, invalidPin));
 
     }
 

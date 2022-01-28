@@ -10,7 +10,7 @@ import org.openqa.selenium.support.PageFactory;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class LoginPageTest extends BaseE2ETest {
+class LoginPageTest extends BaseE2ETest {
 
     @Test
     void loginPage_happyFlow() {

@@ -14,10 +14,10 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ChefPageTest extends BaseE2ETest {
+class ChefPageTest extends BaseE2ETest {
 
     @Test
-    public void chefPage_happyFlow() {
+    void chefPage_happyFlow() {
         var driver = initDriver();
         Navbar navbar = PageFactory.initElements(driver, Navbar.class);
         ChefAndBartenderPage chefPage = PageFactory.initElements(driver, ChefAndBartenderPage.class);

@@ -87,7 +87,7 @@ public class OrderItemServiceImpl extends TransactionalServiceBase implements Or
         orderItemRepository.save(item);
 
         var allFromGroup = orderItemRepository.getAllFromOneGroup(item.getOrderItemGroup().getId());
-        if (allFromGroup.size() > 0 && allFromGroup.stream().allMatch(oi -> oi.getStatus() == OrderItemStatus.DONE)) {
+        if (!allFromGroup.isEmpty() && allFromGroup.stream().allMatch(oi -> oi.getStatus() == OrderItemStatus.DONE)) {
             item.getOrderItemGroup().setStatus(OrderItemGroupStatus.DONE);
             orderItemGroupRepository.save(item.getOrderItemGroup());
             return item.getOrderItemGroup().getOrder().getRestaurantTable().getId();
@@ -151,7 +151,6 @@ public class OrderItemServiceImpl extends TransactionalServiceBase implements Or
     }
 
     @Override
-    //TODO: test
     public void deleteOrderItem(Integer orderItemId, String pin) {
         var orderItem = this.orderItemRepository
                 .findById(orderItemId)

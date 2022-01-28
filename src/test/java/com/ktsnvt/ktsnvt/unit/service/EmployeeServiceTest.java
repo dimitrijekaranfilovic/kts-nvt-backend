@@ -101,8 +101,9 @@ class EmployeeServiceTest {
     @Test
     void delete_whenCalledWithEmployeeWithAssignedActiveOrders_throwsException() {
         // GIVEN
+        var deletedEmployeeId = 999;
         Employee deletedEmployee = new Employee();
-        deletedEmployee.setId(999);
+        deletedEmployee.setId(deletedEmployeeId);
         doNothing().when(salaryService).endActiveSalaryForUser(deletedEmployee);
         EmployeeService employeeServiceSpy = spy(employeeService);
         doReturn(deletedEmployee).when(employeeServiceSpy).readForUpdate(deletedEmployee.getId());
@@ -110,7 +111,7 @@ class EmployeeServiceTest {
         doReturn(false).when(orderItemService).hasActiveOrderItems(deletedEmployee);
 
         // WHEN
-        assertThrows(BusyEmployeeDeletionException.class, () -> employeeServiceSpy.delete(deletedEmployee.getId()));
+        assertThrows(BusyEmployeeDeletionException.class, () -> employeeServiceSpy.delete(deletedEmployeeId));
 
         // THEN
         assertTrue(deletedEmployee.getIsActive());
@@ -123,8 +124,9 @@ class EmployeeServiceTest {
     @Test
     void delete_whenCalledWithEmployeeWithAssignedActiveOrderItems_throwsException() {
         // GIVEN
+        var deletedEmployeeId = 999;
         Employee deletedEmployee = new Employee();
-        deletedEmployee.setId(999);
+        deletedEmployee.setId(deletedEmployeeId);
         doNothing().when(salaryService).endActiveSalaryForUser(deletedEmployee);
         EmployeeService employeeServiceSpy = spy(employeeService);
         doReturn(deletedEmployee).when(employeeServiceSpy).readForUpdate(deletedEmployee.getId());
@@ -132,7 +134,7 @@ class EmployeeServiceTest {
         doReturn(true).when(orderItemService).hasActiveOrderItems(deletedEmployee);
 
         // WHEN
-        assertThrows(BusyEmployeeDeletionException.class, () -> employeeServiceSpy.delete(deletedEmployee.getId()));
+        assertThrows(BusyEmployeeDeletionException.class, () -> employeeServiceSpy.delete(deletedEmployeeId));
 
         // THEN
         assertTrue(deletedEmployee.getIsActive());
@@ -220,8 +222,11 @@ class EmployeeServiceTest {
     @Test
     void update_whenCalledWithTakenPin_throwsException() {
         // GIVEN
-        var updatedEmployee = new Employee("name", "surname", new Authority("WAITER"), "9999", EmployeeType.WAITER);
-        updatedEmployee.setId(999);
+        var updatedEmployeeId = 999;
+        var updatedEmployeeSurname = "surname";
+        var updatedEmployeeType = EmployeeType.WAITER;
+        var updatedEmployee = new Employee("name", updatedEmployeeSurname, new Authority("WAITER"), "9999", updatedEmployeeType);
+        updatedEmployee.setId(updatedEmployeeId);
         var updatedPin = "8888";
         var employeeWithSamePin = new Employee();
         employeeWithSamePin.setId(123);
@@ -233,7 +238,7 @@ class EmployeeServiceTest {
         doReturn(updatedEmployee.getAuthority()).when(authorityService).findByName(updatedEmployee.getType().toString());
 
         // WHEN
-        assertThrows(PinAlreadyExistsException.class, () -> employeeServiceSpy.update(updatedEmployee.getId(), "Dusan", updatedEmployee.getSurname(), updatedPin, updatedEmployee.getType()));
+        assertThrows(PinAlreadyExistsException.class, () -> employeeServiceSpy.update(updatedEmployeeId, "Dusan", updatedEmployeeSurname, updatedPin, updatedEmployeeType));
 
         // THEN
         verifyNoInteractions(authorityService);
@@ -245,8 +250,11 @@ class EmployeeServiceTest {
     @Test
     void update_whenCalledWithTypeChangeFromWaiterWithAssignedOrders_throwsException() {
         // GIVEN
-        var updatedEmployee = new Employee("name", "surname", new Authority("WAITER"), "9999", EmployeeType.WAITER);
-        updatedEmployee.setId(999);
+        var updatedEmployeeId = 999;
+        var updatedEmployeeSurname = "surname";
+        var updatedEmployeePin = "9999";
+        var updatedEmployee = new Employee("name", updatedEmployeeSurname, new Authority("WAITER"), updatedEmployeePin, EmployeeType.WAITER);
+        updatedEmployee.setId(updatedEmployeeId);
         var chefAuthority = new Authority("CHEF");
         EmployeeService employeeServiceSpy = spy(employeeService);
         doReturn(updatedEmployee).when(employeeServiceSpy).readForUpdate(updatedEmployee.getId());
@@ -256,7 +264,7 @@ class EmployeeServiceTest {
         doReturn(chefAuthority).when(authorityService).findByName(EmployeeType.CHEF.toString());
 
         // WHEN
-        assertThrows(IllegalEmployeeTypeChangeException.class, () -> employeeServiceSpy.update(updatedEmployee.getId(), "Dusan", updatedEmployee.getSurname(), updatedEmployee.getPin(), EmployeeType.CHEF));
+        assertThrows(IllegalEmployeeTypeChangeException.class, () -> employeeServiceSpy.update(updatedEmployeeId, "Dusan", updatedEmployeeSurname, updatedEmployeePin, EmployeeType.CHEF));
 
         // THEN
         verify(orderService, times(1)).hasAssignedActiveOrders(updatedEmployee);
@@ -268,8 +276,11 @@ class EmployeeServiceTest {
     @Test
     void update_whenCalledWithTypeChangeFromNotWaiterWithActiveOrderItems_throwsException() {
         // GIVEN
-        var updatedEmployee = new Employee("name", "surname", new Authority("CHEF"), "9999", EmployeeType.CHEF);
-        updatedEmployee.setId(999);
+        var updatedEmployeeId = 999;
+        var updatedEmployeeSurname = "surname";
+        var updatedEmployeePin = "9999";
+        var updatedEmployee = new Employee("name", updatedEmployeeSurname, new Authority("CHEF"), updatedEmployeePin, EmployeeType.CHEF);
+        updatedEmployee.setId(updatedEmployeeId);
         var waiterAuthority = new Authority("WAITER");
         EmployeeService employeeServiceSpy = spy(employeeService);
         doReturn(updatedEmployee).when(employeeServiceSpy).readForUpdate(updatedEmployee.getId());
@@ -279,7 +290,7 @@ class EmployeeServiceTest {
         doReturn(waiterAuthority).when(authorityService).findByName(EmployeeType.WAITER.toString());
 
         // WHEN
-        assertThrows(IllegalEmployeeTypeChangeException.class, () -> employeeServiceSpy.update(updatedEmployee.getId(), "Dusan", updatedEmployee.getSurname(), updatedEmployee.getPin(), EmployeeType.WAITER));
+        assertThrows(IllegalEmployeeTypeChangeException.class, () -> employeeServiceSpy.update(updatedEmployeeId, "Dusan", updatedEmployeeSurname, updatedEmployeePin, EmployeeType.WAITER));
 
         // THEN
         verify(orderItemService, times(1)).hasActiveOrderItems(updatedEmployee);

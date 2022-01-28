@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 
 @SpringBootTest
-public class EmployeeOrderServiceTest {
+class EmployeeOrderServiceTest {
 
     @Mock
     private EmployeeQueryService employeeQueryService;
@@ -64,7 +64,7 @@ public class EmployeeOrderServiceTest {
 
     @ParameterizedTest
     @MethodSource("provideParamsForThrowIfNotResponsible")
-    public void throwIfWaiterNotResponsible_waiterNotResponsible_throwsInvalidEmployeeTypeException(String pin, Integer waiterId) {
+    void throwIfWaiterNotResponsible_waiterNotResponsible_throwsInvalidEmployeeTypeException(String pin, Integer waiterId) {
         // GIVEN
         Employee employee1 = new Employee();
         employee1.setType(EmployeeType.CHEF);
@@ -85,7 +85,7 @@ public class EmployeeOrderServiceTest {
 
     @ParameterizedTest
     @MethodSource("provideParamsForThrowIfNotValidEmployeeType")
-    public void throwIfNotValidEmployeeType_employeeNotValid_throwsInvalidEmployeeTypeException(Employee employee, OrderItem item) {
+    void throwIfNotValidEmployeeType_employeeNotValid_throwsInvalidEmployeeTypeException(Employee employee, OrderItem item) {
         assertThrows(InvalidEmployeeTypeException.class, () -> employeeOrderService.throwIfNotValidEmployeeType(employee, item));
     }
 

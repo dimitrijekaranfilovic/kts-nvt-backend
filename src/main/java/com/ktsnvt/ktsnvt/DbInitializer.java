@@ -39,6 +39,12 @@ public class DbInitializer implements ApplicationRunner {
     private final ResourceLoader resourceLoader;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    
+    private static final String FIVE_HUNDRED = "500.00";
+    private static final String DATE_1 = "2021-01-01";
+    private static final String DATE_2 = "2021-01-01 12:12";
+    private static final String ALLERGIES = "Allergies";
+    private static final String DESCRIPTION = "Description";
 
     @Autowired
     public DbInitializer(AuthorityRepository authorityRepo, EmployeeRepository employeeRepo,
@@ -80,11 +86,11 @@ public class DbInitializer implements ApplicationRunner {
         authorityRepo.save(admin);
         authorityRepo.save(deleted);
 
-        var salary1 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
-        var salary2 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("512.00"), null);
-        var salary3 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
-        var salary4 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("550.00"), null);
-        var salary5 = new Salary(LocalDate.parse("2021-01-01"), null, new BigDecimal("500.00"), null);
+        var salary1 = new Salary(LocalDate.parse(DATE_1), null, new BigDecimal(FIVE_HUNDRED), null);
+        var salary2 = new Salary(LocalDate.parse(DATE_1), null, new BigDecimal("512.00"), null);
+        var salary3 = new Salary(LocalDate.parse(DATE_1), null, new BigDecimal(FIVE_HUNDRED), null);
+        var salary4 = new Salary(LocalDate.parse(DATE_1), null, new BigDecimal("550.00"), null);
+        var salary5 = new Salary(LocalDate.parse(DATE_1), null, new BigDecimal(FIVE_HUNDRED), null);
         salaryRepo.save(salary1);
         salaryRepo.save(salary2);
         salaryRepo.save(salary3);
@@ -108,7 +114,7 @@ public class DbInitializer implements ApplicationRunner {
         superUserRepo.save(manager1);
         superUserRepo.save(admin1);
 
-        var basePrice1 = new BasePrice(LocalDateTime.parse("2021-01-01 12:12", formatter), null, BigDecimal.valueOf(30.00), null);
+        var basePrice1 = new BasePrice(LocalDateTime.parse(DATE_2, formatter), null, BigDecimal.valueOf(30.00), null);
         var basePrice2 = new BasePrice(LocalDateTime.parse("2021-01-02 12:12", formatter), null, BigDecimal.valueOf(440.00), null);
         var basePrice3 = new BasePrice(LocalDateTime.parse("2021-01-03 12:12", formatter), null, BigDecimal.valueOf(50.00), null);
         var basePrice4 = new BasePrice(LocalDateTime.parse("2021-01-03 12:12", formatter), null, BigDecimal.valueOf(42.00), null);
@@ -117,26 +123,26 @@ public class DbInitializer implements ApplicationRunner {
         basePriceRepo.save(basePrice3);
         basePriceRepo.save(basePrice4);
 
-        var item1 = new InventoryItem("Ice cream", "Description", encodeAsBase64("ice-cream.jpg"), "Allergies", ItemCategory.FOOD);
+        var item1 = new InventoryItem("Ice cream", DESCRIPTION, encodeAsBase64("ice-cream.jpg"), ALLERGIES, ItemCategory.FOOD);
         item1.addBasePrice(basePrice1);
-        var item2 = new InventoryItem("T-bone steak", "Description", encodeAsBase64("t-bone-steak.jpg"), "Allergies", ItemCategory.FOOD);
+        var item2 = new InventoryItem("T-bone steak", DESCRIPTION, encodeAsBase64("t-bone-steak.jpg"), ALLERGIES, ItemCategory.FOOD);
         item2.addBasePrice(basePrice2);
-        var item3 = new InventoryItem("Orange juice", "Description", encodeAsBase64("orange-juice.jpg"), "Allergies", ItemCategory.DRINK);
+        var item3 = new InventoryItem("Orange juice", DESCRIPTION, encodeAsBase64("orange-juice.jpg"), ALLERGIES, ItemCategory.DRINK);
         item3.addBasePrice(basePrice3);
-        var item4 = new InventoryItem("Pizza", "Description", encodeAsBase64("pizza.jpg"), "Allergies", ItemCategory.FOOD);
+        var item4 = new InventoryItem("Pizza", DESCRIPTION, encodeAsBase64("pizza.jpg"), ALLERGIES, ItemCategory.FOOD);
         item4.addBasePrice(basePrice4);
         inventoryItemRepo.save(item1);
         inventoryItemRepo.save(item2);
         inventoryItemRepo.save(item3);
         inventoryItemRepo.save(item4);
 
-        var menuItem1 = new MenuItem(BigDecimal.valueOf(100.00), LocalDateTime.parse("2021-01-01 12:12", formatter), null, item1);
+        var menuItem1 = new MenuItem(BigDecimal.valueOf(100.00), LocalDateTime.parse(DATE_2, formatter), null, item1);
         item1.addMenuItem(menuItem1);
-        var menuItem2 = new MenuItem(BigDecimal.valueOf(500.00), LocalDateTime.parse("2021-01-01 12:12", formatter), null, item2);
+        var menuItem2 = new MenuItem(BigDecimal.valueOf(500.00), LocalDateTime.parse(DATE_2, formatter), null, item2);
         item2.addMenuItem(menuItem2);
-        var menuItem3 = new MenuItem(BigDecimal.valueOf(100.00), LocalDateTime.parse("2021-01-01 12:12", formatter), null, item3);
+        var menuItem3 = new MenuItem(BigDecimal.valueOf(100.00), LocalDateTime.parse(DATE_2, formatter), null, item3);
         item3.addMenuItem(menuItem3);
-        var menuItem4 = new MenuItem(BigDecimal.valueOf(322.00), LocalDateTime.parse("2021-01-01 12:12", formatter), null, item4);
+        var menuItem4 = new MenuItem(BigDecimal.valueOf(322.00), LocalDateTime.parse(DATE_2, formatter), null, item4);
         item4.addMenuItem(menuItem4);
         menuItemRepo.save(menuItem1);
         menuItemRepo.save(menuItem2);
@@ -162,9 +168,9 @@ public class DbInitializer implements ApplicationRunner {
         var restaurantTable8 = new RestaurantTable(2, 460, 200, 50, terrace);
         var restaurantTable9 = new RestaurantTable(3, 550, 270, 50, terrace);
         var restaurantTable10 = new RestaurantTable(3, 550, 340, 50, secondFloor);
-        //restaurantTable10.setAvailable(false);
 
-        var order1 = new Order(IN_PROGRESS, LocalDateTime.parse("2021-01-01 12:12", formatter), null, restaurantTable1, employee3);
+
+        var order1 = new Order(IN_PROGRESS, LocalDateTime.parse(DATE_2, formatter), null, restaurantTable1, employee3);
         restaurantTable1.setAvailable(false);
         var order2 = new Order(CREATED, LocalDateTime.now(), null, restaurantTable2, employee3);
         restaurantTable2.setAvailable(false);
@@ -226,7 +232,6 @@ public class DbInitializer implements ApplicationRunner {
 
         var orderItem13 = new OrderItem(2, orderGroup2, null, menuItem2, OrderItemStatus.NEW);
 
-        // orderItem1.setPreparedBy(employee2);
         orderGroup1.addItem(orderItem1);
         orderItem1.setSentAt(LocalDateTime.now());
         orderGroup1.addItem(orderItem2);

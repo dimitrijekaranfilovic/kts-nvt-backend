@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-public class RestaurantTableServiceTest {
+class RestaurantTableServiceTest {
     @Autowired
     private RestaurantTableServiceImpl restaurantTableService;
 

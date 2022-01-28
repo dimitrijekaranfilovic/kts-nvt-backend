@@ -11,7 +11,7 @@ import org.openqa.selenium.support.PageFactory;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class SectionsManagePageTest extends BaseE2ETest {
+class SectionsManagePageTest extends BaseE2ETest {
 
     @Test
     void sectionsManagePageTest_happyFlow() throws InterruptedException {

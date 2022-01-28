@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-public class EmployeeServiceTest {
+class EmployeeServiceTest {
     @Autowired
     private EmployeeServiceImpl employeeService;
 

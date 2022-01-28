@@ -11,8 +11,6 @@ import com.ktsnvt.ktsnvt.dto.readsuperusers.ReadSuperUsersResponse;
 import com.ktsnvt.ktsnvt.dto.updatepassword.UpdatePasswordRequest;
 import com.ktsnvt.ktsnvt.dto.updatesalary.UpdateSalaryRequest;
 import com.ktsnvt.ktsnvt.dto.updatesuperuser.UpdateSuperUserRequest;
-import com.ktsnvt.ktsnvt.exception.NotFoundException;
-import com.ktsnvt.ktsnvt.model.Authority;
 import com.ktsnvt.ktsnvt.model.Salary;
 import com.ktsnvt.ktsnvt.model.SuperUser;
 import com.ktsnvt.ktsnvt.service.SalaryService;
