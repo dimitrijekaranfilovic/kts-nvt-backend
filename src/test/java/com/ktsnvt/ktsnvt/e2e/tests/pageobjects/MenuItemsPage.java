@@ -61,8 +61,7 @@ public class MenuItemsPage extends BaseCRUDPage {
     @FindBy(css = "[class='mat-paginator-range-label']")
     private WebElement paginationItemAndPageNumbers;
 
-    @FindBy(xpath = "//button[@ng-reflect-message='Next page']")
-    private WebElement nextPageButton;
+
 
     public MenuItemsPage(WebDriver driver) {
         super(driver);
@@ -122,6 +121,7 @@ public class MenuItemsPage extends BaseCRUDPage {
 
     }
 
+    @Override
     public boolean checkQuerySearchResults(String query) {
 //        waitForElementToBeRefreshedAndVisible(driver, menuItemTableRows);
         var names = (new WebDriverWait(driver, 10))
@@ -145,29 +145,12 @@ public class MenuItemsPage extends BaseCRUDPage {
         waitForElementToBeRefreshedAndVisible(driver, menuItemTableRows);
         var prices = (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(menuItemPrices)));
-        return prices.stream().map(WebElement::getText).map(Double::parseDouble).allMatch(comparator);
+        return prices.stream().parallel().map(WebElement::getText).map(Double::parseDouble).allMatch(comparator);
     }
 
-    public boolean checkEmptyResultsPage() {
-        return (new WebDriverWait(driver, 10))
-                .until(ExpectedConditions.refreshed(ExpectedConditions.invisibilityOfAllElements(menuItemPrices)));
-    }
 
-    public void clickNextPageButton() {
-        click(nextPageButton);
-    }
 
-    public boolean checkSearchQueryResultsOnAllPages(String query) {
-        do {
-            var satisfied = checkQuerySearchResults(query);
-            if (!satisfied) {
-                return false;
-            }
-            if (nextPageButton.getAttribute("ng-reflect-disabled").equals("false")) {
-                clickNextPageButton();
-            }
-        } while (nextPageButton.getAttribute("ng-reflect-disabled").equals("false"));
-        return true;
-    }
+
+
 
 }

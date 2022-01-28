@@ -35,10 +35,10 @@ class MenuItemsPageTest extends BaseE2ETest {
 
         menuItemsPage.search("ice", 10d, 100d);
         assertTrue(menuItemsPage.checkSearchQueryResultsOnAllPages("ice"));
-        assertTrue(menuItemsPage.checkPriceBound(v -> (v >= 10d)));
-        assertTrue(menuItemsPage.checkPriceBound(v -> (v <= 100d)));
+        assertTrue(menuItemsPage.checkPriceBound(v -> (v >= 10d && v <= 100d)));
+//        assertTrue(menuItemsPage.checkPriceBound(v -> (v <= 100d)));
 
-        menuItemsPage.search("some query that is not found in the results", 0d, 10000d);
+        menuItemsPage.search("ice", 1000000d, 0d);
         assertTrue(menuItemsPage.checkEmptyResultsPage());
 
         menuItemsPage.search("all", 100d, 10000d);
