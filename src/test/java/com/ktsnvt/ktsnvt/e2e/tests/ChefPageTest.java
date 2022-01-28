@@ -5,11 +5,7 @@ import com.ktsnvt.ktsnvt.e2e.tests.pageobjects.Navbar;
 import com.ktsnvt.ktsnvt.e2e.tests.utilities.Utilities;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.PageFactory;
-
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,29 +21,29 @@ class ChefPageTest extends BaseE2ETest {
         navbar.navigateChef();
         assertTrue(Utilities.checkUrl(driver, "/chef"));
 
-        assertTrue(chefPage.checkNewTableRows(3));
-        assertTrue(chefPage.checkPreparingTableRows(1));
+        int initialNewRequests = chefPage.getNewTableRows();
+        int initialPreparingRequests = chefPage.getPreparingTableRows();
 
         chefPage.clickFinishOldestNew();
         chefPage.setPin("1234");
         chefPage.clickConfirmPin();
 
-        assertTrue(chefPage.checkNewTableRows(2));
-        assertTrue(chefPage.checkPreparingTableRows(1));
+        assertTrue(chefPage.checkNewTableRows(initialNewRequests - 1));
+        assertTrue(chefPage.checkPreparingTableRows(initialPreparingRequests));
 
         chefPage.clickPrepareOldestNew();
         chefPage.setPin("1234");
         chefPage.clickConfirmPin();
 
-        assertTrue(chefPage.checkNewTableRows(1));
-        assertTrue(chefPage.checkPreparingTableRows(2));
+        assertTrue(chefPage.checkNewTableRows(initialNewRequests - 2));
+        assertTrue(chefPage.checkPreparingTableRows(initialPreparingRequests + 1));
 
         chefPage.clickFinishOldestPreparing();
         chefPage.setPin("1234");
         chefPage.clickConfirmPin();
 
-        assertTrue(chefPage.checkNewTableRows(1));
-        assertTrue(chefPage.checkPreparingTableRows(1));
+        assertTrue(chefPage.checkNewTableRows(initialNewRequests - 2));
+        assertTrue(chefPage.checkPreparingTableRows(initialPreparingRequests));
         driver.close();
     }
 }

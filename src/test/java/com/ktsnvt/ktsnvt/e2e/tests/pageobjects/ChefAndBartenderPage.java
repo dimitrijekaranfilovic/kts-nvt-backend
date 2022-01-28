@@ -40,6 +40,16 @@ public class ChefAndBartenderPage extends BasePage {
         elements.get(0).click();
     }
 
+    public int getNewTableRows() {
+        List<WebElement> elements = (new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("div[name='left'] tbody tr"))));
+        return elements.size();
+    }
+
+    public int getPreparingTableRows() {
+        List<WebElement> elements = (new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("div[name='right'] tbody tr"))));
+        return elements.size();
+    }
+
     public boolean checkNewTableRows(int number) {
         try {
             List<WebElement> elements = (new WebDriverWait(driver, 10).until(ExpectedConditions.numberOfElementsToBe(By.cssSelector("div[name='left'] tbody tr"), number)));

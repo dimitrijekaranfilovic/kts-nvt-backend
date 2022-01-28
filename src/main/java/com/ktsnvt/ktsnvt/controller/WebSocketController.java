@@ -1,15 +1,12 @@
 package com.ktsnvt.ktsnvt.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktsnvt.ktsnvt.dto.sendnotification.NotificationMessageDTO;
-import com.ktsnvt.ktsnvt.exception.InvalidMessageFormatException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
