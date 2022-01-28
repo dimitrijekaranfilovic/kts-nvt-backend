@@ -7,6 +7,9 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.List;
+import java.util.Locale;
+
 public class MenuItemsPage extends BaseCRUDPage {
 
     @FindBy(css = "input[formcontrolname='query']")
@@ -39,6 +42,18 @@ public class MenuItemsPage extends BaseCRUDPage {
     @FindBy(css = "button[id='yes']")
     private WebElement yesButton;
 
+    @FindBy(css = "tbody tr")
+    private List<WebElement> menuItemTableRows;
+
+    @FindBy(css = "[name='menuItemName']")
+    private List<WebElement> menuItemTableNames;
+
+    @FindBy(css = "[name='menuItemDescription']")
+    private List<WebElement> menuItemTableDescriptions;
+
+    @FindBy(css = "[name='menuItemAllergies']")
+    private List<WebElement> menuItemTableAllergies;
+
     public MenuItemsPage(WebDriver driver) {
         super(driver);
     }
@@ -55,10 +70,12 @@ public class MenuItemsPage extends BaseCRUDPage {
         sendKeys(priceLowerBoundInput, priceLowerBound.toString());
         sendKeys(priceUpperBoundInput, priceUpperbound.toString());
         click(searchButton);
+        waitForElementToBeRefreshedAndVisible(driver, menuItemTableRows);
     }
 
     public void resetSearchForm() throws InterruptedException {
         click(resetButton);
+        waitForElementToBeRefreshedAndVisible(driver, menuItemTableRows);
     }
 
     public void setUpdatePriceField(Double updatePrice) {
@@ -78,5 +95,30 @@ public class MenuItemsPage extends BaseCRUDPage {
         click(yesButton);
     }
 
+
+    public int countItems() {
+        var elements = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.visibilityOfAllElements(menuItemTableRows));
+        return elements.size();
+    }
+
+    public boolean checkQuerySearchResults(String query) {
+        waitForElementToBeRefreshedAndVisible(driver, menuItemTableRows);
+        var names = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.visibilityOfAllElements(menuItemTableNames));
+        var descriptions = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.visibilityOfAllElements(menuItemTableDescriptions));
+        var allergies = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.visibilityOfAllElements(menuItemTableAllergies));
+        for (int i = 0; i < menuItemTableNames.size(); ++i) {
+            if (!names.get(i).getText().toLowerCase(Locale.ROOT).contains(query.trim().toLowerCase(Locale.ROOT))
+                    && !descriptions.get(i).getText().toLowerCase(Locale.ROOT).contains(query.trim().toLowerCase(Locale.ROOT))
+                    && !allergies.get(i).getText().toLowerCase(Locale.ROOT).contains(query.trim().toLowerCase(Locale.ROOT))
+            ) {
+                return false;
+            }
+        }
+        return true;
+    }
 
 }
