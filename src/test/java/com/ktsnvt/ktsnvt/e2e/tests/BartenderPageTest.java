@@ -16,34 +16,34 @@ class BartenderPageTest extends BaseE2ETest {
     void bartenderTest_happyFlow() {
         var driver = initDriver();
         Navbar navbar = PageFactory.initElements(driver, Navbar.class);
-        ChefAndBartenderPage chefPage = PageFactory.initElements(driver, ChefAndBartenderPage.class);
+        ChefAndBartenderPage bartenderPage = PageFactory.initElements(driver, ChefAndBartenderPage.class);
 
         navbar.navigateBartender();
         assertTrue(Utilities.checkUrl(driver, "/bartender"));
 
-        int initialNewRequests = chefPage.getNewTableRows();
-        int initialPreparingRequests = chefPage.getPreparingTableRows();
+        int initialNewRequests = bartenderPage.getNewTableRows();
+        int initialPreparingRequests = bartenderPage.getPreparingTableRows();
 
-        chefPage.clickFinishOldestNew();
-        chefPage.setPin("5678");
-        chefPage.clickConfirmPin();
+        bartenderPage.clickFinishOldestNew();
+        bartenderPage.setPin("5678");
+        bartenderPage.clickConfirmPin();
 
-        assertTrue(chefPage.checkNewTableRows(initialNewRequests - 1));
-        assertTrue(chefPage.checkPreparingTableRows(initialPreparingRequests));
+        assertTrue(bartenderPage.checkNewTableRows(initialNewRequests - 1));
+        assertTrue(bartenderPage.checkPreparingTableRows(initialPreparingRequests));
 
-        chefPage.clickPrepareOldestNew();
-        chefPage.setPin("5678");
-        chefPage.clickConfirmPin();
+        bartenderPage.clickPrepareOldestNew();
+        bartenderPage.setPin("5678");
+        bartenderPage.clickConfirmPin();
 
-        assertTrue(chefPage.checkNewTableRows(initialNewRequests - 2));
-        assertTrue(chefPage.checkPreparingTableRows(initialPreparingRequests + 1));
+        assertTrue(bartenderPage.checkNewTableRows(initialNewRequests - 2));
+        assertTrue(bartenderPage.checkPreparingTableRows(initialPreparingRequests + 1));
 
-        chefPage.clickFinishOldestPreparing();
-        chefPage.setPin("5678");
-        chefPage.clickConfirmPin();
+        bartenderPage.clickFinishOldestPreparing();
+        bartenderPage.setPin("5678");
+        bartenderPage.clickConfirmPin();
 
-        assertTrue(chefPage.checkNewTableRows(initialNewRequests - 2));
-        assertTrue(chefPage.checkPreparingTableRows(initialPreparingRequests));
+        assertTrue(bartenderPage.checkNewTableRows(initialNewRequests - 2));
+        assertTrue(bartenderPage.checkPreparingTableRows(initialPreparingRequests));
         driver.close();
     }
 }
