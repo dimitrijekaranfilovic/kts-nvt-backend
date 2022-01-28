@@ -58,6 +58,9 @@ public class MenuItemsPage extends BaseCRUDPage {
     @FindBy(css = "[name='menuItemPrice']")
     private List<WebElement> menuItemPrices;
 
+    @FindBy(css = "[class='mat-paginator-range-label']")
+    private WebElement paginationItemAndPageNumbers;
+
     public MenuItemsPage(WebDriver driver) {
         super(driver);
     }
@@ -104,6 +107,18 @@ public class MenuItemsPage extends BaseCRUDPage {
         return elements.size();
     }
 
+    public String getPaginationInformation() {
+        return new WebDriverWait(driver, 10)
+                .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOf(paginationItemAndPageNumbers)))
+                .getText();
+    }
+
+    public boolean checkPaginationInformationMatching(String previousPaginationInformation) {
+        var currentPaginationInformation = new WebDriverWait(driver, 10)
+                .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOf(paginationItemAndPageNumbers)));
+        return currentPaginationInformation.getText().compareToIgnoreCase(previousPaginationInformation) == 0;
+    }
+
     public boolean checkQuerySearchResults(String query) {
 //        waitForElementToBeRefreshedAndVisible(driver, menuItemTableRows);
         var names = (new WebDriverWait(driver, 10))
@@ -130,9 +145,8 @@ public class MenuItemsPage extends BaseCRUDPage {
     }
 
     public boolean checkEmptyResultsPage() {
-        var prices = (new WebDriverWait(driver, 10))
+        return (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.refreshed(ExpectedConditions.invisibilityOfAllElements(menuItemPrices)));
-        return true;
     }
 
 }

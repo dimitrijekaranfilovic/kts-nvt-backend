@@ -31,7 +31,7 @@ class MenuItemsPageTest extends BaseE2ETest {
         navbar.navigateMenuItems();
         assertTrue(Utilities.checkUrl(driver, "/menu-items"));
 
-        var numItems = menuItemsPage.countItems();
+        var numOfItemsAndPages = menuItemsPage.getPaginationInformation();
 
         menuItemsPage.search("ice", 10d, 100d);
         assertTrue(menuItemsPage.checkQuerySearchResults("ice"));
@@ -60,6 +60,9 @@ class MenuItemsPageTest extends BaseE2ETest {
         assertTrue(menuItemsPage.checkQuerySearchResults("all"));
         assertTrue(menuItemsPage.checkPriceBound(v -> (v >= 42d)));
         assertTrue(menuItemsPage.checkPriceBound(v -> (v <= 440d)));
+
+        menuItemsPage.resetSearchForm();
+        assertTrue(menuItemsPage.checkPaginationInformationMatching(numOfItemsAndPages));
 
 //        driver.close();
     }
