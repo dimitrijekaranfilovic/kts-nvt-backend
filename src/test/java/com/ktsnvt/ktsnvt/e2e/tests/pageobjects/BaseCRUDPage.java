@@ -72,6 +72,10 @@ public abstract class BaseCRUDPage extends BasePage {
         click(nextPageButton);
     }
 
+    public void clickLastPageButton() {
+        click(lastPageButton);
+    }
+
     // Override this method
     public boolean checkSearchResults(String query, Predicate<Double> comparator, String category) {
         return false;
@@ -88,6 +92,13 @@ public abstract class BaseCRUDPage extends BasePage {
             }
         } while (nextPageButton.getAttribute("ng-reflect-disabled").equals("false"));
         return true;
+    }
+
+    public void goToLastPage() {
+        waitForSpinnerToFinish();
+        if (lastPageButton.getAttribute("ng-reflect-disabled").equals("false")) {
+            clickLastPageButton();
+        }
     }
 
     public boolean checkEmptyResultsPage() {

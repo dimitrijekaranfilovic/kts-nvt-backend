@@ -7,6 +7,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.function.Predicate;
 
 public class EmployeesPage extends BaseCRUDPage {
 
@@ -61,6 +63,24 @@ public class EmployeesPage extends BaseCRUDPage {
     @FindBy(css = "[dataclass='searchOption']")
     private List<WebElement> employeeTypeSearchOptions;
 
+    @FindBy(css = "tbody tr")
+    private List<WebElement> employeeTableRows;
+
+    @FindBy(css = "[element-group='employeeName']")
+    private List<WebElement> employeeTableNames;
+
+    @FindBy(css = "[element-group='employeeSurname']")
+    private List<WebElement> employeeTableSurnames;
+
+    @FindBy(css = "[element-group='employeePin']")
+    private List<WebElement> employeeTablePins;
+
+    @FindBy(css = "[element-group='employeeType']")
+    private List<WebElement> employeeTableTypes;
+
+    @FindBy(css = "[element-group='employeeCurrentSalary']")
+    private List<WebElement> employeeTableCurrentSalary;
+
     public EmployeesPage(WebDriver driver) {
         super(driver);
     }
@@ -91,5 +111,113 @@ public class EmployeesPage extends BaseCRUDPage {
                     .filter(p -> p.getAttribute("value").isBlank()).findFirst();
         }
         option.ifPresent(this::click);
+    }
+
+    @Override
+    public boolean checkSearchResults(String query, Predicate<Double> comparator, String category) {
+        waitForSpinnerToFinish();
+        var names = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(employeeTableNames)));
+        var surnames = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(employeeTableSurnames)));
+        for (int i = 0; i < names.size(); ++i) {
+            if (!names.get(i).getText().toLowerCase(Locale.ROOT).contains(query.trim().toLowerCase(Locale.ROOT))
+                    && !surnames.get(i).getText().toLowerCase(Locale.ROOT).contains(query.trim().toLowerCase(Locale.ROOT))
+            ) {
+                System.out.println("GOT FALSE FOR: " + names.get(i) + ", " + surnames.get(i));
+                return false;
+            }
+        }
+        return checkPriceBound(comparator) && checkCategory(category);
+    }
+
+    public boolean checkPriceBound(Predicate<Double> comparator) {
+        waitForSpinnerToFinish();
+        waitForElementsToBeRefreshedAndVisible(driver, employeeTableRows);
+        var prices = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(employeeTableCurrentSalary)));
+        return prices.stream().parallel().map(WebElement::getText).map(Double::parseDouble).allMatch(comparator);
+    }
+
+    public boolean checkCategory(String categoryName) {
+        waitForSpinnerToFinish();
+        var categories = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(employeeTableTypes)));
+        return categories.stream().parallel().map(WebElement::getText)
+                .allMatch(p -> p.toLowerCase(Locale.ROOT).contains(categoryName.toLowerCase(Locale.ROOT)));
+    }
+
+    public boolean checkCurrentTotalElements(String numOfItemsAndPagesBeforeDeletion, double correction) {
+        waitForSpinnerToFinish();
+        (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.not(
+                        ExpectedConditions.textToBePresentInElement(
+                                paginationItemAndPageNumbers, numOfItemsAndPagesBeforeDeletion)));
+        var currentPageInfo = getPaginationInformation();
+        var previousTotalItems = Double.parseDouble(numOfItemsAndPagesBeforeDeletion
+                .substring(numOfItemsAndPagesBeforeDeletion.length() - 2));
+        var currentTotalItems = Double.parseDouble(currentPageInfo
+                .substring(currentPageInfo.length() - 2));
+        return currentTotalItems == previousTotalItems + correction;
+    }
+
+    public void clickCreateEmployee() {
+        click(createEmployeeButton);
+    }
+
+    public void setName(String name) {
+        sendKeys(nameInput, name);
+    }
+
+    public void setSurname(String surname) {
+        sendKeys(surnameInput, surname);
+    }
+
+    public void setPin(String pin) {
+        sendKeys(pinInput, pin);
+    }
+
+    public void setSalary(double salary) {
+        sendKeys(salaryInput, String.valueOf(salary));
+    }
+
+    public void clickSaveButton() {
+        click(saveButton);
+    }
+
+    public boolean checkLastEmployeeDetails(String name, String surname, String pin, double salary) {
+        waitForSpinnerToFinish();
+        var nameMatches = getLastTableRowField(0).matches(name);
+        var surnameMatches = getLastTableRowField(1).matches(surname);
+        var pinMatches = getLastTableRowField(2).matches(pin);
+        var salaryMatches = Double.parseDouble(getLastTableRowField(4)) == salary;
+        return nameMatches && surnameMatches && pinMatches && salaryMatches;
+    }
+
+    public void clickUpdateLastEmployee() {
+        waitForSpinnerToFinish();
+        performLastTableRowAction(0);
+    }
+
+    public void clickUpdateLastEmployeeSalary() {
+        waitForSpinnerToFinish();
+        performLastTableRowAction(1);
+    }
+
+    public void clickDeleteLastEmployee() {
+        waitForSpinnerToFinish();
+        performLastTableRowAction(2);
+    }
+
+    public void setUpdateSalary(double salary) {
+        sendKeys(updateSalaryInput, String.valueOf(salary));
+    }
+
+    public void clickUpdateSalary() {
+        click(saveSalaryButton);
+    }
+
+    public void clickConfirm() {
+        click(yesButton);
     }
 }

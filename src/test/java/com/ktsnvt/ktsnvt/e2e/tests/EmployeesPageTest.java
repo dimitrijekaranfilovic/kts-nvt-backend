@@ -29,42 +29,55 @@ class EmployeesPageTest extends BaseE2ETest {
 
         var numOfItemsAndPages = employeesPage.getPaginationInformation();
 
-        employeesPage.search("ice", 10d, 100d, "WAITER");
+        employeesPage.search("jovan", 10d, 560d, "CHEF");
         assertTrue(employeesPage.checkSearchQueryResultsOnAllPages(
-                "ice", v -> (v >= 10d && v <= 100d), "WAITER"));
+                "jovan", v -> (v >= 10d && v <= 560d), "CHEF"));
 
-        employeesPage.search("ice", 1000000d, 0d, "WAITER");
+        employeesPage.search("et", 100d, 10000d, "BARTENDER");
+        assertTrue(employeesPage.checkSearchQueryResultsOnAllPages(
+                "et", v -> (v >= 100d && v <= 10000d), "BARTENDER"));
+
+        employeesPage.search("ice", 1000000d, 0d, "");
         assertTrue(employeesPage.checkEmptyResultsPage());
-
-        employeesPage.search("all", 100d, 10000d, "WAITER");
-        assertTrue(employeesPage.checkSearchQueryResultsOnAllPages(
-                "all", v -> (v >= 100d && v <= 10000d), "WAITER"));
-
-        employeesPage.search("all", 100d, 10000d, "WAITER");
-        assertTrue(employeesPage.checkSearchQueryResultsOnAllPages(
-                "all", v -> (v >= 100d && v <= 10000d), "WAITER"));
-
-        employeesPage.search("all", 0d, 322d, "WAITER");
-        assertTrue(employeesPage.checkSearchQueryResultsOnAllPages(
-                "all", v -> (v >= 0d && v <= 322d), "WAITER"));
-
-        employeesPage.search("all", 42d, 440d, "WAITER");
-        assertTrue(employeesPage.checkSearchQueryResultsOnAllPages(
-                "all", v -> (v >= 42d && v <= 440d), "WAITER"));
 
         employeesPage.resetSearchForm();
 
         assertTrue(employeesPage.checkPaginationInformationMatching(numOfItemsAndPages));
 
-//        employeesPage.clickUpdateLastMenuItemPriceButton();
-//        employeesPage.setUpdatePriceField(496d);
-//        employeesPage.clickSaveChangesButton();
-//        assertTrue(employeesPage.checkLastMenuItemPriceUpdated(496d));
-//
-//        var numOfItemsAndPagesBeforeDeletion = employeesPage.getPaginationInformation();
-//        employeesPage.clickDeactivateLastMenuItem();
-//        employeesPage.clickConfirmDeletion();
-//        assertTrue(employeesPage.checkNumberOfItemsAfterDeactivation(numOfItemsAndPagesBeforeDeletion));
+        var paginationBeforeAdding = employeesPage.getPaginationInformation();
+        employeesPage.clickCreateEmployee();
+        employeesPage.setName("pera");
+        employeesPage.setSurname("peric");
+        employeesPage.setPin("9999");
+        employeesPage.setSalary(300.0);
+        employeesPage.clickSaveButton();
+        employeesPage.goToLastPage();
+        assertTrue(employeesPage.checkCurrentTotalElements(paginationBeforeAdding, +1d));
+        assertTrue(employeesPage.checkLastEmployeeDetails("pera", "peric", "9999", 300.0));
+
+        var paginationBeforeUpdate = employeesPage.getPaginationInformation();
+        employeesPage.goToLastPage();
+        employeesPage.clickUpdateLastEmployee();
+        employeesPage.setName("updated");
+        employeesPage.setSurname("employee");
+        employeesPage.clickSaveButton();
+        assertTrue(employeesPage.checkPaginationInformationMatching(paginationBeforeUpdate));
+        assertTrue(employeesPage.checkLastEmployeeDetails("updated", "employee", "9999", 300.0));
+
+        var paginationBeforeSalaryUpdate = employeesPage.getPaginationInformation();
+        employeesPage.goToLastPage();
+        employeesPage.clickUpdateLastEmployeeSalary();
+        employeesPage.setUpdateSalary(999.0);
+        employeesPage.clickUpdateSalary();
+        employeesPage.goToLastPage();
+        assertTrue(employeesPage.checkPaginationInformationMatching(paginationBeforeSalaryUpdate));
+        assertTrue(employeesPage.checkLastEmployeeDetails("updated", "employee", "9999", 999.0));
+
+        var paginationBeforeDelete = employeesPage.getPaginationInformation();
+        employeesPage.goToLastPage();
+        employeesPage.clickDeleteLastEmployee();
+        employeesPage.clickConfirm();
+        assertTrue(employeesPage.checkCurrentTotalElements(paginationBeforeDelete, -1d));
 
         driver.quit();
     }
