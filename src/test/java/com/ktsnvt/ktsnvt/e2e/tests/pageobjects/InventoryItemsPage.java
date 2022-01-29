@@ -7,8 +7,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class InventoryItemsPage extends BaseCRUDPage {
@@ -272,5 +271,32 @@ public class InventoryItemsPage extends BaseCRUDPage {
                 break;
             }
         } while (goToNextPageIfPossible());
+    }
+
+    public String findUniqueInventoryItemName(String proposedName) {
+        waitForSpinnerToFinish();
+        var allExistingNames = new HashSet<String>();
+        do {
+            var allNamesOnCurrentPage = findAllNamesOnCurrentPage();
+            allExistingNames.addAll(allNamesOnCurrentPage);
+        } while (goToNextPageIfPossible());
+
+        while (allExistingNames.contains(proposedName)) {
+            proposedName = UUID.randomUUID().toString();
+        }
+        return proposedName;
+    }
+
+    private Set<String> findAllNamesOnCurrentPage() {
+        waitForSpinnerToFinish();
+        var retVal = new HashSet<String>();
+        var rows = waitForElementsToBeRefreshedAndVisible(driver, inventoryItemTableRows);
+        for (var row :
+                rows) {
+            var name = row.findElement(By.cssSelector("[element-group='inventoryItemName']"));
+            var rowName = name.getText();
+            retVal.add(rowName);
+        }
+        return retVal;
     }
 }
