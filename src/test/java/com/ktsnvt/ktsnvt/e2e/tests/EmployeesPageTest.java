@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class EmployeesPageTest extends BaseE2ETest {
 
     @Test
-    void employeePage_happyFlow() throws InterruptedException {
+    void employeePage_happyFlow() {
         var driver = initDriver();
         var navbar = PageFactory.initElements(driver, Navbar.class);
         var loginPage = PageFactory.initElements(driver, LoginPage.class);
@@ -27,44 +27,44 @@ class EmployeesPageTest extends BaseE2ETest {
 
         assertTrue(Utilities.checkUrl(driver, "/employees"));
 
-        assertTrue(employeesPage.checkEmployeeTableRows(3));
+        var numOfItemsAndPages = employeesPage.getPaginationInformation();
 
-        employeesPage.search("sv", 10.0, 1000.0);
-        assertTrue(employeesPage.checkEmployeeTableRows(1));
+        employeesPage.search("ice", 10d, 100d, "WAITER");
+        assertTrue(employeesPage.checkSearchQueryResultsOnAllPages(
+                "ice", v -> (v >= 10d && v <= 100d), "WAITER"));
 
-        employeesPage.search("sv", 800.0, 1000.0);
-        assertTrue(employeesPage.checkEmployeeTableRows(0));
+        employeesPage.search("ice", 1000000d, 0d, "WAITER");
+        assertTrue(employeesPage.checkEmptyResultsPage());
+
+        employeesPage.search("all", 100d, 10000d, "WAITER");
+        assertTrue(employeesPage.checkSearchQueryResultsOnAllPages(
+                "all", v -> (v >= 100d && v <= 10000d), "WAITER"));
+
+        employeesPage.search("all", 100d, 10000d, "WAITER");
+        assertTrue(employeesPage.checkSearchQueryResultsOnAllPages(
+                "all", v -> (v >= 100d && v <= 10000d), "WAITER"));
+
+        employeesPage.search("all", 0d, 322d, "WAITER");
+        assertTrue(employeesPage.checkSearchQueryResultsOnAllPages(
+                "all", v -> (v >= 0d && v <= 322d), "WAITER"));
+
+        employeesPage.search("all", 42d, 440d, "WAITER");
+        assertTrue(employeesPage.checkSearchQueryResultsOnAllPages(
+                "all", v -> (v >= 42d && v <= 440d), "WAITER"));
 
         employeesPage.resetSearchForm();
-        assertTrue(employeesPage.checkEmployeeTableRows(3));
 
-        employeesPage.clickCreateEmployee();
-        employeesPage.setName("pera");
-        employeesPage.setSurname("peric");
-        employeesPage.setPin("9999");
-        employeesPage.setSalary(300.0);
-        employeesPage.clickSaveButton();
-        assertTrue(employeesPage.checkEmployeeTableRows(4));
-        assertEquals("pera", employeesPage.getLastEmployeeName());
-        assertEquals("300", employeesPage.getLastEmployeeSalary());
+        assertTrue(employeesPage.checkPaginationInformationMatching(numOfItemsAndPages));
 
-        employeesPage.clickUpdateLastEmployee();
-        employeesPage.setName("NOVO IME");
-        employeesPage.clickSaveButton();
-        assertTrue(employeesPage.checkEmployeeTableRows(4));
-        Thread.sleep(500);
-        assertEquals("NOVO IME", employeesPage.getLastEmployeeName());
-
-        employeesPage.clickUpdateLastEmployeeSalary();
-        employeesPage.setUpdateSalary(420.0);
-        employeesPage.clickSaveSalaryButton();
-        assertTrue(employeesPage.checkEmployeeTableRows(4));
-        Thread.sleep(500);
-        assertEquals("420", employeesPage.getLastEmployeeSalary());
-
-        employeesPage.clickDeleteLastEmployee();
-        employeesPage.clickYesButton();
-        assertTrue(employeesPage.checkEmployeeTableRows(3));
+//        employeesPage.clickUpdateLastMenuItemPriceButton();
+//        employeesPage.setUpdatePriceField(496d);
+//        employeesPage.clickSaveChangesButton();
+//        assertTrue(employeesPage.checkLastMenuItemPriceUpdated(496d));
+//
+//        var numOfItemsAndPagesBeforeDeletion = employeesPage.getPaginationInformation();
+//        employeesPage.clickDeactivateLastMenuItem();
+//        employeesPage.clickConfirmDeletion();
+//        assertTrue(employeesPage.checkNumberOfItemsAfterDeactivation(numOfItemsAndPagesBeforeDeletion));
 
         driver.quit();
     }

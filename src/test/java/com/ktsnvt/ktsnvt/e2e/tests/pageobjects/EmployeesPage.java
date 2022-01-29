@@ -1,11 +1,12 @@
 package com.ktsnvt.ktsnvt.e2e.tests.pageobjects;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.util.List;
 
 public class EmployeesPage extends BaseCRUDPage {
 
@@ -54,82 +55,41 @@ public class EmployeesPage extends BaseCRUDPage {
     @FindBy(css = "button[id='yes']")
     private WebElement yesButton;
 
+    @FindBy(css = "[formcontrolname='type']")
+    private WebElement employeeTypeSearchField;
+
+    @FindBy(css = "[dataclass='searchOption']")
+    private List<WebElement> employeeTypeSearchOptions;
+
     public EmployeesPage(WebDriver driver) {
         super(driver);
     }
 
-    public void search(String query, Double salaryLowerBound, Double salaryUpperBound) throws InterruptedException {
+    public void search(String query, Double salaryLowerBound, Double salaryUpperBound, String category) {
+        waitForSpinnerToFinish();
         sendKeys(queryInput, query);
         sendKeys(salaryLowerBoundInput, salaryLowerBound.toString());
         sendKeys(salaryUpperBoundInput, salaryUpperBound.toString());
+        selectCategoryOption(category);
         click(searchButton);
-        Thread.sleep(200);
     }
 
-    public boolean checkEmployeeTableRows(int numberOfElements) {
-        var elements = (new WebDriverWait(driver, 10)
-                .until(ExpectedConditions.numberOfElementsToBe(By.cssSelector("tbody tr"), numberOfElements)));
-        return elements.size() == numberOfElements;
-    }
-
-    public void resetSearchForm() throws InterruptedException {
+    public void resetSearchForm() {
+        waitForSpinnerToFinish();
         click(resetButton);
-        Thread.sleep(200);
     }
 
-    public void clickCreateEmployee() {
-        click(createEmployeeButton);
-    }
-
-    public void setName(String name) {
-        sendKeys(nameInput, name);
-    }
-
-    public void setSurname(String surname) {
-        sendKeys(surnameInput, surname);
-    }
-
-    public void setPin(String pin) {
-        sendKeys(pinInput, pin);
-    }
-
-    public void setSalary(Double salary) {
-        sendKeys(salaryInput, salary.toString());
-    }
-
-    public void clickSaveButton() {
-        click(saveButton);
-    }
-
-    public void clickSaveSalaryButton() {
-        click(saveSalaryButton);
-    }
-
-    public void setUpdateSalary(Double salary) {
-        sendKeys(updateSalaryInput, salary.toString());
-    }
-
-    public void clickYesButton() {
-        click(yesButton);
-    }
-
-    public String getLastEmployeeName() {
-        return getLastTableRowField(0);
-    }
-
-    public String getLastEmployeeSalary() {
-        return getLastTableRowField(4);
-    }
-
-    public void clickUpdateLastEmployee() {
-        performLastTableRowAction(0);
-    }
-
-    public void clickUpdateLastEmployeeSalary() {
-        performLastTableRowAction(1);
-    }
-
-    public void clickDeleteLastEmployee() {
-        performLastTableRowAction(2);
+    public void selectCategoryOption(String categoryName) {
+        waitForSpinnerToFinish();
+        click(employeeTypeSearchField);
+        var searchOptions = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(employeeTypeSearchOptions)));
+        var option = searchOptions.stream()
+                .filter(p -> p.getAttribute("value").contains(categoryName)).findFirst();
+        if (option.isEmpty()) {
+            option = employeeTypeSearchOptions.stream()
+                    .filter(p -> p.getAttribute("value").isBlank()).findFirst();
+        }
+        option.ifPresent(this::click);
     }
 }

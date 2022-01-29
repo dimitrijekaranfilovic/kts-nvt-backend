@@ -7,6 +7,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 public abstract class BaseCRUDPage extends BasePage {
@@ -20,8 +21,33 @@ public abstract class BaseCRUDPage extends BasePage {
     @FindBy(id = "suchEmpty")
     protected WebElement suchEmpty;
 
+    @FindBy(css = "[class='mat-paginator-range-label']")
+    protected WebElement paginationItemAndPageNumbers;
+
+    @FindBy(id = "loading-spinner")
+    protected WebElement loadingSpinner;
+
     public BaseCRUDPage(WebDriver driver) {
         super(driver);
+    }
+
+    public String getPaginationInformation() {
+        waitForSpinnerToFinish();
+        return new WebDriverWait(driver, 10)
+                .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOf(paginationItemAndPageNumbers)))
+                .getText();
+    }
+
+    public boolean checkPaginationInformationMatching(String previousPaginationInformation) {
+        waitForSpinnerToFinish();
+        return (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.textToBePresentInElement(paginationItemAndPageNumbers, previousPaginationInformation));
+
+    }
+
+    public void waitForSpinnerToFinish() {
+        (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.invisibilityOf(loadingSpinner));
     }
 
     protected void performLastTableRowAction(int index) {

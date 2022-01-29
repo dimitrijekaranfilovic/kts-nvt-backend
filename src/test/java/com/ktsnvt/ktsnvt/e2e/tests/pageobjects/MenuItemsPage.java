@@ -51,9 +51,6 @@ public class MenuItemsPage extends BaseCRUDPage {
     @FindBy(css = "[element-group='menuItemPrice']")
     private List<WebElement> menuItemPrices;
 
-    @FindBy(css = "[class='mat-paginator-range-label']")
-    private WebElement paginationItemAndPageNumbers;
-
     @FindBy(css = "[formcontrolname='category']")
     private WebElement menuItemCategorySearchField;
 
@@ -62,10 +59,6 @@ public class MenuItemsPage extends BaseCRUDPage {
 
     @FindBy(css = "[element-group='menuItemCategory']")
     private List<WebElement> menuItemTableCategories;
-
-    @FindBy(id = "loading-spinner")
-    private WebElement loadingSpinner;
-
 
     public MenuItemsPage(WebDriver driver) {
         super(driver);
@@ -95,7 +88,6 @@ public class MenuItemsPage extends BaseCRUDPage {
         return Double.parseDouble(priceField) == enteredPrice;
     }
 
-
     public void setUpdatePriceField(Double updatePrice) {
         var priceField = (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.visibilityOf(updateMenuItemPriceField));
@@ -117,30 +109,11 @@ public class MenuItemsPage extends BaseCRUDPage {
         click(yesButton);
     }
 
-    public void waitForSpinnerToFinish() {
-        (new WebDriverWait(driver, 10))
-                .until(ExpectedConditions.invisibilityOf(loadingSpinner));
-    }
-
     public int countItems() {
         waitForSpinnerToFinish();
         var elements = (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.visibilityOfAllElements(menuItemTableRows));
         return elements.size();
-    }
-
-    public String getPaginationInformation() {
-        waitForSpinnerToFinish();
-        return new WebDriverWait(driver, 10)
-                .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOf(paginationItemAndPageNumbers)))
-                .getText();
-    }
-
-    public boolean checkPaginationInformationMatching(String previousPaginationInformation) {
-        waitForSpinnerToFinish();
-        return (new WebDriverWait(driver, 10))
-                .until(ExpectedConditions.textToBePresentInElement(paginationItemAndPageNumbers, previousPaginationInformation));
-
     }
 
     @Override
