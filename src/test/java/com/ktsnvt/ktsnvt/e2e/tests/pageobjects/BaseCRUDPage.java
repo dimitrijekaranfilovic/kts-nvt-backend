@@ -7,6 +7,8 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.function.Predicate;
+
 public abstract class BaseCRUDPage extends BasePage {
 
     @FindBy(xpath = "//button[@ng-reflect-message='Next page']")
@@ -35,7 +37,7 @@ public abstract class BaseCRUDPage extends BasePage {
     }
 
     protected WebElement getLastTableRow() {
-        return  (new WebDriverWait(driver, 10))
+        return (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.visibilityOfElementLocated(By.xpath("(//table[1]/tbody/tr)[last()]")));
     }
 
@@ -43,11 +45,14 @@ public abstract class BaseCRUDPage extends BasePage {
         click(nextPageButton);
     }
 
-    public boolean checkQuerySearchResults(String query){return true;}
+    // Override this method
+    public boolean checkSearchResults(String query, Predicate<Double> comparator, String category) {
+        return false;
+    }
 
-    public boolean checkSearchQueryResultsOnAllPages(String query) {
+    public boolean checkSearchQueryResultsOnAllPages(String query, Predicate<Double> comparator, String category) {
         do {
-            var satisfied = checkQuerySearchResults(query);
+            var satisfied = checkSearchResults(query, comparator, category);
             if (!satisfied) {
                 return false;
             }
@@ -59,9 +64,9 @@ public abstract class BaseCRUDPage extends BasePage {
     }
 
     public boolean checkEmptyResultsPage() {
-         (new WebDriverWait(driver, 10))
+        (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOf(suchEmpty)));
-         return true;
+        return true;
     }
 
 }

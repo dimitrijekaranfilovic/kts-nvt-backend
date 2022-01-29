@@ -33,28 +33,29 @@ class MenuItemsPageTest extends BaseE2ETest {
 
         var numOfItemsAndPages = menuItemsPage.getPaginationInformation();
 
-        menuItemsPage.search("ice", 10d, 100d);
-        assertTrue(menuItemsPage.checkSearchQueryResultsOnAllPages("ice"));
-        assertTrue(menuItemsPage.checkPriceBound(v -> (v >= 10d && v <= 100d)));
 
-        menuItemsPage.search("ice", 1000000d, 0d);
+        menuItemsPage.search("ice", 10d, 100d, "FOOD");
+        assertTrue(menuItemsPage.checkSearchQueryResultsOnAllPages(
+                "ice", v -> (v >= 10d && v <= 100d), "FOOD"));
+
+        menuItemsPage.search("ice", 1000000d, 0d, "");
         assertTrue(menuItemsPage.checkEmptyResultsPage());
 
-        menuItemsPage.search("all", 100d, 10000d);
-        assertTrue(menuItemsPage.checkSearchQueryResultsOnAllPages("all"));
-        assertTrue(menuItemsPage.checkPriceBound(v -> (v >= 100d && v <= 10000d)));
+        menuItemsPage.search("all", 100d, 10000d, "DRINK");
+        assertTrue(menuItemsPage.checkSearchQueryResultsOnAllPages(
+                "all", v -> (v >= 100d && v <= 10000d), "DRINK"));
 
-        menuItemsPage.search("all", 100d, 10000d);
-        assertTrue(menuItemsPage.checkSearchQueryResultsOnAllPages("all"));
-        assertTrue(menuItemsPage.checkPriceBound(v -> (v >= 100d && v <= 10000d)));
+        menuItemsPage.search("all", 100d, 10000d, "DRINK");
+        assertTrue(menuItemsPage.checkSearchQueryResultsOnAllPages(
+                "all", v -> (v >= 100d && v <= 10000d), "DRINK"));
 
-        menuItemsPage.search("all", 0d, 322d);
-        assertTrue(menuItemsPage.checkSearchQueryResultsOnAllPages("all"));
-        assertTrue(menuItemsPage.checkPriceBound(v -> (v >= 0d && v <= 322d)));
+        menuItemsPage.search("all", 0d, 322d, "DRINK");
+        assertTrue(menuItemsPage.checkSearchQueryResultsOnAllPages(
+                "all", v -> (v >= 0d && v <= 322d), "DRINK"));
 
-        menuItemsPage.search("all", 42d, 440d);
-        assertTrue(menuItemsPage.checkSearchQueryResultsOnAllPages("all"));
-        assertTrue(menuItemsPage.checkPriceBound(v -> (v >= 42d && v <= 440d)));
+        menuItemsPage.search("all", 42d, 440d, "FOOD");
+        assertTrue(menuItemsPage.checkSearchQueryResultsOnAllPages(
+                "all", v -> (v >= 42d && v <= 440d), "FOOD"));
 
         menuItemsPage.resetSearchForm();
 

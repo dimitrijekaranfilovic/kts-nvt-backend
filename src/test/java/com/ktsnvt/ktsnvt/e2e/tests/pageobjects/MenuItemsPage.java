@@ -61,6 +61,14 @@ public class MenuItemsPage extends BaseCRUDPage {
     @FindBy(css = "[class='mat-paginator-range-label']")
     private WebElement paginationItemAndPageNumbers;
 
+    @FindBy(css = "[formcontrolname='category']")
+    private WebElement menuItemCategorySearchField;
+
+    @FindBy(css = "[dataclass='searchOption']")
+    private List<WebElement> menuItemCategorySearchOptions;
+
+    @FindBy(css = "[name='menuItemCategory']")
+    private List<WebElement> menuItemTableCategories;
 
 
     public MenuItemsPage(WebDriver driver) {
@@ -74,10 +82,11 @@ public class MenuItemsPage extends BaseCRUDPage {
         return elements.size() == numberOfElements;
     }
 
-    public void search(String query, Double priceLowerBound, Double priceUpperbound) throws InterruptedException {
+    public void search(String query, Double priceLowerBound, Double priceUpperbound, String category) throws InterruptedException {
         sendKeys(queryInput, query);
         sendKeys(priceLowerBoundInput, priceLowerBound.toString());
         sendKeys(priceUpperBoundInput, priceUpperbound.toString());
+        selectCategoryOption(category);
         click(searchButton);
     }
 
@@ -122,7 +131,7 @@ public class MenuItemsPage extends BaseCRUDPage {
     }
 
     @Override
-    public boolean checkQuerySearchResults(String query) {
+    public boolean checkSearchResults(String query, Predicate<Double> comparator, String categoryName) {
 //        waitForElementToBeRefreshedAndVisible(driver, menuItemTableRows);
         var names = (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(menuItemTableNames)));
@@ -138,7 +147,7 @@ public class MenuItemsPage extends BaseCRUDPage {
                 return false;
             }
         }
-        return true;
+        return checkPriceBound(comparator) && checkCategory(categoryName);
     }
 
     public boolean checkPriceBound(Predicate<Double> comparator) {
@@ -149,8 +158,25 @@ public class MenuItemsPage extends BaseCRUDPage {
     }
 
 
+    public void selectCategoryOption(String categoryName) {
+        click(menuItemCategorySearchField);
+        var searchOptions = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(menuItemCategorySearchOptions)));
+        var option = searchOptions.stream()
+                .filter(p -> p.getAttribute("value").contains(categoryName)).findFirst();
+        if (option.isEmpty()) {
+            option = menuItemCategorySearchOptions.stream()
+                    .filter(p -> p.getAttribute("value").isBlank()).findFirst();
+        }
+        option.ifPresent(this::click);
+    }
 
-
+    public boolean checkCategory(String categoryName) {
+        var categories = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(menuItemTableCategories)));
+        return categories.stream().parallel().map(WebElement::getText)
+                .allMatch(p -> p.toLowerCase(Locale.ROOT).contains(categoryName.toLowerCase(Locale.ROOT)));
+    }
 
 
 }
