@@ -65,9 +65,9 @@ class MenuItemsPageTest extends BaseE2ETest {
         navbar.navigateInventoryItems();
         assertTrue(Utilities.checkUrl(driver, "/inventory-items"));
 
-        inventoryItemsPage.clickCreateInventoryItem();
         var proposedCreateName = inventoryItemsPage
                 .findUniqueInventoryItemName("Ice cream");
+        inventoryItemsPage.clickCreateInventoryItem();
         var createdName = inventoryItemsPage.setUpdateNameField(proposedCreateName);
         inventoryItemsPage.setUpdateDescriptionFieldField("New description");
         inventoryItemsPage.setUpdateBasePriceField(42d);

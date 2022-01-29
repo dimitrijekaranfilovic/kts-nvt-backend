@@ -17,6 +17,9 @@ public abstract class BaseCRUDPage extends BasePage {
     @FindBy(xpath = "//button[@ng-reflect-message='Last page']")
     protected WebElement lastPageButton;
 
+    @FindBy(xpath = "//button[@ng-reflect-message='First page']")
+    protected WebElement firstPageButton;
+
     @FindBy(id = "suchEmpty")
     protected WebElement suchEmpty;
 
@@ -75,6 +78,10 @@ public abstract class BaseCRUDPage extends BasePage {
     public void clickNextPageButton() {
         click(nextPageButton);
     }
+    
+    public void clickFirstPageButton() {
+        click(firstPageButton);
+    }
 
     public void clickLastPageButton() {
         click(lastPageButton);
@@ -99,6 +106,13 @@ public abstract class BaseCRUDPage extends BasePage {
         waitForSpinnerToFinish();
         if (lastPageButton.getAttribute("ng-reflect-disabled").equals("false")) {
             clickLastPageButton();
+        }
+    }
+
+    public void goToFirstPage() {
+        waitForSpinnerToFinish();
+        if (firstPageButton.getAttribute("ng-reflect-disabled").equals("false")) {
+            clickFirstPageButton();
         }
     }
 

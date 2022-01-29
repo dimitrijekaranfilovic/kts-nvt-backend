@@ -126,6 +126,7 @@ public class InventoryItemsPage extends BaseCRUDPage {
     }
 
     public void clickAddToMenu(String itemName) {
+        goToFirstPage();
         waitForSpinnerToFinish();
         do {
             var row = findItemWithNameOnCurrentPage(itemName);
@@ -149,6 +150,7 @@ public class InventoryItemsPage extends BaseCRUDPage {
     }
 
     public void clickDeleteInventoryItemByName(String itemName) {
+        goToFirstPage();
         waitForSpinnerToFinish();
         do {
             var row = findItemWithNameOnCurrentPage(itemName);
@@ -214,6 +216,7 @@ public class InventoryItemsPage extends BaseCRUDPage {
     }
 
     public boolean checkItemFields(String itemName, String itemDescription, Double price, String itemAllergy, String inMenu) {
+        goToFirstPage();
         waitForSpinnerToFinish();
         do {
             var row = findItemWithNameOnCurrentPage(itemName);
@@ -263,6 +266,7 @@ public class InventoryItemsPage extends BaseCRUDPage {
     }
 
     public void clickUpdateInventoryItem(String createdName) {
+        goToFirstPage();
         waitForSpinnerToFinish();
         do {
             var row = findItemWithNameOnCurrentPage(createdName);
@@ -274,6 +278,7 @@ public class InventoryItemsPage extends BaseCRUDPage {
     }
 
     public String findUniqueInventoryItemName(String proposedName) {
+        goToFirstPage();
         waitForSpinnerToFinish();
         var allExistingNames = new HashSet<String>();
         do {

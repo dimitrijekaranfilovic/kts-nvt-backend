@@ -162,6 +162,7 @@ public class MenuItemsPage extends BaseCRUDPage {
     }
 
     public void clickUpdateMenuItem(String createdName) {
+        goToFirstPage();
         waitForSpinnerToFinish();
         do {
             var row = findItemWithNameOnCurrentPage(createdName);
@@ -187,6 +188,7 @@ public class MenuItemsPage extends BaseCRUDPage {
     }
 
     public void clickDeleteMenuItemByName(String itemName) {
+        goToFirstPage();
         waitForSpinnerToFinish();
         do {
             var row = findItemWithNameOnCurrentPage(itemName);
@@ -199,6 +201,7 @@ public class MenuItemsPage extends BaseCRUDPage {
 
 
     public boolean checkMenuItemFields(String itemName, String itemDescription, Double price, String itemAllergy) {
+        goToFirstPage();
         waitForSpinnerToFinish();
         do {
             var row = findItemWithNameOnCurrentPage(itemName);
