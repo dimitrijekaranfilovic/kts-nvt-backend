@@ -124,7 +124,6 @@ public class EmployeesPage extends BaseCRUDPage {
             if (!names.get(i).getText().toLowerCase(Locale.ROOT).contains(query.trim().toLowerCase(Locale.ROOT))
                     && !surnames.get(i).getText().toLowerCase(Locale.ROOT).contains(query.trim().toLowerCase(Locale.ROOT))
             ) {
-                System.out.println("GOT FALSE FOR: " + names.get(i) + ", " + surnames.get(i));
                 return false;
             }
         }
@@ -187,9 +186,9 @@ public class EmployeesPage extends BaseCRUDPage {
 
     public boolean checkLastEmployeeDetails(String name, String surname, String pin, double salary) {
         waitForSpinnerToFinish();
-        var nameMatches = getLastTableRowField(0).matches(name);
-        var surnameMatches = getLastTableRowField(1).matches(surname);
-        var pinMatches = getLastTableRowField(2).matches(pin);
+        var nameMatches = getLastTableRowField(0).equals(name);
+        var surnameMatches = getLastTableRowField(1).equals(surname);
+        var pinMatches = getLastTableRowField(2).equals(pin);
         var salaryMatches = Double.parseDouble(getLastTableRowField(4)) == salary;
         return nameMatches && surnameMatches && pinMatches && salaryMatches;
     }

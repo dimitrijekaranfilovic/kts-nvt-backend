@@ -30,6 +30,8 @@ class UpdateProfilePageTest extends BaseE2ETest {
         navbar.clickUpdateProfile();
 
         assertTrue(Utilities.checkUrl(driver, "/super-users/profile"));
+        var nameBeforeUpdate = updateProfilePage.getName();
+        var surnameBeforeUpdate = updateProfilePage.getSurname();
 
         updateProfilePage.setName("pera");
         updateProfilePage.setSurname("peric");
@@ -37,6 +39,17 @@ class UpdateProfilePageTest extends BaseE2ETest {
 
         assertTrue(Utilities.checkUrl(driver, "/employees"));
         assertTrue(navbar.getProfileName().contains("pera peric"));
+
+        navbar.clickUpdateProfile();
+
+        assertTrue(Utilities.checkUrl(driver, "/super-users/profile"));
+
+        updateProfilePage.setName(nameBeforeUpdate);
+        updateProfilePage.setSurname(surnameBeforeUpdate);
+        updateProfilePage.clickUpdateProfile();
+
+        assertTrue(Utilities.checkUrl(driver, "/employees"));
+        assertTrue(navbar.getProfileName().contains(String.format("%s %s", nameBeforeUpdate, surnameBeforeUpdate)));
 
         driver.quit();
     }

@@ -31,39 +31,50 @@ class SuperUsersPageTest extends BaseE2ETest {
         navbar.navigateSuperUser();
         assertTrue(Utilities.checkUrl(driver, "/super-users"));
 
-        assertTrue(superUsersPage.checkSuperUsersTableRows(2));
+        var numOfItemsAndPages = superUsersPage.getPaginationInformation();
 
-        superUsersPage.search("ni", 10.0, 1000.0);
-        assertTrue(superUsersPage.checkSuperUsersTableRows(1));
+        superUsersPage.search("nikola", 10d, 560d, "ADMIN");
+        assertTrue(superUsersPage.checkSearchQueryResultsOnAllPages(
+                "nikola", v -> (v >= 10d && v <= 560d), "ADMIN"));
 
-        superUsersPage.search("ni", 800.0, 1000.0);
-        assertTrue(superUsersPage.checkSuperUsersTableRows(0));
+        superUsersPage.search("sn", 100d, 10000d, "MANAGER");
+        assertTrue(superUsersPage.checkSearchQueryResultsOnAllPages(
+                "sn", v -> (v >= 100d && v <= 10000d), "MANAGER"));
+
+        superUsersPage.search("ice", 1000000d, 0d, "");
+        assertTrue(superUsersPage.checkEmptyResultsPage());
 
         superUsersPage.resetSearchForm();
-        assertTrue(superUsersPage.checkSuperUsersTableRows(2));
 
+        assertTrue(superUsersPage.checkPaginationInformationMatching(numOfItemsAndPages));
+
+        var paginationBeforeAdding = superUsersPage.getPaginationInformation();
         superUsersPage.clickCreateSuperUser();
         superUsersPage.setName("pera");
         superUsersPage.setSurname("peric");
-        superUsersPage.setEmail("peraperic@pera.com");
+        superUsersPage.setEmail("nepostojeci.email@gmail.com");
         superUsersPage.setPassword("password");
         superUsersPage.setConfirmPassword("password");
         superUsersPage.setSalary(300.0);
         superUsersPage.clickSaveButton();
-        assertTrue(superUsersPage.checkSuperUsersTableRows(3));
-        assertEquals("pera", superUsersPage.getLastSuperUserName());
-        assertEquals("300", superUsersPage.getLastSuperUserSalary());
+        superUsersPage.goToLastPage();
+        assertTrue(superUsersPage.checkCurrentTotalElements(paginationBeforeAdding, +1d));
+        assertTrue(superUsersPage.checkLastSuperUserDetails("pera", "peric", "nepostojeci.email@gmail.com", "Manager", 300.0));
 
+        var paginationBeforeSalaryUpdate = superUsersPage.getPaginationInformation();
+        superUsersPage.goToLastPage();
         superUsersPage.clickUpdateLastSuperUserSalary();
-        superUsersPage.setUpdateSalary(420.0);
+        superUsersPage.setUpdateSalary(999.0);
         superUsersPage.clickSaveSalaryButton();
-        assertTrue(superUsersPage.checkSuperUsersTableRows(3));
-        Thread.sleep(500);
-        assertEquals("420", superUsersPage.getLastSuperUserSalary());
+        superUsersPage.goToLastPage();
+        assertTrue(superUsersPage.checkPaginationInformationMatching(paginationBeforeSalaryUpdate));
+        assertTrue(superUsersPage.checkLastSuperUserDetails("pera", "peric", "nepostojeci.email@gmail.com", "Manager", 999.0));
 
+        var paginationBeforeDelete = superUsersPage.getPaginationInformation();
+        superUsersPage.goToLastPage();
         superUsersPage.clickDeleteLastSuperUser();
         superUsersPage.clickYesButton();
-        assertTrue(superUsersPage.checkSuperUsersTableRows(2));
+        assertTrue(superUsersPage.checkCurrentTotalElements(paginationBeforeDelete, -1d));
 
         driver.quit();
     }

@@ -51,7 +51,7 @@ public class LayoutPage extends BasePage {
         confirmBtnElement.click();
     }
 
-    public void clickOnTable(Integer tableX, Integer tableY) throws InterruptedException {
+    public void clickOnTable(Integer tableX, Integer tableY) {
         List<WebElement> elements = new WebDriverWait(driver, 10).until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("canvas"))));
 
         try {
@@ -73,7 +73,7 @@ public class LayoutPage extends BasePage {
         click(confirmButton);
     }
 
-    public void dragTable(int x, int y, int newX, int newY) throws InterruptedException {
+    public void dragTable(int x, int y, int newX, int newY) {
         List<WebElement> elements = new WebDriverWait(driver, 10).until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("canvas"))));
         int canvasX, canvasY;
         try {
