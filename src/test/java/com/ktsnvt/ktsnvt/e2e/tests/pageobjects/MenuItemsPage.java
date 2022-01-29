@@ -100,7 +100,6 @@ public class MenuItemsPage extends BaseCRUDPage {
     }
 
     public void clickSaveChangesButton() {
-        waitForSpinnerToFinish();
         click(menuItemUpdateSubmitButton);
     }
 
@@ -112,8 +111,9 @@ public class MenuItemsPage extends BaseCRUDPage {
 
 
     public void setUpdatePriceField(Double updatePrice) {
-        waitForSpinnerToFinish();
-        sendKeys(updateMenuItemPriceField,
+        var priceField = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.visibilityOf(updateMenuItemPriceField));
+        sendKeys(priceField,
                 updatePrice.toString());
     }
 
@@ -123,6 +123,7 @@ public class MenuItemsPage extends BaseCRUDPage {
     }
 
     public void clickDeactivateLastMenuItem() {
+        waitForSpinnerToFinish();
         performLastTableRowAction(1);
     }
 
@@ -150,7 +151,6 @@ public class MenuItemsPage extends BaseCRUDPage {
     }
 
     public boolean checkPaginationInformationMatching(String previousPaginationInformation) {
-        System.out.println(previousPaginationInformation);
         waitForSpinnerToFinish();
         return (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.textToBePresentInElement(paginationItemAndPageNumbers, previousPaginationInformation));
@@ -180,7 +180,7 @@ public class MenuItemsPage extends BaseCRUDPage {
 
     public boolean checkPriceBound(Predicate<Double> comparator) {
         waitForSpinnerToFinish();
-        waitForElementToBeRefreshedAndVisible(driver, menuItemTableRows);
+        waitForElementsToBeRefreshedAndVisible(driver, menuItemTableRows);
         var prices = (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(menuItemPrices)));
         return prices.stream().parallel().map(WebElement::getText).map(Double::parseDouble).allMatch(comparator);
@@ -210,4 +210,24 @@ public class MenuItemsPage extends BaseCRUDPage {
     }
 
 
+    public boolean checkNumberOfItemsAfterDeactivation(String numOfItemsAndPagesBeforeDeletion) {
+        waitForSpinnerToFinish();
+        (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.not(
+                        ExpectedConditions.textToBePresentInElement(
+                                paginationItemAndPageNumbers, numOfItemsAndPagesBeforeDeletion)));
+        var currentPageInfo = getPaginationInformation();
+        System.out.println(currentPageInfo);
+        var previousTotalItems = Double.parseDouble(numOfItemsAndPagesBeforeDeletion
+                .substring(numOfItemsAndPagesBeforeDeletion.length() - 2));
+        var currentTotalItems = Double.parseDouble(currentPageInfo
+                .substring(currentPageInfo.length() - 2));
+        return currentTotalItems == previousTotalItems - 1d;
+    }
+
+    public double getLastMenuItemPrice() {
+        waitForSpinnerToFinish();
+        var priceField = getLastTableRowField(4);
+        return Double.parseDouble(priceField);
+    }
 }

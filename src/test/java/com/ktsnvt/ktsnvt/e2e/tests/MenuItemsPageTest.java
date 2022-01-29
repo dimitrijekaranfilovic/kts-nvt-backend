@@ -61,14 +61,18 @@ class MenuItemsPageTest extends BaseE2ETest {
 
         assertTrue(menuItemsPage.checkPaginationInformationMatching(numOfItemsAndPages));
 
-
         menuItemsPage.clickUpdateLastMenuItemPriceButton();
-        menuItemsPage.setUpdatePriceField(42d);
+        menuItemsPage.setUpdatePriceField(496d);
         menuItemsPage.clickSaveChangesButton();
-        menuItemsPage.checkLastMenuItemPriceUpdated(42d);
+        assertTrue(menuItemsPage.checkLastMenuItemPriceUpdated(496d));
 
+        var numOfItemsAndPagesBeforeDeletion = menuItemsPage.getPaginationInformation();
+        System.out.println(numOfItemsAndPagesBeforeDeletion);
+        menuItemsPage.clickDeactivateLastMenuItem();
+        menuItemsPage.clickConfirmDeletion();
+        assertTrue(menuItemsPage.checkNumberOfItemsAfterDeactivation(numOfItemsAndPagesBeforeDeletion));
 
-//        driver.close();
+        driver.close();
     }
 
 }

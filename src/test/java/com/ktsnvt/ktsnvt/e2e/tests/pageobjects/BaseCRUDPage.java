@@ -38,7 +38,8 @@ public abstract class BaseCRUDPage extends BasePage {
 
     protected WebElement getLastTableRow() {
         return (new WebDriverWait(driver, 10))
-                .until(ExpectedConditions.visibilityOfElementLocated(By.xpath("(//table[1]/tbody/tr)[last()]")));
+                .until(ExpectedConditions.refreshed(
+                        ExpectedConditions.visibilityOfElementLocated(By.xpath("(//table[1]/tbody/tr)[last()]"))));
     }
 
     public void clickNextPageButton() {

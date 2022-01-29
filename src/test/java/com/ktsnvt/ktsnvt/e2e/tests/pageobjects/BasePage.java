@@ -26,9 +26,16 @@ public abstract class BasePage {
     }
 
 
-    public List<WebElement> waitForElementToBeRefreshedAndVisible(WebDriver driver, List<WebElement> elements) {
+    public List<WebElement> waitForElementsToBeRefreshedAndVisible(WebDriver driver, List<WebElement> elements) {
         return new WebDriverWait(driver, 10)
                 .until(ExpectedConditions.refreshed(
                         ExpectedConditions.visibilityOfAllElements(elements)));
     }
+
+    public WebElement waitForElementToBeRefreshedAndVisible(WebDriver driver,WebElement element) {
+        return new WebDriverWait(driver, 10)
+                .until(ExpectedConditions.refreshed(
+                        ExpectedConditions.visibilityOf(element)));
+    }
+
 }
