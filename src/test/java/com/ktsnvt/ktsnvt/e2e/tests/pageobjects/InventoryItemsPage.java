@@ -7,6 +7,10 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.List;
+import java.util.Locale;
+import java.util.function.Predicate;
+
 public class InventoryItemsPage extends BaseCRUDPage {
 
     @FindBy(css = "input[formcontrolname='query']")
@@ -51,6 +55,29 @@ public class InventoryItemsPage extends BaseCRUDPage {
     @FindBy(css = "button[id='yes']")
     private WebElement yesButton;
 
+    @FindBy(css = "[formcontrolname='category']")
+    private WebElement inventoryItemCategorySearchField;
+
+    @FindBy(css = "[dataclass='searchOption']")
+    private List<WebElement> inventoryItemCategorySearchOptions;
+
+    @FindBy(css = "[element-group='inventoryItemName']")
+    private List<WebElement> inventoryItemTableNames;
+
+    @FindBy(css = "[element-group='inventoryItemDescription']")
+    private List<WebElement> inventoryItemTableDescriptions;
+
+    @FindBy(css = "[element-group='inventoryItemAllergies']")
+    private List<WebElement> inventoryItemTableAllergies;
+
+    @FindBy(css = "[element-group='inventoryItemPrice']")
+    private List<WebElement> inventoryItemPrices;
+
+    @FindBy(css = "[element-group='inventoryItemCategory']")
+    private List<WebElement> inventoryItemTableCategories;
+
+    @FindBy(css = "tbody tr")
+    private List<WebElement> inventoryItemTableRows;
 
     public InventoryItemsPage(WebDriver driver) {
         super(driver);
@@ -62,14 +89,15 @@ public class InventoryItemsPage extends BaseCRUDPage {
         return elements.size() == numberOfElements;
     }
 
-    public void search(String query, Double priceLowerBound, Double priceUpperbound) throws InterruptedException {
+    public void search(String query, Double priceLowerBound, Double priceUpperbound, String category) {
         sendKeys(queryInput, query);
         sendKeys(basePriceLowerBoundInput, priceLowerBound.toString());
         sendKeys(basePriceUpperBoundInput, priceUpperbound.toString());
+        selectCategoryOption(category);
         click(searchButton);
     }
 
-    public void resetSearchForm() throws InterruptedException {
+    public void resetSearchForm(){
         click(resetButton);
     }
 
@@ -145,5 +173,55 @@ public class InventoryItemsPage extends BaseCRUDPage {
 
     public void clickConfirmDeletion() {
         click(yesButton);
+    }
+
+    public void selectCategoryOption(String categoryName) {
+        waitForSpinnerToFinish();
+        click(inventoryItemCategorySearchField);
+        var searchOptions = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(inventoryItemCategorySearchOptions)));
+        var option = searchOptions.stream()
+                .filter(p -> p.getAttribute("value").contains(categoryName)).findFirst();
+        if (option.isEmpty()) {
+            option = inventoryItemCategorySearchOptions.stream()
+                    .filter(p -> p.getAttribute("value").isBlank()).findFirst();
+        }
+        option.ifPresent(this::click);
+    }
+
+    @Override
+    public boolean checkSearchResults(String query, Predicate<Double> comparator, String categoryName) {
+        waitForSpinnerToFinish();
+        var names = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(inventoryItemTableNames)));
+        var descriptions = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(inventoryItemTableDescriptions)));
+        var allergies = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(inventoryItemTableAllergies)));
+        for (int i = 0; i < inventoryItemTableNames.size(); ++i) {
+            if (!names.get(i).getText().toLowerCase(Locale.ROOT).contains(query.trim().toLowerCase(Locale.ROOT))
+                    && !descriptions.get(i).getText().toLowerCase(Locale.ROOT).contains(query.trim().toLowerCase(Locale.ROOT))
+                    && !allergies.get(i).getText().toLowerCase(Locale.ROOT).contains(query.trim().toLowerCase(Locale.ROOT))
+            ) {
+                return false;
+            }
+        }
+        return checkPriceBound(comparator) && checkCategory(categoryName);
+    }
+
+    public boolean checkCategory(String categoryName) {
+        waitForSpinnerToFinish();
+        var categories = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(inventoryItemTableCategories)));
+        return categories.stream().parallel().map(WebElement::getText)
+                .allMatch(p -> p.toLowerCase(Locale.ROOT).contains(categoryName.toLowerCase(Locale.ROOT)));
+    }
+
+    public boolean checkPriceBound(Predicate<Double> comparator) {
+        waitForSpinnerToFinish();
+        waitForElementsToBeRefreshedAndVisible(driver, inventoryItemTableRows);
+        var prices = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(inventoryItemPrices)));
+        return prices.stream().parallel().map(WebElement::getText).map(Double::parseDouble).allMatch(comparator);
     }
 }

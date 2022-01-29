@@ -64,7 +64,7 @@ public class MenuItemsPage extends BaseCRUDPage {
         super(driver);
     }
 
-    public void search(String query, Double priceLowerBound, Double priceUpperbound, String category) throws InterruptedException {
+    public void search(String query, Double priceLowerBound, Double priceUpperbound, String category) {
         waitForSpinnerToFinish();
         sendKeys(queryInput, query);
         sendKeys(priceLowerBoundInput, priceLowerBound.toString());
@@ -118,7 +118,6 @@ public class MenuItemsPage extends BaseCRUDPage {
 
     @Override
     public boolean checkSearchResults(String query, Predicate<Double> comparator, String categoryName) {
-//        waitForElementToBeRefreshedAndVisible(driver, menuItemTableRows);
         waitForSpinnerToFinish();
         var names = (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(menuItemTableNames)));

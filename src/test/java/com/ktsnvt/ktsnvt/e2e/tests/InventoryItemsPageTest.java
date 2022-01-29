@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class InventoryItemsPageTest extends BaseE2ETest {
+class InventoryItemsPageTest extends BaseE2ETest {
 
     @Test
     void inventoryItems_happyFlow() throws InterruptedException {
@@ -31,22 +31,24 @@ public class InventoryItemsPageTest extends BaseE2ETest {
         navbar.navigateInventoryItems();
         assertTrue(Utilities.checkUrl(driver, "/inventory-items"));
 
-        assertTrue(inventoryItemsPage.checkInventoryItemsRows(4));
+        inventoryItemsPage.search("ice", 10d, 100d, "FOOD");
+        assertTrue(inventoryItemsPage.checkSearchQueryResultsOnAllPages(
+                "ice", v -> (v >= 10d && v <= 100d), "FOOD"));
 
-        inventoryItemsPage.search("ice", 10d, 100d);
-        assertTrue(inventoryItemsPage.checkInventoryItemsRows(2));
+        inventoryItemsPage.search("nothing", 10000d, 0d, "");
+        assertTrue(inventoryItemsPage.checkEmptyResultsPage());
 
-        inventoryItemsPage.search("nothing", 0d, 10000d);
-        assertTrue(inventoryItemsPage.checkInventoryItemsRows(0));
+        inventoryItemsPage.search("all", 100d, 10000d, "FOOD");
+        assertTrue(inventoryItemsPage.checkSearchQueryResultsOnAllPages(
+                "all", v -> (v >= 100d && v <= 10000d), "FOOD"));
 
-        inventoryItemsPage.search("all", 100d, 10000d);
-        assertTrue(inventoryItemsPage.checkInventoryItemsRows(1));
+        inventoryItemsPage.search("all", 0d, 322d, "DRINK");
+        assertTrue(inventoryItemsPage.checkSearchQueryResultsOnAllPages(
+                "all", v -> (v >= 0d && v <= 322d), "DRINK"));
 
-        inventoryItemsPage.search("all", 0d, 322d);
-        assertTrue(inventoryItemsPage.checkInventoryItemsRows(3));
-
-        inventoryItemsPage.search("all", 42d, 440d);
-        assertTrue(inventoryItemsPage.checkInventoryItemsRows(3));
+        inventoryItemsPage.search("all", 42d, 440d, "FOOD");
+        assertTrue(inventoryItemsPage.checkSearchQueryResultsOnAllPages(
+                "all", v -> (v >= 42d && v <= 440d), "FOOD"));
 
         inventoryItemsPage.resetSearchForm();
 
