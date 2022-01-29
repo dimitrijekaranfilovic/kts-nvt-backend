@@ -69,7 +69,7 @@ class MenuItemsPageTest extends BaseE2ETest {
         menuItemsPage.clickConfirmDeletion();
         assertTrue(menuItemsPage.checkNumberOfItemsAfterDeactivation(numOfItemsAndPagesBeforeDeletion));
 
-        driver.close();
+        driver.quit();
     }
 
 }
