@@ -1,6 +1,5 @@
 package com.ktsnvt.ktsnvt.e2e.tests.pageobjects;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -28,12 +27,6 @@ public class MenuItemsPage extends BaseCRUDPage {
     @FindBy(css = "button[id='menuItemResetSearchBtn']")
     private WebElement resetButton;
 
-    @FindBy(css = "button[element-group='updateMenuItemPriceBtn']")
-    private List<WebElement> updateMenuPriceButton;
-
-    @FindBy(css = "button[element-group='deactivateMenuItemBtn']")
-    private WebElement deactivateMenuItemButton;
-
     @FindBy(css = "input[id='menuItemUpdatePriceField']")
     private WebElement updateMenuItemPriceField;
 
@@ -46,16 +39,16 @@ public class MenuItemsPage extends BaseCRUDPage {
     @FindBy(css = "tbody tr")
     private List<WebElement> menuItemTableRows;
 
-    @FindBy(css = "[name='menuItemName']")
+    @FindBy(css = "[element-group='menuItemName']")
     private List<WebElement> menuItemTableNames;
 
-    @FindBy(css = "[name='menuItemDescription']")
+    @FindBy(css = "[element-group='menuItemDescription']")
     private List<WebElement> menuItemTableDescriptions;
 
-    @FindBy(css = "[name='menuItemAllergies']")
+    @FindBy(css = "[element-group='menuItemAllergies']")
     private List<WebElement> menuItemTableAllergies;
 
-    @FindBy(css = "[name='menuItemPrice']")
+    @FindBy(css = "[element-group='menuItemPrice']")
     private List<WebElement> menuItemPrices;
 
     @FindBy(css = "[class='mat-paginator-range-label']")
@@ -67,7 +60,7 @@ public class MenuItemsPage extends BaseCRUDPage {
     @FindBy(css = "[dataclass='searchOption']")
     private List<WebElement> menuItemCategorySearchOptions;
 
-    @FindBy(css = "[name='menuItemCategory']")
+    @FindBy(css = "[element-group='menuItemCategory']")
     private List<WebElement> menuItemTableCategories;
 
     @FindBy(id = "loading-spinner")
@@ -76,13 +69,6 @@ public class MenuItemsPage extends BaseCRUDPage {
 
     public MenuItemsPage(WebDriver driver) {
         super(driver);
-    }
-
-
-    public Boolean checkMenuItemsRows(int numberOfElements) {
-        var elements = (new WebDriverWait(driver, 10))
-                .until(ExpectedConditions.numberOfElementsToBe(By.cssSelector("tbody tr"), numberOfElements));
-        return elements.size() == numberOfElements;
     }
 
     public void search(String query, Double priceLowerBound, Double priceUpperbound, String category) throws InterruptedException {
@@ -94,7 +80,7 @@ public class MenuItemsPage extends BaseCRUDPage {
         click(searchButton);
     }
 
-    public void resetSearchForm() throws InterruptedException {
+    public void resetSearchForm() {
         waitForSpinnerToFinish();
         click(resetButton);
     }
@@ -223,11 +209,5 @@ public class MenuItemsPage extends BaseCRUDPage {
         var currentTotalItems = Double.parseDouble(currentPageInfo
                 .substring(currentPageInfo.length() - 2));
         return currentTotalItems == previousTotalItems - 1d;
-    }
-
-    public double getLastMenuItemPrice() {
-        waitForSpinnerToFinish();
-        var priceField = getLastTableRowField(4);
-        return Double.parseDouble(priceField);
     }
 }

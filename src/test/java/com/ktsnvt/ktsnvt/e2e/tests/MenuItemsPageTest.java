@@ -20,7 +20,6 @@ class MenuItemsPageTest extends BaseE2ETest {
         var loginPage = PageFactory.initElements(driver, LoginPage.class);
         var menuItemsPage = PageFactory.initElements(driver, MenuItemsPage.class);
 
-
         navbar.navigateLogin();
         loginPage.setEmail("email2@email.com");
         loginPage.setPassword("password");
@@ -32,7 +31,6 @@ class MenuItemsPageTest extends BaseE2ETest {
         assertTrue(Utilities.checkUrl(driver, "/menu-items"));
 
         var numOfItemsAndPages = menuItemsPage.getPaginationInformation();
-
 
         menuItemsPage.search("ice", 10d, 100d, "FOOD");
         assertTrue(menuItemsPage.checkSearchQueryResultsOnAllPages(

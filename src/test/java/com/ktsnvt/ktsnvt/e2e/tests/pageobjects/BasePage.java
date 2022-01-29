@@ -32,10 +32,4 @@ public abstract class BasePage {
                         ExpectedConditions.visibilityOfAllElements(elements)));
     }
 
-    public WebElement waitForElementToBeRefreshedAndVisible(WebDriver driver,WebElement element) {
-        return new WebDriverWait(driver, 10)
-                .until(ExpectedConditions.refreshed(
-                        ExpectedConditions.visibilityOf(element)));
-    }
-
 }
