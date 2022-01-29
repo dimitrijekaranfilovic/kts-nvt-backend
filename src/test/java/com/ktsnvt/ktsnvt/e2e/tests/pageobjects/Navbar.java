@@ -39,6 +39,9 @@ public class Navbar extends BasePage {
     @FindBy(css = "a[routerlink='/inventory-items']")
     private WebElement linkInventoryItems;
 
+    @FindBy(css = "a[routerlink='/menu-items']")
+    private WebElement linkMenuItems;
+
     public Navbar(WebDriver driver) {
         super(driver);
     }
@@ -63,7 +66,13 @@ public class Navbar extends BasePage {
         click(linkSections);
     }
 
-    public void navigateInventoryItems() {click(linkInventoryItems);}
+    public void navigateInventoryItems() {
+        click(linkInventoryItems);
+    }
+
+    public void navigateMenuItems() {
+        click(linkMenuItems);
+    }
 
     public void clickLogout() {
         click(profileButton);

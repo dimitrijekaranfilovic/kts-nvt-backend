@@ -5,6 +5,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.List;
+
 public abstract class BasePage {
     protected final WebDriver driver;
 
@@ -22,4 +24,12 @@ public abstract class BasePage {
         var element = new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(clickable));
         element.click();
     }
+
+
+    public List<WebElement> waitForElementsToBeRefreshedAndVisible(WebDriver driver, List<WebElement> elements) {
+        return new WebDriverWait(driver, 10)
+                .until(ExpectedConditions.refreshed(
+                        ExpectedConditions.visibilityOfAllElements(elements)));
+    }
+
 }
