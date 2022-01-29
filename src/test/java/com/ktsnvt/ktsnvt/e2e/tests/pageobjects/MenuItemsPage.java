@@ -203,7 +203,6 @@ public class MenuItemsPage extends BaseCRUDPage {
                         ExpectedConditions.textToBePresentInElement(
                                 paginationItemAndPageNumbers, numOfItemsAndPagesBeforeDeletion)));
         var currentPageInfo = getPaginationInformation();
-        System.out.println(currentPageInfo);
         var previousTotalItems = Double.parseDouble(numOfItemsAndPagesBeforeDeletion
                 .substring(numOfItemsAndPagesBeforeDeletion.length() - 2));
         var currentTotalItems = Double.parseDouble(currentPageInfo

@@ -65,7 +65,6 @@ class MenuItemsPageTest extends BaseE2ETest {
         assertTrue(menuItemsPage.checkLastMenuItemPriceUpdated(496d));
 
         var numOfItemsAndPagesBeforeDeletion = menuItemsPage.getPaginationInformation();
-        System.out.println(numOfItemsAndPagesBeforeDeletion);
         menuItemsPage.clickDeactivateLastMenuItem();
         menuItemsPage.clickConfirmDeletion();
         assertTrue(menuItemsPage.checkNumberOfItemsAfterDeactivation(numOfItemsAndPagesBeforeDeletion));
