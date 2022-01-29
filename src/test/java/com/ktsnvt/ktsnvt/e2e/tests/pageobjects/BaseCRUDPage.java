@@ -55,7 +55,7 @@ public abstract class BaseCRUDPage extends BasePage {
         click(actions.get(index));
     }
 
-    protected void performRowAction(WebElement row, int index){
+    protected void performRowAction(WebElement row, int index) {
         var actions = row.findElements(By.cssSelector("button"));
         click(actions.get(index));
     }
@@ -114,6 +114,20 @@ public abstract class BaseCRUDPage extends BasePage {
             return true;
         }
         return false;
+    }
+
+    public boolean checkNumberOfItemsAfterDeactivation(String numOfItemsAndPagesBeforeDeletion) {
+        waitForSpinnerToFinish();
+        (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.not(
+                        ExpectedConditions.textToBePresentInElement(
+                                paginationItemAndPageNumbers, numOfItemsAndPagesBeforeDeletion)));
+        var currentPageInfo = getPaginationInformation();
+        var previousTotalItems = Double.parseDouble(numOfItemsAndPagesBeforeDeletion
+                .substring(numOfItemsAndPagesBeforeDeletion.length() - 2));
+        var currentTotalItems = Double.parseDouble(currentPageInfo
+                .substring(currentPageInfo.length() - 2));
+        return currentTotalItems == previousTotalItems - 1d;
     }
 
 }

@@ -158,19 +158,4 @@ public class MenuItemsPage extends BaseCRUDPage {
         return categories.stream().parallel().map(WebElement::getText)
                 .allMatch(p -> p.toLowerCase(Locale.ROOT).contains(categoryName.toLowerCase(Locale.ROOT)));
     }
-
-
-    public boolean checkNumberOfItemsAfterDeactivation(String numOfItemsAndPagesBeforeDeletion) {
-        waitForSpinnerToFinish();
-        (new WebDriverWait(driver, 10))
-                .until(ExpectedConditions.not(
-                        ExpectedConditions.textToBePresentInElement(
-                                paginationItemAndPageNumbers, numOfItemsAndPagesBeforeDeletion)));
-        var currentPageInfo = getPaginationInformation();
-        var previousTotalItems = Double.parseDouble(numOfItemsAndPagesBeforeDeletion
-                .substring(numOfItemsAndPagesBeforeDeletion.length() - 2));
-        var currentTotalItems = Double.parseDouble(currentPageInfo
-                .substring(currentPageInfo.length() - 2));
-        return currentTotalItems == previousTotalItems - 1d;
-    }
 }

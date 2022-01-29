@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.openqa.selenium.support.PageFactory;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class InventoryItemsPageTest extends BaseE2ETest {
 
     @Test
-    void inventoryItems_happyFlow() throws InterruptedException {
+    void inventoryItems_happyFlow(){
         var driver = initDriver();
         var navbar = PageFactory.initElements(driver, Navbar.class);
         var loginPage = PageFactory.initElements(driver, LoginPage.class);
@@ -76,8 +77,12 @@ class InventoryItemsPageTest extends BaseE2ETest {
         assertTrue(inventoryItemsPage.checkItemFields(updatedName, "Updated description",
                 496d, "Updated allergy", "true"));
 
-        inventoryItemsPage.clickDeleteLastInventoryItem();
+        var numOfItemsAndPagesBeforeDeletion = inventoryItemsPage.getPaginationInformation();
+        inventoryItemsPage.clickDeleteLastInventoryItem(updatedName);
         inventoryItemsPage.clickConfirmDeletion();
+        assertFalse(inventoryItemsPage.checkItemFields(updatedName, "Updated description",
+                496d, "Updated allergy", "true"));
+        assertTrue(inventoryItemsPage.checkNumberOfItemsAfterDeactivation(numOfItemsAndPagesBeforeDeletion));
 
         driver.quit();
     }

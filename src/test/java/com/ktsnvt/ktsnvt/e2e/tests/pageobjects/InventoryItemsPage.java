@@ -149,8 +149,15 @@ public class InventoryItemsPage extends BaseCRUDPage {
         return getLastTableRowField(5);
     }
 
-    public void clickDeleteLastInventoryItem() {
-        performLastTableRowAction(2);
+    public void clickDeleteLastInventoryItem(String itemName) {
+        waitForSpinnerToFinish();
+        do {
+            var row = findItemWithNameOnCurrentPage(itemName);
+            if (row != null) {
+                performRowAction(row, 2);
+                break;
+            }
+        } while (goToNextPageIfPossible());
     }
 
     public void clickConfirmDeletion() {
@@ -212,11 +219,7 @@ public class InventoryItemsPage extends BaseCRUDPage {
         do {
             var row = findItemWithNameOnCurrentPage(itemName);
             if (row != null) {
-                if (checkItemFields(row, itemName, itemDescription, price, itemAllergy, inMenu)) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return checkItemFields(row, itemName, itemDescription, price, itemAllergy, inMenu);
             }
         } while (goToNextPageIfPossible());
         return false;
@@ -252,14 +255,11 @@ public class InventoryItemsPage extends BaseCRUDPage {
                 .findElement(By.cssSelector("[element-group='inventoryItemAllergies']")).getText();
         var currentIsInMenu = inventoryItem
                 .findElement(By.cssSelector("[element-group='inventoryItemIsInMenu']")).getText();
-        if (currentName.equals(itemName)
+        return currentName.equals(itemName)
                 && currentDescription.equals(itemDescription)
                 && Double.parseDouble(currentPrice) == price
                 && currentAllergy.equals(itemAllergy)
-                && currentIsInMenu.equals(inMenu)) {
-            return true;
-        }
-        return false;
+                && currentIsInMenu.equals(inMenu);
 
     }
 
