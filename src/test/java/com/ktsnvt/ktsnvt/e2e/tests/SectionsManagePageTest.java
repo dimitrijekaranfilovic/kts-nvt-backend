@@ -28,20 +28,20 @@ class SectionsManagePageTest extends BaseE2ETest {
 
         navbar.navigateSectionsAdmin();
         assertTrue(Utilities.checkUrl(driver, "/sections/manage"));
-        assertTrue(sectionsManagePage.checkSectionTableRows(4));
 
+        var sectionsBeforeInsert = sectionsManagePage.getNumberOfElements();
         sectionsManagePage.clickCreateSection();
         sectionsManagePage.setName("Nova Sekcija");
         sectionsManagePage.clickSaveButton();
-        assertTrue(sectionsManagePage.checkSectionTableRows(5));
-        assertEquals("Nova Sekcija", sectionsManagePage.getLastSectionName());
+        assertEquals(sectionsBeforeInsert + 1, sectionsManagePage.getNumberOfElements());
+        assertTrue(sectionsManagePage.checkLastSectionName("Nova Sekcija"));
 
+        var sectionsBeforeUpdate = sectionsManagePage.getNumberOfElements();
         sectionsManagePage.clickUpdateLastSection();
         sectionsManagePage.setName("Izmenjena sekcija");
         sectionsManagePage.clickSaveButton();
-        Thread.sleep(500);
-        assertTrue(sectionsManagePage.checkSectionTableRows(5));
-        assertEquals("Izmenjena sekcija", sectionsManagePage.getLastSectionName());
+        assertEquals(sectionsBeforeUpdate, sectionsManagePage.getNumberOfElements());
+        assertTrue(sectionsManagePage.checkLastSectionName("Izmenjena sekcija"));
 
         var id = sectionsManagePage.getLastSectionId();
         sectionsManagePage.clickViewSeatingLayoutLastSection();
@@ -49,9 +49,10 @@ class SectionsManagePageTest extends BaseE2ETest {
         navbar.navigateSectionsAdmin();
         assertTrue(Utilities.checkUrl(driver, "/sections/manage"));
 
+        var sectionsBeforeDelete = sectionsManagePage.getNumberOfElements();
         sectionsManagePage.clickDeleteLastSection();
         sectionsManagePage.clickYesButton();
-        assertTrue(sectionsManagePage.checkSectionTableRows(4));
+        assertEquals(sectionsBeforeDelete - 1, sectionsManagePage.getNumberOfElements());
 
         driver.quit();
     }

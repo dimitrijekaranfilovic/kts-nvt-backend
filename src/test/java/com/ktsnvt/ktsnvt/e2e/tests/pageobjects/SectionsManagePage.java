@@ -1,11 +1,10 @@
 package com.ktsnvt.ktsnvt.e2e.tests.pageobjects;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.util.List;
 
 public class SectionsManagePage extends BaseCRUDPage {
     @FindBy(css = "button[id='createSection']")
@@ -19,6 +18,9 @@ public class SectionsManagePage extends BaseCRUDPage {
 
     @FindBy(css = "button[id='yes']")
     private WebElement yesButton;
+
+    @FindBy(css = "tbody tr")
+    private List<WebElement> sectionTableRows;
 
     public SectionsManagePage(WebDriver driver) {
         super(driver);
@@ -40,17 +42,14 @@ public class SectionsManagePage extends BaseCRUDPage {
         click(yesButton);
     }
 
-    public boolean checkSectionTableRows(int numberOfElements) {
-        var elements = (new WebDriverWait(driver, 10)
-                .until(ExpectedConditions.numberOfElementsToBe(By.cssSelector("tbody tr"), numberOfElements)));
-        return elements.size() == numberOfElements;
-    }
-
-    public String getLastSectionName() {
-        return getLastTableRowField(1);
+    public int getNumberOfElements() {
+        waitForSpinnerToFinish();
+        waitForElementsToBeRefreshedAndVisible(driver, sectionTableRows);
+        return sectionTableRows.size();
     }
 
     public String getLastSectionId() {
+        waitForSpinnerToFinish();
         return getLastTableRowField(0);
     }
 
@@ -64,5 +63,9 @@ public class SectionsManagePage extends BaseCRUDPage {
 
     public void clickDeleteLastSection() {
         performLastTableRowAction(2);
+    }
+
+    public boolean checkLastSectionName(String name) {
+        return getLastTableRowField(1).equals(name);
     }
 }
