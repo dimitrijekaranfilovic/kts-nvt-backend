@@ -53,7 +53,7 @@ class InventoryItemsPageTest extends BaseE2ETest {
         inventoryItemsPage.resetSearchForm();
 
         inventoryItemsPage.clickCreateInventoryItem();
-        inventoryItemsPage.setUpdateNameField("New item that doesn't exist");
+        var createdName = inventoryItemsPage.setUpdateNameField("New item that doesn't exist");
         inventoryItemsPage.setUpdateDescriptionFieldField("New description");
         inventoryItemsPage.setUpdateBasePriceField(42d);
         inventoryItemsPage.setUpdateAllergiesField("New allergy");
@@ -62,7 +62,7 @@ class InventoryItemsPageTest extends BaseE2ETest {
                 "New description", 42d, "New allergy", "false"));
 
 
-        inventoryItemsPage.clickUpdateLastInventoryItem();
+        inventoryItemsPage.clickUpdateInventoryItem(createdName);
         inventoryItemsPage.setUpdateNameField("Updated name that doesnt exist");
         inventoryItemsPage.setUpdateDescriptionFieldField("Updated description");
         inventoryItemsPage.setUpdateBasePriceField(496d);

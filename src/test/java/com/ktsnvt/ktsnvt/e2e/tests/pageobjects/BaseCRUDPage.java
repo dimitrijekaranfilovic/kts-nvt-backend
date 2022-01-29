@@ -55,6 +55,11 @@ public abstract class BaseCRUDPage extends BasePage {
         click(actions.get(index));
     }
 
+    protected void performRowAction(WebElement row, int index){
+        var actions = row.findElements(By.cssSelector("button"));
+        click(actions.get(index));
+    }
+
     protected String getLastTableRowField(int index) {
         var lastTableRow = getLastTableRow();
         var tds = lastTableRow.findElements(By.cssSelector("td"));

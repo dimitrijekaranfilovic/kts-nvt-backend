@@ -99,8 +99,9 @@ public class InventoryItemsPage extends BaseCRUDPage {
         click(createInventoryItemButton);
     }
 
-    public void setUpdateNameField(String updateName) {
+    public String setUpdateNameField(String updateName) {
         sendKeys(updateNameField, updateName);
+        return updateName;
     }
 
     public void setUpdateDescriptionFieldField(String updateDescription) {
@@ -253,5 +254,15 @@ public class InventoryItemsPage extends BaseCRUDPage {
         }
         return false;
 
+    }
+
+    public void clickUpdateInventoryItem(String createdName) {
+        waitForSpinnerToFinish();
+        do {
+            var row = findItemWithNameOnCurrentPage(createdName);
+            if (row != null) {
+                performRowAction(row, 0);
+            }
+        } while (goToNextPageIfPossible());
     }
 }
