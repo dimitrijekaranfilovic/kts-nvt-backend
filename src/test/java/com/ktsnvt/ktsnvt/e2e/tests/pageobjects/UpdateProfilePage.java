@@ -29,4 +29,12 @@ public class UpdateProfilePage extends BasePage {
     public void clickUpdateProfile() {
         click(updateProfileButton);
     }
+
+    public String getName() {
+        return firstNameInput.getAttribute("value");
+    }
+
+    public String getSurname() {
+        return lastNameInput.getAttribute("value");
+    }
 }

@@ -18,7 +18,7 @@ public class AdminSectionsPage extends BasePage {
     }
 
     public void clickLayoutButton(Integer buttonIndex) {
-        List<WebElement> elements = new WebDriverWait(driver, 0).until(ExpectedConditions.visibilityOfAllElements(layoutButtons));
+        List<WebElement> elements = new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfAllElements(layoutButtons));
         elements.get(buttonIndex).click();
     }
 }

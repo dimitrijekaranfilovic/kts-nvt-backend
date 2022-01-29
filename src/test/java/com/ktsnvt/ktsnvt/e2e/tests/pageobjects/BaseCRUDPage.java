@@ -90,6 +90,13 @@ public abstract class BaseCRUDPage extends BasePage {
         return true;
     }
 
+    public void goToLastPage() {
+        waitForSpinnerToFinish();
+        if (lastPageButton.getAttribute("ng-reflect-disabled").equals("false")) {
+            clickLastPageButton();
+        }
+    }
+
     public boolean checkEmptyResultsPage() {
         (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOf(suchEmpty)));
