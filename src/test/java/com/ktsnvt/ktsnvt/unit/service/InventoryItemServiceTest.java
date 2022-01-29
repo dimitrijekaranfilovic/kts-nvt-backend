@@ -54,7 +54,7 @@ class InventoryItemServiceTest {
         savedItem.setId(42);
         savedItem.setName(inventoryItem.getName());
 
-        doReturn(Optional.empty()).when(inventoryItemRepository).findByName(inventoryItem.getName());
+        doReturn(Optional.empty()).when(inventoryItemRepository).findByNameAndIsActiveTrue(inventoryItem.getName());
         doReturn(savedItem).when(inventoryItemRepository).save(inventoryItem);
 
         // WHEN
@@ -62,7 +62,7 @@ class InventoryItemServiceTest {
 
         // THEN
         assertEquals(savedItem, returnedItem);
-        verify(inventoryItemRepository, times(1)).findByName(inventoryItem.getName());
+        verify(inventoryItemRepository, times(1)).findByNameAndIsActiveTrue(inventoryItem.getName());
         verify(inventoryItemRepository, times(1)).save(inventoryItem);
     }
 
@@ -73,14 +73,14 @@ class InventoryItemServiceTest {
         inventoryItem.setName("name taken");
         var sameInventoryItem = new InventoryItem();
         sameInventoryItem.setName("name taken");
-        doReturn(Optional.of(sameInventoryItem)).when(inventoryItemRepository).findByName(inventoryItem.getName());
+        doReturn(Optional.of(sameInventoryItem)).when(inventoryItemRepository).findByNameAndIsActiveTrue(inventoryItem.getName());
 
         // WHEN
         assertThrows(InventoryItemNameAlreadyExistsException.class,
                 () -> inventoryItemService.createInventoryItem(inventoryItem));
 
         // THEN
-        verify(inventoryItemRepository, times(1)).findByName(inventoryItem.getName());
+        verify(inventoryItemRepository, times(1)).findByNameAndIsActiveTrue(inventoryItem.getName());
         verifyNoMoreInteractions(inventoryItemRepository);
     }
 
@@ -186,7 +186,7 @@ class InventoryItemServiceTest {
         var inventoryItemServiceSpy = spy(inventoryItemService);
 
         doReturn(inventoryItem).when(inventoryItemServiceSpy).readForUpdate(id);
-        doReturn(Optional.empty()).when(inventoryItemRepository).findByName(name);
+        doReturn(Optional.empty()).when(inventoryItemRepository).findByNameAndIsActiveTrue(name);
         doNothing().when(basePriceService).updateInventoryItemBasePrice(eq(id), any(BasePrice.class));
         doReturn(currentDate).when(localDateTimeService).currentTime();
 
@@ -201,7 +201,7 @@ class InventoryItemServiceTest {
         assertEquals(image, inventoryItem.getImage());
         assertEquals(itemCategory, inventoryItem.getCategory());
         verify(inventoryItemServiceSpy, times(1)).readForUpdate(id);
-        verify(inventoryItemRepository, times(1)).findByName(name);
+        verify(inventoryItemRepository, times(1)).findByNameAndIsActiveTrue(name);
         verify(basePriceService, times(1))
                 .updateInventoryItemBasePrice(eq(id), any(BasePrice.class));
         verify(localDateTimeService, times(1)).currentTime();
@@ -227,7 +227,7 @@ class InventoryItemServiceTest {
 
         var inventoryItemServiceSpy = spy(inventoryItemService);
         doReturn(inventoryItem).when(inventoryItemServiceSpy).readForUpdate(id);
-        doReturn(Optional.of(inventoryItemSameName)).when(inventoryItemRepository).findByName(name);
+        doReturn(Optional.of(inventoryItemSameName)).when(inventoryItemRepository).findByNameAndIsActiveTrue(name);
 
         // WHEN
         assertThrows(InventoryItemNameAlreadyExistsException.class,
@@ -241,7 +241,7 @@ class InventoryItemServiceTest {
         assertNotEquals(image, inventoryItem.getImage());
         assertNotEquals(itemCategory, inventoryItem.getCategory());
         verify(inventoryItemServiceSpy, times(1)).readForUpdate(id);
-        verify(inventoryItemRepository, times(1)).findByName(name);
+        verify(inventoryItemRepository, times(1)).findByNameAndIsActiveTrue(name);
         verifyNoInteractions(basePriceService);
         verifyNoInteractions(localDateTimeService);
     }

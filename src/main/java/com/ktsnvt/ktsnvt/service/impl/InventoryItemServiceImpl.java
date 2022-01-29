@@ -38,7 +38,7 @@ public class InventoryItemServiceImpl extends TransactionalServiceBase implement
 
     @Override
     public InventoryItem createInventoryItem(InventoryItem inventoryItem) {
-        var sameInventoryItem = inventoryItemRepository.findByName(inventoryItem.getName());
+        var sameInventoryItem = inventoryItemRepository.findByNameAndIsActiveTrue(inventoryItem.getName());
         if (sameInventoryItem.isPresent()) {
             throw new InventoryItemNameAlreadyExistsException(inventoryItem.getName());
         }
@@ -76,7 +76,7 @@ public class InventoryItemServiceImpl extends TransactionalServiceBase implement
         var inventoryItem = readForUpdate(id);
 
         if (!name.equals(inventoryItem.getName())) {
-            inventoryItemRepository.findByName(name)
+            inventoryItemRepository.findByNameAndIsActiveTrue(name)
                     .ifPresent(item -> {
                         throw new InventoryItemNameAlreadyExistsException(name);
                     });

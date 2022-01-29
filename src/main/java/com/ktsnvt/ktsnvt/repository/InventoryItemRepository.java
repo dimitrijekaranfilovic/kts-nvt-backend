@@ -15,7 +15,7 @@ import java.util.Optional;
 public interface InventoryItemRepository extends JpaRepository<InventoryItem, Integer> {
 
     @Lock(LockModeType.OPTIMISTIC)
-    Optional<InventoryItem> findByName(String name);
+    Optional<InventoryItem> findByNameAndIsActiveTrue(String name);
 
     @Lock(LockModeType.OPTIMISTIC)
     @Query("select i from InventoryItem i where i.id = :id and i.isActive = true")
