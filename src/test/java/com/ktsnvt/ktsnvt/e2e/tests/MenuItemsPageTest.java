@@ -45,9 +45,9 @@ class MenuItemsPageTest extends BaseE2ETest {
         assertTrue(menuItemsPage.checkSearchQueryResultsOnAllPages(
                 "all", v -> (v >= 100d && v <= 10000d), "DRINK"));
 
-        menuItemsPage.search("all", 100d, 10000d, "DRINK");
+        menuItemsPage.search("all", 100d, 10000d, "FOOD");
         assertTrue(menuItemsPage.checkSearchQueryResultsOnAllPages(
-                "all", v -> (v >= 100d && v <= 10000d), "DRINK"));
+                "all", v -> (v >= 100d && v <= 10000d), "FOOD"));
 
         menuItemsPage.search("all", 0d, 322d, "DRINK");
         assertTrue(menuItemsPage.checkSearchQueryResultsOnAllPages(
@@ -60,6 +60,13 @@ class MenuItemsPageTest extends BaseE2ETest {
         menuItemsPage.resetSearchForm();
 
         assertTrue(menuItemsPage.checkPaginationInformationMatching(numOfItemsAndPages));
+
+
+        menuItemsPage.clickUpdateLastMenuItemPriceButton();
+        menuItemsPage.setUpdatePriceField(42d);
+        menuItemsPage.clickSaveChangesButton();
+        menuItemsPage.checkLastMenuItemPriceUpdated(42d);
+
 
 //        driver.close();
     }

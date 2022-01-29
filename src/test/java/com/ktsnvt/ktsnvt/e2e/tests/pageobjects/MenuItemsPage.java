@@ -28,10 +28,10 @@ public class MenuItemsPage extends BaseCRUDPage {
     @FindBy(css = "button[id='menuItemResetSearchBtn']")
     private WebElement resetButton;
 
-    @FindBy(css = "button[id='updateMenuItemPriceBtn']")
-    private WebElement updateMenuPriceButton;
+    @FindBy(css = "button[element-group='updateMenuItemPriceBtn']")
+    private List<WebElement> updateMenuPriceButton;
 
-    @FindBy(css = "button[id='deactivateMenuItemBtn']")
+    @FindBy(css = "button[element-group='deactivateMenuItemBtn']")
     private WebElement deactivateMenuItemButton;
 
     @FindBy(css = "input[id='menuItemUpdatePriceField']")
@@ -99,13 +99,27 @@ public class MenuItemsPage extends BaseCRUDPage {
         click(resetButton);
     }
 
+    public void clickSaveChangesButton() {
+        waitForSpinnerToFinish();
+        click(menuItemUpdateSubmitButton);
+    }
+
+    public boolean checkLastMenuItemPriceUpdated(Double enteredPrice) {
+        waitForSpinnerToFinish();
+        var priceField = getLastTableRowField(4);
+        return Double.parseDouble(priceField) == enteredPrice;
+    }
+
+
     public void setUpdatePriceField(Double updatePrice) {
+        waitForSpinnerToFinish();
         sendKeys(updateMenuItemPriceField,
                 updatePrice.toString());
     }
 
-    public void clickUpdateMenuItemPriceButton() {
-        click(updateMenuPriceButton);
+    public void clickUpdateLastMenuItemPriceButton() {
+        waitForSpinnerToFinish();
+        performLastTableRowAction(0);
     }
 
     public void clickDeactivateLastMenuItem() {
