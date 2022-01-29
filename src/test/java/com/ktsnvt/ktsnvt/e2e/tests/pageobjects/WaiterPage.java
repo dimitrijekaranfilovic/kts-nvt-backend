@@ -41,8 +41,6 @@ public class WaiterPage extends BasePage {
     public void clickOnTable(Integer tableX, Integer tableY) throws InterruptedException {
         List<WebElement> elements = new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("canvas")));
 
-        Thread.sleep(200); // wait for animation to finish
-
         Point location = elements.get(0).getLocation();
         int x = location.getX();
         int y = location.getY();
