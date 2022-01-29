@@ -44,6 +44,7 @@ class BartenderPageTest extends BaseE2ETest {
 
         assertTrue(bartenderPage.checkNewTableRows(initialNewRequests - 2));
         assertTrue(bartenderPage.checkPreparingTableRows(initialPreparingRequests));
-        driver.close();
+
+        driver.quit();
     }
 }

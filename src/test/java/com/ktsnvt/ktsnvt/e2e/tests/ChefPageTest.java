@@ -44,6 +44,7 @@ class ChefPageTest extends BaseE2ETest {
 
         assertTrue(chefPage.checkNewTableRows(initialNewRequests - 2));
         assertTrue(chefPage.checkPreparingTableRows(initialPreparingRequests));
-        driver.close();
+
+        driver.quit();
     }
 }
