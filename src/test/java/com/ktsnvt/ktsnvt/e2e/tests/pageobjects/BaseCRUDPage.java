@@ -7,7 +7,6 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.util.List;
 import java.util.function.Predicate;
 
 public abstract class BaseCRUDPage extends BasePage {
@@ -72,6 +71,10 @@ public abstract class BaseCRUDPage extends BasePage {
         click(nextPageButton);
     }
 
+    public void clickLastPageButton() {
+        click(lastPageButton);
+    }
+
     // Override this method
     public boolean checkSearchResults(String query, Predicate<Double> comparator, String category) {
         return false;
@@ -83,10 +86,7 @@ public abstract class BaseCRUDPage extends BasePage {
             if (!satisfied) {
                 return false;
             }
-            if (nextPageButton.getAttribute("ng-reflect-disabled").equals("false")) {
-                clickNextPageButton();
-            }
-        } while (nextPageButton.getAttribute("ng-reflect-disabled").equals("false"));
+        } while (goToNextPageIfPossible());
         return true;
     }
 
@@ -94,6 +94,14 @@ public abstract class BaseCRUDPage extends BasePage {
         (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOf(suchEmpty)));
         return true;
+    }
+
+    public boolean goToNextPageIfPossible() {
+        if (nextPageButton.getAttribute("ng-reflect-disabled").equals("false")) {
+            clickNextPageButton();
+            return true;
+        }
+        return false;
     }
 
 }

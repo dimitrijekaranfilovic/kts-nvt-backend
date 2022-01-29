@@ -109,13 +109,6 @@ public class MenuItemsPage extends BaseCRUDPage {
         click(yesButton);
     }
 
-    public int countItems() {
-        waitForSpinnerToFinish();
-        var elements = (new WebDriverWait(driver, 10))
-                .until(ExpectedConditions.visibilityOfAllElements(menuItemTableRows));
-        return elements.size();
-    }
-
     @Override
     public boolean checkSearchResults(String query, Predicate<Double> comparator, String categoryName) {
         waitForSpinnerToFinish();
@@ -143,7 +136,6 @@ public class MenuItemsPage extends BaseCRUDPage {
                 .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(menuItemPrices)));
         return prices.stream().parallel().map(WebElement::getText).map(Double::parseDouble).allMatch(comparator);
     }
-
 
     public void selectCategoryOption(String categoryName) {
         waitForSpinnerToFinish();

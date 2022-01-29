@@ -83,12 +83,6 @@ public class InventoryItemsPage extends BaseCRUDPage {
         super(driver);
     }
 
-    public Boolean checkInventoryItemsRows(int numberOfElements) {
-        var elements = (new WebDriverWait(driver, 10))
-                .until(ExpectedConditions.numberOfElementsToBe(By.cssSelector("tbody tr"), numberOfElements));
-        return elements.size() == numberOfElements;
-    }
-
     public void search(String query, Double priceLowerBound, Double priceUpperbound, String category) {
         sendKeys(queryInput, query);
         sendKeys(basePriceLowerBoundInput, priceLowerBound.toString());
@@ -97,7 +91,7 @@ public class InventoryItemsPage extends BaseCRUDPage {
         click(searchButton);
     }
 
-    public void resetSearchForm(){
+    public void resetSearchForm() {
         click(resetButton);
     }
 
@@ -125,26 +119,6 @@ public class InventoryItemsPage extends BaseCRUDPage {
 
     public void clickSubmitInventoryItemUpdate() {
         click(submitInventoryItemUpdate);
-    }
-
-    public String getLastInventoryItemName() {
-        return getLastTableRowField(0);
-    }
-
-    public String getLastInventoryItemDescription() {
-        return getLastTableRowField(1);
-    }
-
-    public String getLastInventoryItemBasePrice() {
-        return getLastTableRowField(4);
-    }
-
-    public String getLastInventoryItemAllergy() {
-        return getLastTableRowField(2);
-    }
-
-    public String getLastInventoryItemCategory() {
-        return getLastTableRowField(3);
     }
 
     public void clickUpdateLastInventoryItem() {
@@ -223,5 +197,61 @@ public class InventoryItemsPage extends BaseCRUDPage {
         var prices = (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(inventoryItemPrices)));
         return prices.stream().parallel().map(WebElement::getText).map(Double::parseDouble).allMatch(comparator);
+    }
+
+    public boolean checkItemFields(String itemName, String itemDescription, Double price, String itemAllergy, String inMenu) {
+        waitForSpinnerToFinish();
+        do {
+            var row = findItemWithNameOnCurrentPage(itemName);
+            if (row != null) {
+                if (checkItemFields(row, itemName, itemDescription, price, itemAllergy, inMenu)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } while (goToNextPageIfPossible());
+        return false;
+    }
+
+    private WebElement findItemWithNameOnCurrentPage(String itemName) {
+        waitForSpinnerToFinish();
+        var rows = waitForElementsToBeRefreshedAndVisible(driver, inventoryItemTableRows);
+        for (var row :
+                rows) {
+            var name = row.findElement(By.cssSelector("[element-group='inventoryItemName']"));
+            var rowName = name.getText();
+            if (itemName.equals(rowName)) {
+                return row;
+            }
+        }
+        return null;
+    }
+
+    private boolean checkItemFields(WebElement inventoryItem, String itemName, String itemDescription,
+                                    Double price, String itemAllergy, String inMenu) {
+        waitForSpinnerToFinish();
+        if (inventoryItem == null) {
+            return false;
+        }
+        var currentName = inventoryItem
+                .findElement(By.cssSelector("[element-group='inventoryItemName']")).getText();
+        var currentDescription = inventoryItem
+                .findElement(By.cssSelector("[element-group='inventoryItemDescription']")).getText();
+        var currentPrice = inventoryItem
+                .findElement(By.cssSelector("[element-group='inventoryItemPrice']")).getText();
+        var currentAllergy = inventoryItem
+                .findElement(By.cssSelector("[element-group='inventoryItemAllergies']")).getText();
+        var currentIsInMenu = inventoryItem
+                .findElement(By.cssSelector("[element-group='inventoryItemIsInMenu']")).getText();
+        if (currentName.equals(itemName)
+                && currentDescription.equals(itemDescription)
+                && Double.parseDouble(currentPrice) == price
+                && currentAllergy.equals(itemAllergy)
+                && currentIsInMenu.equals(inMenu)) {
+            return true;
+        }
+        return false;
+
     }
 }

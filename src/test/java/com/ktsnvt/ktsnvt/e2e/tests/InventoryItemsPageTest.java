@@ -53,32 +53,23 @@ class InventoryItemsPageTest extends BaseE2ETest {
         inventoryItemsPage.resetSearchForm();
 
         inventoryItemsPage.clickCreateInventoryItem();
-        inventoryItemsPage.setUpdateNameField("New item");
+        inventoryItemsPage.setUpdateNameField("New item that doesn't exist");
         inventoryItemsPage.setUpdateDescriptionFieldField("New description");
         inventoryItemsPage.setUpdateBasePriceField(42d);
         inventoryItemsPage.setUpdateAllergiesField("New allergy");
         inventoryItemsPage.clickSubmitInventoryItemUpdate();
-        Thread.sleep(1000);
-        assertTrue(inventoryItemsPage.checkInventoryItemsRows(5));
-        assertEquals("New item", inventoryItemsPage.getLastInventoryItemName());
-        assertEquals("New description", inventoryItemsPage.getLastInventoryItemDescription());
-        assertEquals("42", inventoryItemsPage.getLastInventoryItemBasePrice());
-        assertEquals("New allergy", inventoryItemsPage.getLastInventoryItemAllergy());
-        assertEquals("false", inventoryItemsPage.getLastInventoryItemInMenu());
+        assertTrue(inventoryItemsPage.checkItemFields("New item that doesn't exist",
+                "New description", 42d, "New allergy", "false"));
 
 
         inventoryItemsPage.clickUpdateLastInventoryItem();
-        inventoryItemsPage.setUpdateNameField("Updated name");
+        inventoryItemsPage.setUpdateNameField("Updated name that doesnt exist");
         inventoryItemsPage.setUpdateDescriptionFieldField("Updated description");
         inventoryItemsPage.setUpdateBasePriceField(496d);
         inventoryItemsPage.setUpdateAllergiesField("Updated allergy");
         inventoryItemsPage.clickSubmitInventoryItemUpdate();
-        Thread.sleep(1000);
-        assertEquals("Updated name", inventoryItemsPage.getLastInventoryItemName());
-        assertEquals("Updated description", inventoryItemsPage.getLastInventoryItemDescription());
-        assertEquals("496", inventoryItemsPage.getLastInventoryItemBasePrice());
-        assertEquals("Updated allergy", inventoryItemsPage.getLastInventoryItemAllergy());
-        assertEquals("false", inventoryItemsPage.getLastInventoryItemInMenu());
+        assertTrue(inventoryItemsPage.checkItemFields("Updated name that doesnt exist", "Updated description",
+                496d, "Updated allergy", "false"));
 
         inventoryItemsPage.clickAddToMenu();
         inventoryItemsPage.setNewMenuItemPrice(42d);
@@ -88,7 +79,6 @@ class InventoryItemsPageTest extends BaseE2ETest {
 
         inventoryItemsPage.clickDeleteLastInventoryItem();
         inventoryItemsPage.clickConfirmDeletion();
-        assertTrue(inventoryItemsPage.checkInventoryItemsRows(4));
 
         driver.quit();
     }
