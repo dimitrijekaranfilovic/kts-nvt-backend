@@ -70,6 +70,9 @@ public class MenuItemsPage extends BaseCRUDPage {
     @FindBy(css = "[name='menuItemCategory']")
     private List<WebElement> menuItemTableCategories;
 
+    @FindBy(id = "loading-spinner")
+    private WebElement loadingSpinner;
+
 
     public MenuItemsPage(WebDriver driver) {
         super(driver);
@@ -83,6 +86,7 @@ public class MenuItemsPage extends BaseCRUDPage {
     }
 
     public void search(String query, Double priceLowerBound, Double priceUpperbound, String category) throws InterruptedException {
+        waitForSpinnerToFinish();
         sendKeys(queryInput, query);
         sendKeys(priceLowerBoundInput, priceLowerBound.toString());
         sendKeys(priceUpperBoundInput, priceUpperbound.toString());
@@ -91,6 +95,7 @@ public class MenuItemsPage extends BaseCRUDPage {
     }
 
     public void resetSearchForm() throws InterruptedException {
+        waitForSpinnerToFinish();
         click(resetButton);
     }
 
@@ -111,20 +116,28 @@ public class MenuItemsPage extends BaseCRUDPage {
         click(yesButton);
     }
 
+    public void waitForSpinnerToFinish() {
+        (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.invisibilityOf(loadingSpinner));
+    }
 
     public int countItems() {
+        waitForSpinnerToFinish();
         var elements = (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.visibilityOfAllElements(menuItemTableRows));
         return elements.size();
     }
 
     public String getPaginationInformation() {
+        waitForSpinnerToFinish();
         return new WebDriverWait(driver, 10)
                 .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOf(paginationItemAndPageNumbers)))
                 .getText();
     }
 
     public boolean checkPaginationInformationMatching(String previousPaginationInformation) {
+        System.out.println(previousPaginationInformation);
+        waitForSpinnerToFinish();
         return (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.textToBePresentInElement(paginationItemAndPageNumbers, previousPaginationInformation));
 
@@ -133,6 +146,7 @@ public class MenuItemsPage extends BaseCRUDPage {
     @Override
     public boolean checkSearchResults(String query, Predicate<Double> comparator, String categoryName) {
 //        waitForElementToBeRefreshedAndVisible(driver, menuItemTableRows);
+        waitForSpinnerToFinish();
         var names = (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(menuItemTableNames)));
         var descriptions = (new WebDriverWait(driver, 10))
@@ -151,6 +165,7 @@ public class MenuItemsPage extends BaseCRUDPage {
     }
 
     public boolean checkPriceBound(Predicate<Double> comparator) {
+        waitForSpinnerToFinish();
         waitForElementToBeRefreshedAndVisible(driver, menuItemTableRows);
         var prices = (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(menuItemPrices)));
@@ -159,6 +174,7 @@ public class MenuItemsPage extends BaseCRUDPage {
 
 
     public void selectCategoryOption(String categoryName) {
+        waitForSpinnerToFinish();
         click(menuItemCategorySearchField);
         var searchOptions = (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(menuItemCategorySearchOptions)));
@@ -172,6 +188,7 @@ public class MenuItemsPage extends BaseCRUDPage {
     }
 
     public boolean checkCategory(String categoryName) {
+        waitForSpinnerToFinish();
         var categories = (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(menuItemTableCategories)));
         return categories.stream().parallel().map(WebElement::getText)
