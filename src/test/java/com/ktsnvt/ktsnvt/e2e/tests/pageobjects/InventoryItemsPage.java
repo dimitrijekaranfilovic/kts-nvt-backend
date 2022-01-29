@@ -148,7 +148,7 @@ public class InventoryItemsPage extends BaseCRUDPage {
         return getLastTableRowField(5);
     }
 
-    public void clickDeleteLastInventoryItem(String itemName) {
+    public void clickDeleteInventoryItemByName(String itemName) {
         waitForSpinnerToFinish();
         do {
             var row = findItemWithNameOnCurrentPage(itemName);

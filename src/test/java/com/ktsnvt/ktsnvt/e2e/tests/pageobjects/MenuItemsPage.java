@@ -1,5 +1,6 @@
 package com.ktsnvt.ktsnvt.e2e.tests.pageobjects;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -88,11 +89,12 @@ public class MenuItemsPage extends BaseCRUDPage {
         return Double.parseDouble(priceField) == enteredPrice;
     }
 
-    public void setUpdatePriceField(Double updatePrice) {
+    public double setUpdatePriceField(Double updatePrice) {
         var priceField = (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.visibilityOf(updateMenuItemPriceField));
         sendKeys(priceField,
                 updatePrice.toString());
+        return updatePrice;
     }
 
     public void clickUpdateLastMenuItemPriceButton() {
@@ -157,5 +159,74 @@ public class MenuItemsPage extends BaseCRUDPage {
                 .until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElements(menuItemTableCategories)));
         return categories.stream().parallel().map(WebElement::getText)
                 .allMatch(p -> p.toLowerCase(Locale.ROOT).contains(categoryName.toLowerCase(Locale.ROOT)));
+    }
+
+    public void clickUpdateMenuItem(String createdName) {
+        waitForSpinnerToFinish();
+        do {
+            var row = findItemWithNameOnCurrentPage(createdName);
+            if (row != null) {
+                performRowAction(row, 0);
+                break;
+            }
+        } while (goToNextPageIfPossible());
+    }
+
+    private WebElement findItemWithNameOnCurrentPage(String itemName) {
+        waitForSpinnerToFinish();
+        var rows = waitForElementsToBeRefreshedAndVisible(driver, menuItemTableRows);
+        for (var row :
+                rows) {
+            var name = row.findElement(By.cssSelector("[element-group='menuItemName']"));
+            var rowName = name.getText();
+            if (itemName.equals(rowName)) {
+                return row;
+            }
+        }
+        return null;
+    }
+
+    public void clickDeleteMenuItemByName(String itemName) {
+        waitForSpinnerToFinish();
+        do {
+            var row = findItemWithNameOnCurrentPage(itemName);
+            if (row != null) {
+                performRowAction(row, 1);
+                break;
+            }
+        } while (goToNextPageIfPossible());
+    }
+
+
+    public boolean checkMenuItemFields(String itemName, String itemDescription, Double price, String itemAllergy) {
+        waitForSpinnerToFinish();
+        do {
+            var row = findItemWithNameOnCurrentPage(itemName);
+            if (row != null) {
+                return checkMenuItemFields(row, itemName, itemDescription, price, itemAllergy);
+            }
+        } while (goToNextPageIfPossible());
+        return false;
+    }
+
+    private boolean checkMenuItemFields(WebElement inventoryItem, String itemName, String itemDescription,
+                                        Double price, String itemAllergy) {
+        waitForSpinnerToFinish();
+        if (inventoryItem == null) {
+            return false;
+        }
+        var currentName = inventoryItem
+                .findElement(By.cssSelector("[element-group='menuItemName']")).getText();
+        var currentDescription = inventoryItem
+                .findElement(By.cssSelector("[element-group='menuItemDescription']")).getText();
+        var currentPrice = inventoryItem
+                .findElement(By.cssSelector("[element-group='menuItemPrice']")).getText();
+        var currentAllergy = inventoryItem
+                .findElement(By.cssSelector("[element-group='menuItemAllergies']")).getText();
+        return currentName.equals(itemName)
+                && currentDescription.equals(itemDescription)
+                && Double.parseDouble(currentPrice) == price
+                && currentAllergy.equals(itemAllergy);
+
     }
 }

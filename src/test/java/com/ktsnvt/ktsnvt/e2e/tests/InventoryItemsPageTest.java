@@ -55,7 +55,6 @@ class InventoryItemsPageTest extends BaseE2ETest {
         inventoryItemsPage.clickCreateInventoryItem();
         var proposedCreateName = inventoryItemsPage
                 .findUniqueInventoryItemName("Ice cream");
-        System.out.println(proposedCreateName);
         var createdName = inventoryItemsPage.setUpdateNameField(proposedCreateName);
         inventoryItemsPage.setUpdateDescriptionFieldField("New description");
         inventoryItemsPage.setUpdateBasePriceField(42d);
@@ -83,7 +82,7 @@ class InventoryItemsPageTest extends BaseE2ETest {
                 496d, "Updated allergy", "true"));
 
         var numOfItemsAndPagesBeforeDeletion = inventoryItemsPage.getPaginationInformation();
-        inventoryItemsPage.clickDeleteLastInventoryItem(updatedName);
+        inventoryItemsPage.clickDeleteInventoryItemByName(updatedName);
         inventoryItemsPage.clickConfirmDeletion();
         assertFalse(inventoryItemsPage.checkItemFields(updatedName, "Updated description",
                 496d, "Updated allergy", "true"));
