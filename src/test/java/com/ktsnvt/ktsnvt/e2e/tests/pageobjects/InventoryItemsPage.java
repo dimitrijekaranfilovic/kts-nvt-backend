@@ -126,8 +126,15 @@ public class InventoryItemsPage extends BaseCRUDPage {
         performLastTableRowAction(0);
     }
 
-    public void clickAddToMenu() {
-        performLastTableRowAction(1);
+    public void clickAddToMenu(String itemName) {
+        waitForSpinnerToFinish();
+        do {
+            var row = findItemWithNameOnCurrentPage(itemName);
+            if (row != null) {
+                performRowAction(row, 1);
+                break;
+            }
+        } while (goToNextPageIfPossible());
     }
 
     public void setNewMenuItemPrice(Double newMenuItemPrice) {
@@ -262,6 +269,7 @@ public class InventoryItemsPage extends BaseCRUDPage {
             var row = findItemWithNameOnCurrentPage(createdName);
             if (row != null) {
                 performRowAction(row, 0);
+                break;
             }
         } while (goToNextPageIfPossible());
     }

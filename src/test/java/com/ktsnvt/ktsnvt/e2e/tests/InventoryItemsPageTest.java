@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.openqa.selenium.support.PageFactory;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -58,24 +57,24 @@ class InventoryItemsPageTest extends BaseE2ETest {
         inventoryItemsPage.setUpdateBasePriceField(42d);
         inventoryItemsPage.setUpdateAllergiesField("New allergy");
         inventoryItemsPage.clickSubmitInventoryItemUpdate();
-        assertTrue(inventoryItemsPage.checkItemFields("New item that doesn't exist",
+        assertTrue(inventoryItemsPage.checkItemFields(createdName,
                 "New description", 42d, "New allergy", "false"));
 
 
         inventoryItemsPage.clickUpdateInventoryItem(createdName);
-        inventoryItemsPage.setUpdateNameField("Updated name that doesnt exist");
+        var updatedName = inventoryItemsPage.setUpdateNameField("Updated name that doesnt exist");
         inventoryItemsPage.setUpdateDescriptionFieldField("Updated description");
         inventoryItemsPage.setUpdateBasePriceField(496d);
         inventoryItemsPage.setUpdateAllergiesField("Updated allergy");
         inventoryItemsPage.clickSubmitInventoryItemUpdate();
-        assertTrue(inventoryItemsPage.checkItemFields("Updated name that doesnt exist", "Updated description",
+        assertTrue(inventoryItemsPage.checkItemFields(updatedName, "Updated description",
                 496d, "Updated allergy", "false"));
 
-        inventoryItemsPage.clickAddToMenu();
+        inventoryItemsPage.clickAddToMenu(updatedName);
         inventoryItemsPage.setNewMenuItemPrice(42d);
         inventoryItemsPage.clickAddMenuItemButton();
-        Thread.sleep(1000);
-        assertEquals("true", inventoryItemsPage.getLastInventoryItemInMenu());
+        assertTrue(inventoryItemsPage.checkItemFields(updatedName, "Updated description",
+                496d, "Updated allergy", "true"));
 
         inventoryItemsPage.clickDeleteLastInventoryItem();
         inventoryItemsPage.clickConfirmDeletion();
