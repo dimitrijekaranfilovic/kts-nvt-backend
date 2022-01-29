@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class InventoryItemsPageTest extends BaseE2ETest {
 
     @Test
-    void inventoryItems_happyFlow(){
+    void inventoryItems_happyFlow() {
         var driver = initDriver();
         var navbar = PageFactory.initElements(driver, Navbar.class);
         var loginPage = PageFactory.initElements(driver, LoginPage.class);

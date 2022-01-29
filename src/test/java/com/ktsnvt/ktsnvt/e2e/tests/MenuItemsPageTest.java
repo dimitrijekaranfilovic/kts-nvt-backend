@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class MenuItemsPageTest extends BaseE2ETest {
 
     @Test
-    void menuItemsHappyFlow() throws InterruptedException {
+    void menuItemsHappyFlow() {
         var driver = initDriver();
         var navbar = PageFactory.initElements(driver, Navbar.class);
         var loginPage = PageFactory.initElements(driver, LoginPage.class);
