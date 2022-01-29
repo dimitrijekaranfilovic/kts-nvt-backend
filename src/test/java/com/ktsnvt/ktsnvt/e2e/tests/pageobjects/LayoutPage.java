@@ -54,8 +54,6 @@ public class LayoutPage extends BasePage {
     public void clickOnTable(Integer tableX, Integer tableY) throws InterruptedException {
         List<WebElement> elements = new WebDriverWait(driver, 10).until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("canvas"))));
 
-        Thread.sleep(200); // wait for animation to finish
-
         try {
             Point location = elements.get(0).getLocation();
             int x = location.getX();
@@ -77,7 +75,6 @@ public class LayoutPage extends BasePage {
 
     public void dragTable(int x, int y, int newX, int newY) throws InterruptedException {
         List<WebElement> elements = new WebDriverWait(driver, 10).until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("canvas"))));
-        Thread.sleep(200); // wait for animation to finish
         int canvasX, canvasY;
         try {
             Point location = elements.get(0).getLocation();
